@@ -107,12 +107,24 @@ function statusBanner(card, status) {
   return s + '\n:::\n'
 }
 
+/** 文献资料性质 → 知识七层分层（决策-0002）映射，用于文献页 L1-L4 标记 */
+const LEVEL_MAP = {
+  '原始文献': 'L1',
+  '历代注释': 'L2',
+  '近现代传承文献': 'L3',
+  '现代学术研究': 'L4'
+}
+
 /** 详情页元信息表 */
 function metaTable(card) {
   const y = card.yaml
   const rows = META_FIELDS[card.slug]
     .map(([key, label]) => (y[key] ? `| ${label} | ${String(y[key]).replace(/\n/g, ' ') } |` : null))
     .filter(Boolean)
+  if (card.slug === 'library' && y['资料性质']) {
+    const level = LEVEL_MAP[y['资料性质']] || '其他'
+    rows.unshift(`| 知识层级 | ${level}（${y['资料性质']}） |`)
+  }
   return '| 字段 | 内容 |\n| ---- | ---- |\n' + rows.join('\n')
 }
 
