@@ -10,7 +10,8 @@
     "dev": "node scripts/生成网站页面.mjs && vitepress dev docs",
     "build": "node scripts/生成网站页面.mjs && vitepress build docs",
     "preview": "vitepress preview docs",
-    "generate": "node scripts/生成网站页面.mjs"
+    "generate": "node scripts/生成网站页面.mjs",
+    "test": "node scripts/test-publish-status.mjs"
   },
   "dependencies": {
     "vitepress": "^1.6.4"

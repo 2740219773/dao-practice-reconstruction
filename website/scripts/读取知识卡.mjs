@@ -54,3 +54,22 @@ export async function readAllCards() {
 function fileNameToSlug(file) {
   return file.replace(/\\/g, '/').split('/').pop().replace(/\.md$/, '')
 }
+
+/**
+ * 按「## N. 标题」切分知识卡正文，返回 [{num, title, lines}]
+ * 先统一行尾（CRLF→LF）：JS 正则 `.` 不匹配 \r，CRLF 卡会失配导致章节静默丢失
+ */
+export function splitChapters(body) {
+  const chapters = []
+  let current = null
+  for (const line of body.replace(/\r\n/g, '\n').split('\n')) {
+    const m = line.match(/^## (\d+)\.\s+(.+)$/)
+    if (m) {
+      current = { num: Number(m[1]), title: m[2], lines: [] }
+      chapters.push(current)
+    } else if (current) {
+      current.lines.push(line)
+    }
+  }
+  return chapters
+}

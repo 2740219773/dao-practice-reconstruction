@@ -12,8 +12,8 @@
  */
 import { mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
-import { readAllCards, REPO_ROOT } from './读取知识卡.mjs'
-import { validateAllCards, PUBLISHABLE } from './校验公开字段.mjs'
+import { readAllCards, REPO_ROOT, splitChapters } from './读取知识卡.mjs'
+import { validateAllCards, PUBLISHABLE, ALLOWLISTS } from './校验公开字段.mjs'
 
 /** 输出目录：website/docs/{slug} */
 const DOCS_DIR = path.join(REPO_ROOT, 'website', 'docs')
@@ -27,27 +27,10 @@ const LIBRARY_GROUPS = [
 ]
 
 /**
- * 各类型详情页章节白名单（只输出白名单内章节，防止内部审计内容外泄）：
+ * 各类型详情页章节白名单定义在 校验公开字段.mjs（ALLOWLISTS）：
  *  - include：正常输出；collapse：折叠输出（<details>）
- * 知识卡章节号 → 站点章节标题（用户审查意见确定的三类样板页结构）
+ * 可公开卡缺失 include 章节会由校验阶段终止构建
  */
-const ALLOWLISTS = {
-  library: {
-    label: '文献页',
-    include: { 2: '文献简介', 3: '成书与作者', 4: '使用版本', 7: '研究范围', 9: '关键原文索引', 12: '不能直接得出的结论', 13: '未解决问题' },
-    collapse: { 15: '修改记录' }
-  },
-  originals: {
-    label: '原文页',
-    include: { 1: '原文出处', 2: '原文', 4: '逐词说明', 6: '直译', 8: '历代注释', 9: '可能解释', 10: '待检索现代方向', 11: '不能直接推出的结论', 12: '关联概念', 13: '关联原文' },
-    collapse: {}
-  },
-  concepts: {
-    label: '概念页',
-    include: { 1: '概念说明', 4: '不同文献中的含义', 5: '不同时期的变化', 7: '当前暂定分类', 12: '常见误解', 16: '能确认与不能确认', 18: '关联', 13: '开放争议' },
-    collapse: {}
-  }
-}
 
 /** 各类型详情页状态区字段（键 → 显示名，YAML 中存在才显示） */
 const META_FIELDS = {
@@ -56,37 +39,24 @@ const META_FIELDS = {
     ['大致年代', '大致年代'], ['文献类型', '文献类型'], ['资料性质', '资料性质'],
     ['使用版本', '使用版本'], ['文献可靠等级', '文献可靠等级'],
     ['最低解释层级', '最低解释层级'], ['最高推论层级', '最高推论层级'],
-    ['反证状态', '反证状态'], ['风险等级', '风险等级']
+    ['反证状态', '反证状态'], ['风险等级', '风险等级'],
+    ['最后修改日期', '最后修改日期'], ['最后修改人员', '最后修改人员']
   ],
   originals: [
     ['编号', '编号'], ['所属文献', '所属文献'], ['章节', '章节'], ['卷次', '卷次'],
     ['使用版本', '使用版本'], ['页码状态', '页码状态'], ['引文核对状态', '引文核对状态'],
     ['文献可靠等级', '文献可靠等级'], ['最高推论层级', '最高推论层级'],
-    ['反证状态', '反证状态'], ['风险等级', '风险等级']
+    ['反证状态', '反证状态'], ['风险等级', '风险等级'],
+    ['最后修改日期', '最后修改日期'], ['最后修改人员', '最后修改人员']
   ],
   concepts: [
     ['编号', '编号'], ['概念类别', '概念类别'], ['主要时期', '主要时期'],
     ['涉及传统', '涉及传统'], ['涉及流派', '涉及流派'], ['当前定义状态', '当前定义状态'],
     ['文献可靠等级', '文献可靠等级'], ['最高推论层级', '最高推论层级'],
     ['现代证据等级', '现代证据等级'], ['对应强度', '对应强度'],
-    ['反证状态', '反证状态'], ['风险等级', '风险等级']
+    ['反证状态', '反证状态'], ['风险等级', '风险等级'],
+    ['最后修改日期', '最后修改日期'], ['最后修改人员', '最后修改人员']
   ]
-}
-
-/** 按「## N. 标题」切分知识卡正文（先统一行尾：JS 正则 . 不匹配 \r，CRLF 卡会失配） */
-function splitChapters(body) {
-  const chapters = []
-  let current = null
-  for (const line of body.replace(/\r\n/g, '\n').split('\n')) {
-    const m = line.match(/^## (\d+)\.\s+(.+)$/)
-    if (m) {
-      current = { num: Number(m[1]), title: m[2], lines: [] }
-      chapters.push(current)
-    } else if (current) {
-      current.lines.push(line)
-    }
-  }
-  return chapters
 }
 
 /** 详情页顶部状态警示条 */
@@ -115,11 +85,20 @@ const LEVEL_MAP = {
   '现代学术研究': 'L4'
 }
 
+/** 值 → 展示文本：js-yaml 会把 2026-08-01 解析为 Date，需格式化为 YYYY-MM-DD */
+function displayValue(v) {
+  if (v instanceof Date) {
+    const p = (n) => String(n).padStart(2, '0')
+    return `${v.getFullYear()}-${p(v.getMonth() + 1)}-${p(v.getDate())}`
+  }
+  return String(v).replace(/\n/g, ' ')
+}
+
 /** 详情页元信息表 */
 function metaTable(card) {
   const y = card.yaml
   const rows = META_FIELDS[card.slug]
-    .map(([key, label]) => (y[key] ? `| ${label} | ${String(y[key]).replace(/\n/g, ' ') } |` : null))
+    .map(([key, label]) => (y[key] ? `| ${label} | ${displayValue(y[key])} |` : null))
     .filter(Boolean)
   if (card.slug === 'library' && y['资料性质']) {
     const level = LEVEL_MAP[y['资料性质']] || '其他'
@@ -177,6 +156,8 @@ function renderDetail(card, status) {
   const parts = []
   parts.push('---')
   parts.push(`title: ${y['标题'] || card.slugOf}`)
+  // 生成页不在 Git 中，VitePress 的 lastUpdated 无意义；更新时间以知识卡 YAML「最后修改日期/人员」为准（见元信息表）
+  parts.push('lastUpdated: false')
   parts.push('---')
   parts.push(`<!-- 本页由 website/scripts/生成网站页面.mjs 自动生成，请勿手工修改；源文件：${card.relPath} -->`)
   parts.push('')
@@ -209,6 +190,8 @@ function renderIndex(slug, cards) {
   const parts = []
   parts.push('---')
   parts.push(`title: ${title}`)
+  // 索引页为构建时生成物，不在 Git 中，关闭 VitePress 的 lastUpdated
+  parts.push('lastUpdated: false')
   parts.push('---')
   parts.push(`# ${title}`)
   parts.push('')
