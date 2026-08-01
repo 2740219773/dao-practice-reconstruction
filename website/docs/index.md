@@ -14,7 +14,7 @@ hero:
       link: /library/
     - theme: alt
       text: 研究方法
-      link: /method
+      link: /project/method/
 
 features:
   - title: 知识整理为主线

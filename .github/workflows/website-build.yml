@@ -1,0 +1,35 @@
+name: website-build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: website
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: website/.node-version
+          cache: npm
+          cache-dependency-path: website/package-lock.json
+      - name: 安装依赖
+        run: npm ci
+      - name: 构建网站
+        run: npm run build
+      - name: 验证构建产物
+        run: |
+          test -f docs/.vitepress/dist/index.html
+          test -f docs/.vitepress/dist/project/index.html
+          test -f docs/.vitepress/dist/safety/index.html
+      - name: 上传构建产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: wendaozhi-dist
+          path: website/docs/.vitepress/dist
+          retention-days: 14
