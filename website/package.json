@@ -7,11 +7,17 @@
     "node": ">=22"
   },
   "scripts": {
-    "dev": "vitepress dev docs",
-    "build": "vitepress build docs",
-    "preview": "vitepress preview docs"
+    "dev": "node scripts/生成网站页面.mjs && vitepress dev docs",
+    "build": "node scripts/生成网站页面.mjs && vitepress build docs",
+    "preview": "vitepress preview docs",
+    "generate": "node scripts/生成网站页面.mjs"
   },
   "dependencies": {
     "vitepress": "^1.6.4"
+  },
+  "devDependencies": {
+    "fast-glob": "^3.3.3",
+    "gray-matter": "^4.0.3",
+    "zod": "^4.4.3"
   }
 }

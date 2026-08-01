@@ -11,7 +11,9 @@ export default defineConfig({
   cleanUrls: true,
   lastUpdated: true,
   head: [
-    ['link', { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' }]
+    ['link', { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' }],
+    // 正式公开前阻止搜索引擎收录（网站建设计划 V0.1 六.小项）；正式上线时移除本行并补充 sitemap
+    ['meta', { name: 'robots', content: 'noindex,nofollow' }]
   ],
   themeConfig: {
     search: {
@@ -29,13 +31,30 @@ export default defineConfig({
     },
     nav: [
       { text: '首页', link: '/' },
-      { text: '项目说明', link: '/project/' },
-      { text: '研究方法', link: '/project/method/' },
-      { text: '文献库', link: '/library/' },
-      { text: '原文库', link: '/originals/' },
-      { text: '概念库', link: '/concepts/' },
-      { text: '争议与开放问题', link: '/disputes/' },
-      { text: '当代传播观察', link: '/contemporary/' },
+      {
+        text: '项目',
+        items: [
+          { text: '项目说明', link: '/project/' },
+          { text: '研究方法', link: '/project/method/' },
+          { text: '当前进度', link: '/project/progress/' }
+        ]
+      },
+      {
+        text: '知识库',
+        items: [
+          { text: '文献库', link: '/library/' },
+          { text: '原文库', link: '/originals/' },
+          { text: '概念库', link: '/concepts/' }
+        ]
+      },
+      {
+        text: '研究议题',
+        items: [
+          { text: '"静"专题', link: '/topics/' },
+          { text: '争议与开放问题', link: '/disputes/' },
+          { text: '当代传播观察', link: '/contemporary/' }
+        ]
+      },
       { text: '安全边界', link: '/safety/' }
     ],
     sidebar: [

@@ -1,3 +1,8 @@
 node_modules/
 docs/.vitepress/cache/
 docs/.vitepress/dist/
+# 知识卡自动生成页（构建产物）：由 scripts/生成网站页面.mjs 生成，
+# 知识卡原件是源头（02-文献卡/03-原文卡/04-概念卡），生成物不入库
+docs/library/
+docs/originals/
+docs/concepts/
