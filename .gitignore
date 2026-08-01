@@ -1,5 +1,4 @@
 
 # 私有内容与本地工具配置，不提交
 private/
-.obsidian/workspace*
-.obsidian/cache
+.obsidian/
