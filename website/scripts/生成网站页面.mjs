@@ -73,11 +73,11 @@ const META_FIELDS = {
   ]
 }
 
-/** 按「## N. 标题」切分知识卡正文 */
+/** 按「## N. 标题」切分知识卡正文（先统一行尾：JS 正则 . 不匹配 \r，CRLF 卡会失配） */
 function splitChapters(body) {
   const chapters = []
   let current = null
-  for (const line of body.split('\n')) {
+  for (const line of body.replace(/\r\n/g, '\n').split('\n')) {
     const m = line.match(/^## (\d+)\.\s+(.+)$/)
     if (m) {
       current = { num: Number(m[1]), title: m[2], lines: [] }
@@ -128,18 +128,47 @@ function metaTable(card) {
   return '| 字段 | 内容 |\n| ---- | ---- |\n' + rows.join('\n')
 }
 
-/** 详情页正文章节（白名单过滤 + 修改记录折叠） */
+/** 章节号 → 区块容器名（未列出的章节普通输出；容器语法见 config.ts markdownConfig） */
+const CHAPTER_BLOCKS = {
+  library: { 12: 'conclusion' },
+  originals: { 2: 'original', 8: 'annotation', 11: 'conclusion' },
+  concepts: {}
+}
+
+/** 详情页正文章节（白名单过滤 + 修改记录折叠 + 区块容器包裹） */
 function bodyChapters(card) {
   const allow = ALLOWLISTS[card.slug]
+  const blocks = CHAPTER_BLOCKS[card.slug] || {}
   const out = []
   for (const ch of splitChapters(card.body)) {
+    const content = ch.lines.join('\n').trim()
     if (allow.include[ch.num]) {
-      out.push(`## ${allow.include[ch.num]}\n\n${ch.lines.join('\n').trim()}`)
+      const block = blocks[ch.num]
+      if (block) {
+        out.push(`::: ${block} ${allow.include[ch.num]}\n\n${content}\n\n:::`)
+      } else {
+        out.push(`## ${allow.include[ch.num]}\n\n${content}`)
+      }
     } else if (allow.collapse[ch.num]) {
-      out.push(`<details>\n<summary>${allow.collapse[ch.num]}（折叠）</summary>\n\n${ch.lines.join('\n').trim()}\n\n</details>`)
+      out.push(`<details>\n<summary>${allow.collapse[ch.num]}（折叠）</summary>\n\n${content}\n\n</details>`)
     }
   }
   return out.join('\n\n---\n\n')
+}
+
+/** 徽章行：网站状态 / 知识层级 / 审核状态 / 证据等级 / 风险等级 */
+function tagRow(card, status) {
+  const y = card.yaml
+  const tags = []
+  const cls = status === '正式公开' ? 'tag-publish-public' : status === '可公开草稿' ? 'tag-publish-draft' : 'tag-publish-other'
+  tags.push(`<span class="tag ${cls}">${status}</span>`)
+  if (card.slug === 'library' && y['资料性质']) {
+    tags.push(`<span class="tag tag-level">${LEVEL_MAP[y['资料性质']] || '其他'} ${y['资料性质']}</span>`)
+  }
+  if (y['当前状态']) tags.push(`<span class="tag tag-status">审核：${y['当前状态']}</span>`)
+  if (y['文献可靠等级']) tags.push(`<span class="tag tag-evidence">证据：${y['文献可靠等级']}</span>`)
+  if (y['风险等级']) tags.push(`<span class="tag tag-risk">风险：${y['风险等级']}</span>`)
+  return `<p class="tag-row">${tags.join(' ')}</p>`
 }
 
 /** 生成单张详情页 */
@@ -154,6 +183,7 @@ function renderDetail(card, status) {
   parts.push(`# ${y['标题'] || card.slugOf}`)
   parts.push('')
   parts.push(statusBanner(card, status))
+  parts.push(tagRow(card, status))
   parts.push(metaTable(card))
   parts.push('')
   parts.push('## 公开摘要')
@@ -169,7 +199,7 @@ function renderDetail(card, status) {
     parts.push(body)
   }
   parts.push('')
-  parts.push(`> 来源：[${card.relPath}](https://github.com/2740219773/dao-practice-reconstruction/blob/main/${card.relPath.split('/').map(encodeURIComponent).join('/')})（项目仓库，持续修订中）`)
+  parts.push(`::: source 来源与修订\n\n本页内容源于项目仓库知识卡 [${card.relPath}](https://github.com/2740219773/dao-practice-reconstruction/blob/main/${card.relPath.split('/').map(encodeURIComponent).join('/')})，持续修订中；网站为展示层，仓库是源头。\n\n:::`)
   return parts.join('\n') + '\n'
 }
 

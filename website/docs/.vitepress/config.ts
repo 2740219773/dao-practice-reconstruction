@@ -1,4 +1,23 @@
 import { defineConfig } from 'vitepress'
+import container from 'markdown-it-container'
+
+/** 注册知识区块容器（对应 style.css 的 .block-*） */
+function blockContainer(md, name) {
+  md.use(container, name, {
+    render(tokens, idx) {
+      if (tokens[idx].nesting === 1) {
+        return `<div class="block block-${name}"><p class="block-title">${tokens[idx].info.trim().replace(/^${name}\s*/i, '') || ''}</p>`
+      }
+      return `</div>\n`
+    }
+  })
+}
+
+function markdownConfig(md) {
+  for (const n of ['original', 'annotation', 'tradition', 'project', 'hypothesis', 'conclusion', 'source']) {
+    blockContainer(md, n)
+  }
+}
 
 export default defineConfig({
   lang: 'zh-CN',
@@ -10,6 +29,9 @@ export default defineConfig({
   base: '/',
   cleanUrls: true,
   lastUpdated: true,
+  markdown: {
+    config: markdownConfig
+  },
   head: [
     ['link', { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' }],
     // 正式公开前阻止搜索引擎收录（网站建设计划 V0.1 六.小项）；正式上线时移除本行并补充 sitemap
