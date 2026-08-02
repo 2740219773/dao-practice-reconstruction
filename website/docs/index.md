@@ -216,16 +216,16 @@ features:
 
 ## 最近整理
 
-按最近提交的整理事件自动汇总（每项可点击查看对应提交）：
+按项目研究整理事件自动汇总（每项可点击查看对应提交）：
 
 <!-- GEN:BEGIN 最近整理 -->
 
-- **08-02**　[校准现代证据等级与风险字段表达](https://github.com/2740219773/dao-practice-reconstruction/commit/e6bc2e0)
-- **08-02**　[推理语气弱化并同步现代研究状态](https://github.com/2740219773/dao-practice-reconstruction/commit/1852837)
 - **08-02**　[建立第一批现代研究卡与风险资料卡](https://github.com/2740219773/dao-practice-reconstruction/commit/d88f7d6)
-- **08-02**　[同步仓库进度与网站展示状态](https://github.com/2740219773/dao-practice-reconstruction/commit/8bc4c10)
 - **08-02**　[建立第一批假说卡](https://github.com/2740219773/dao-practice-reconstruction/commit/f29c5db)
-- **08-02**　[YAML 标题引号改中文引号以保解析兼容](https://github.com/2740219773/dao-practice-reconstruction/commit/663e45d)
+- **08-02**　[建立第一批主张卡与争议卡](https://github.com/2740219773/dao-practice-reconstruction/commit/ac81cfe)
+- **08-02**　[建立虚心气息身概念卡](https://github.com/2740219773/dao-practice-reconstruction/commit/9abd4cd)
+- **08-02**　[建立坐忘论收心断缘泰定原文卡](https://github.com/2740219773/dao-practice-reconstruction/commit/9f27695)
+- **08-02**　[建立内业静心气第一批原文卡](https://github.com/2740219773/dao-practice-reconstruction/commit/fa277b3)
 
 <!-- GEN:END 最近整理 -->
 

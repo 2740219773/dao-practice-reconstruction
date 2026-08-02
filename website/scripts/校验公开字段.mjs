@@ -67,6 +67,24 @@ const cardFields = z.object({
 }).passthrough()
 
 /**
+ * 风险字段类型校验（映射表 V0.4 起风险字段拆分）：
+ * 现代研究卡／风险资料卡必须填写「卡片发布风险」「所含实践最高风险」，不得沿用旧「风险等级」。
+ * 其余卡类型（文献/原文/概念等）仍允许使用「风险等级」，由各自模板约定。
+ */
+const RISK_SPLIT_CARDS = ['research', 'risks']
+
+/** 校验现代研究卡/风险资料卡的风险字段，返回错误列表 */
+export function checkRiskFields(card) {
+  if (!RISK_SPLIT_CARDS.includes(card.slug)) return []
+  const y = card.yaml
+  const errors = []
+  if (!y['卡片发布风险']) errors.push('缺少「卡片发布风险」')
+  if (!y['所含实践最高风险']) errors.push('缺少「所含实践最高风险」')
+  if (y['风险等级']) errors.push('不得使用旧「风险等级」字段（映射表 V0.4 起拆分为「卡片发布风险」＋「所含实践最高风险」）')
+  return errors
+}
+
+/**
  * 校验单张卡，返回 { ok, status, errors: string[] }
  */
 export function validateCard(card) {
@@ -77,6 +95,8 @@ export function validateCard(card) {
       errors.push(`${issue.path.join('.') || '字段'}：${issue.message}`)
     }
   }
+  // 风险字段类型校验（映射表 V0.4：现代研究卡/风险资料卡必须用拆分后字段）
+  for (const e of checkRiskFields(card)) errors.push(e)
   const status = parsed.success ? parsed.data['网站发布状态'] : undefined
   if (parsed.success && status) {
     const summary = parsed.data['公开摘要']

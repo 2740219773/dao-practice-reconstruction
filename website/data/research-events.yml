@@ -1,0 +1,48 @@
+# research-events.yml —— 首页「最近整理」时间线数据源（手工登记）
+#
+# 用途：网站首页「最近整理」区块由此文件生成（website/scripts/生成网站页面.mjs 优先读取）。
+#      文件存在时不再依赖 git log，避免 Cloudflare Pages 浅克隆导致时间线缺失。
+#
+# 登记规则：
+#  - 只登记知识内容整理事件：docs(原文) / docs(文献) / docs(概念) / docs(主张·争议) /
+#    docs(假说) / docs(研究) / docs(审查) / docs(专题) 类提交；
+#  - 技术性提交（fix(项目) / fix(YAML) / test(网站) / chore 等）不登记；
+#  - 每次内容整理提交后，在列表最上方追加一条（保持时间倒序）。
+#
+# 字段：
+#  - date：MM-DD
+#  - hash：提交短哈希（生成 GitHub 链接）
+#  - title：展示标题（不写 type(scope) 前缀）
+- date: 08-02
+  hash: d88f7d6
+  title: 建立第一批现代研究卡与风险资料卡
+- date: 08-02
+  hash: f29c5db
+  title: 建立第一批假说卡
+- date: 08-02
+  hash: ac81cfe
+  title: 建立第一批主张卡与争议卡
+- date: 08-02
+  hash: 9abd4cd
+  title: 建立虚心气息身概念卡
+- date: 08-02
+  hash: 9f27695
+  title: 建立坐忘论收心断缘泰定原文卡
+- date: 08-02
+  hash: fa277b3
+  title: 建立内业静心气第一批原文卡
+- date: 08-02
+  hash: d460a0e
+  title: 建立庄子人间世心斋原文卡
+- date: 08-01
+  hash: fabcf96
+  title: 完成道德经第十六章底本与引文核对
+- date: 08-01
+  hash: 02dd136
+  title: 庄子大宗师「坐忘」原文卡（步骤 4 B 组）
+- date: 08-01
+  hash: 1637114
+  title: 道德经「静」专题四张原文卡与概念卡「静」（步骤 4）
+- date: 08-01
+  hash: f2088a2
+  title: 建立六张核心文献卡（步骤 3）

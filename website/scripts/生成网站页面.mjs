@@ -13,6 +13,7 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { execSync } from 'node:child_process'
 import path from 'node:path'
+import yaml from 'js-yaml'
 import { readAllCards, REPO_ROOT, splitChapters } from './读取知识卡.mjs'
 import { validateAllCards, PUBLISHABLE, ALLOWLISTS } from './校验公开字段.mjs'
 
@@ -276,26 +277,55 @@ function renderStatsSection(cards, publishable) {
   ].join('\n')
 }
 
-/** 首页「最近整理」区块：按最近提交的整理事件生成时间线（最多 6 条，每条链接到对应提交） */
-function renderRecentSection() {
-  if (!existsSync(path.join(REPO_ROOT, '.git'))) return '（仓库未初始化，暂无法读取整理事件）'
+/** 首页「最近整理」区块：研究事件时间线（最多 6 条，每条链接到对应提交）
+ *  数据源优先：website/data/research-events.yml（手工登记，防浅克隆丢历史）；
+ *  兜底：git log，仅保留内容整理类提交（docs(原文/文献/概念/主张/假说/研究/审查/专题)），
+ *  过滤 fix/test/chore 等技术性提交。 */
+const RECENT_EVENTS_FILE = path.join(REPO_ROOT, 'website', 'data', 'research-events.yml')
+/** 内容整理类提交前缀（白名单）；技术性提交（fix(项目)/fix(YAML)/test/chore 等）一律不展示 */
+const CONTENT_COMMIT_RE = /^docs\((原文|文献|概念|主张|假说|研究|审查|专题)/
+
+/** 读取手工登记的研究事件（research-events.yml），返回 {date, hash, title}[] 或 null */
+function readRecentEventsFile() {
+  try {
+    const raw = readFileSync(RECENT_EVENTS_FILE, 'utf8')
+    const data = yaml.load(raw)
+    if (!Array.isArray(data)) return null
+    return data.filter((e) => e && e.date && e.title).map((e) => ({ date: e.date, hash: String(e.hash || ''), title: String(e.title).trim() }))
+  } catch {
+    return null
+  }
+}
+
+/** git log 兜底：只保留内容整理类提交，取最近 6 条 */
+function readRecentEventsFromGit() {
+  if (!existsSync(path.join(REPO_ROOT, '.git'))) return []
   let out
   try {
     out = execSync(
-      "git log -n 6 --date=format:%m-%d --pretty=format:%h%x1f%ad%x1f%s",
+      "git log -n 50 --date=format:%m-%d --pretty=format:%h%x1f%ad%x1f%s",
       { cwd: REPO_ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }
     ).trim()
   } catch {
-    return '（无法读取提交历史，稍后自动恢复）'
+    return []
   }
-  if (!out) return '（暂无整理事件）'
+  return out.split('\n')
+    .map((line) => line.split('\x1f'))
+    .filter(([, , s]) => CONTENT_COMMIT_RE.test(String(s)))
+    .slice(0, 6)
+    .map(([hash, date, subject]) => ({ hash, date, title: String(subject).replace(/^docs\([^)]*\):\s*/, '') }))
+}
+
+function renderRecentSection() {
+  const fileEvents = readRecentEventsFile()
+  const events = (fileEvents && fileEvents.length > 0 ? fileEvents : readRecentEventsFromGit()).slice(0, 6)
+  if (events.length === 0) return '（暂无整理事件）'
   const repoUrl = 'https://github.com/2740219773/dao-practice-reconstruction'
-  return out.split('\n').map((line) => {
-    const [hash, date, subject] = line.split('\x1f')
-    // 事件名取提交信息去掉「type(scope): 」前缀，如「docs(研究): 建立…」→「建立…」
-    const name = String(subject).replace(/^[a-z]+\([^)]*\):\s*/, '')
-    return `- **${date}**　[${name}](${repoUrl}/commit/${hash})`
-  }).join('\n')
+  return events.map(({ date, hash, title }) =>
+    hash
+      ? `- **${date}**　[${title}](${repoUrl}/commit/${hash})`
+      : `- **${date}**　${title}`
+  ).join('\n')
 }
 
 /** 替换首页占位符区块（<!-- GEN:BEGIN X --> … <!-- GEN:END X -->）之间的内容 */
