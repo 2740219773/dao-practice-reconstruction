@@ -220,12 +220,12 @@ features:
 
 <!-- GEN:BEGIN 最近整理 -->
 
+- **08-02**　[校准现代证据等级与风险字段表达](https://github.com/2740219773/dao-practice-reconstruction/commit/e6bc2e0)
 - **08-02**　[推理语气弱化并同步现代研究状态](https://github.com/2740219773/dao-practice-reconstruction/commit/1852837)
 - **08-02**　[建立第一批现代研究卡与风险资料卡](https://github.com/2740219773/dao-practice-reconstruction/commit/d88f7d6)
 - **08-02**　[同步仓库进度与网站展示状态](https://github.com/2740219773/dao-practice-reconstruction/commit/8bc4c10)
 - **08-02**　[建立第一批假说卡](https://github.com/2740219773/dao-practice-reconstruction/commit/f29c5db)
 - **08-02**　[YAML 标题引号改中文引号以保解析兼容](https://github.com/2740219773/dao-practice-reconstruction/commit/663e45d)
-- **08-02**　[建立第一批主张卡与争议卡](https://github.com/2740219773/dao-practice-reconstruction/commit/ac81cfe)
 
 <!-- GEN:END 最近整理 -->
 
