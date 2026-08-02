@@ -220,12 +220,12 @@ features:
 
 <!-- GEN:BEGIN 最近整理 -->
 
+- **08-02**　[完成「静」专题第一轮反方审查](https://github.com/2740219773/dao-practice-reconstruction/commit/3ddd2ff)
 - **08-02**　[建立第一批反方现代研究卡（正念认知/心跳计数/思维抑制/慢呼吸/不良反应方法学）](https://github.com/2740219773/dao-practice-reconstruction/commit/867af06)
 - **08-02**　[建立第一批现代研究卡与风险资料卡](https://github.com/2740219773/dao-practice-reconstruction/commit/d88f7d6)
 - **08-02**　[建立第一批假说卡](https://github.com/2740219773/dao-practice-reconstruction/commit/f29c5db)
 - **08-02**　[建立第一批主张卡与争议卡](https://github.com/2740219773/dao-practice-reconstruction/commit/ac81cfe)
 - **08-02**　[建立虚心气息身概念卡](https://github.com/2740219773/dao-practice-reconstruction/commit/9abd4cd)
-- **08-02**　[建立坐忘论收心断缘泰定原文卡](https://github.com/2740219773/dao-practice-reconstruction/commit/9f27695)
 
 <!-- GEN:END 最近整理 -->
 

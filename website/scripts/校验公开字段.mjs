@@ -67,11 +67,13 @@ const cardFields = z.object({
 }).passthrough()
 
 /**
- * 风险字段类型校验（映射表 V0.4 起风险字段拆分）：
- * 现代研究卡／风险资料卡必须填写「卡片发布风险」「所含实践最高风险」，不得沿用旧「风险等级」。
+ * 风险字段类型校验（映射表 V0.4 起风险字段拆分，V0.6 起含取值枚举）：
+ * 现代研究卡／风险资料卡必须填写「卡片发布风险」「所含实践最高风险」，不得沿用旧「风险等级」；
+ * 两个字段的值必须属于 S0—S4（映射表 V0.6 分级定义），防止非法取值通过。
  * 其余卡类型（文献/原文/概念等）仍允许使用「风险等级」，由各自模板约定。
  */
 const RISK_SPLIT_CARDS = ['research', 'risks']
+const RISK_LEVELS = ['S0', 'S1', 'S2', 'S3', 'S4']
 
 /** 校验现代研究卡/风险资料卡的风险字段，返回错误列表 */
 export function checkRiskFields(card) {
@@ -81,6 +83,12 @@ export function checkRiskFields(card) {
   if (!y['卡片发布风险']) errors.push('缺少「卡片发布风险」')
   if (!y['所含实践最高风险']) errors.push('缺少「所含实践最高风险」')
   if (y['风险等级']) errors.push('不得使用旧「风险等级」字段（映射表 V0.4 起拆分为「卡片发布风险」＋「所含实践最高风险」）')
+  for (const field of ['卡片发布风险', '所含实践最高风险']) {
+    const v = y[field]
+    if (v && !RISK_LEVELS.includes(v)) {
+      errors.push(`「${field}」取值「${v}」非法，必须为 ${RISK_LEVELS.join('／')}（映射表 V0.6）`)
+    }
+  }
   return errors
 }
 
