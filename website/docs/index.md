@@ -206,8 +206,8 @@ layout: home
 <!-- 紧凑数字栏：对普通访问者只显示三个总数，详细分类折叠 -->
 <div class="wd-stat-compact">
 <div class="wd-stat-item"><div class="wd-stat-num">68</div><div class="wd-stat-label">知识卡总计</div></div>
-<div class="wd-stat-item"><div class="wd-stat-num">3</div><div class="wd-stat-label">已公开</div></div>
-<div class="wd-stat-item"><div class="wd-stat-num">65</div><div class="wd-stat-label">整理中（未公开）</div></div>
+<div class="wd-stat-item"><div class="wd-stat-num">5</div><div class="wd-stat-label">已公开</div></div>
+<div class="wd-stat-item"><div class="wd-stat-num">63</div><div class="wd-stat-label">整理中（未公开）</div></div>
 </div>
 
 <details class="wd-stat-detail">
@@ -260,7 +260,7 @@ layout: home
 
 ### 网站已公开内容
 
-发布状态为「可公开草稿／正式公开」：可公开草稿 3 张
+发布状态为「可公开草稿／正式公开」：可公开草稿 5 张
 
 <div class="wd-stat">
 <div class="wd-stat-item">
@@ -268,7 +268,7 @@ layout: home
 <div class="wd-stat-label">文献卡</div>
 </div>
 <div class="wd-stat-item">
-<div class="wd-stat-num">1</div>
+<div class="wd-stat-num">3</div>
 <div class="wd-stat-label">原文卡</div>
 </div>
 <div class="wd-stat-item">
@@ -276,7 +276,7 @@ layout: home
 <div class="wd-stat-label">概念卡</div>
 </div>
 <div class="wd-stat-item">
-<div class="wd-stat-num">3</div>
+<div class="wd-stat-num">5</div>
 <div class="wd-stat-label">公开页合计</div>
 </div>
 </div>
