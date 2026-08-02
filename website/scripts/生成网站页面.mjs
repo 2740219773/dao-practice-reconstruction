@@ -166,15 +166,25 @@ function tagRow(card, status) {
   return `<p class="tag-row">${tags.join(' ')}</p>`
 }
 
-/** 原文页题签页眉（WEB-001：书卷式版式） */
-function originalHeader(card) {
+/** 详情页书卷式题签页眉（WEB-001 原文页样板 → WEB-002 通用化：文献/概念页同体系） */
+function docHeader(card) {
   const y = card.yaml
   const row = (label, v) => (v ? `<span class="wd-oh-item"><b>${label}</b>${v}</span>` : '')
+  const fields = {
+    originals: ['所属文献', '章节', '卷次', '使用版本'],
+    library: ['其他名称', '传统署名', '大致年代', '文献类型', '资料性质', '使用版本'],
+    concepts: ['概念类别', '主要时期', '涉及传统', '当前定义状态']
+  }[card.slug] || []
+  const meta = fields.map((f) => row(f, y[f])).join('')
+  // 原文页保留页码/页码状态两字段（WEB-001 收尾约定）
+  const extra = card.slug === 'originals'
+    ? `${row('页码', y['页码'] || '待补录')}${row('页码状态', y['页码状态'] && y['页码状态'] !== '待补录' ? y['页码状态'] : '')}`
+    : ''
   return [
     '<div class="wd-original-header">',
-    `<div class="wd-oh-seal">${y['编号'] || '原文'}</div>`,
+    `<div class="wd-oh-seal">${y['编号'] || card.slug}</div>`,
     '<div class="wd-oh-main">',
-    `<div class="wd-oh-meta">${row('所属文献', y['所属文献'])}${row('章节', y['章节'])}${row('卷次', y['卷次'])}${row('使用版本', y['使用版本'])}${row('页码', y['页码'] || '待补录')}${row('页码状态', y['页码状态'] && y['页码状态'] !== '待补录' ? y['页码状态'] : '')}</div>`,
+    `<div class="wd-oh-meta">${meta}${extra}</div>`,
     '</div>',
     '</div>'
   ].join('\n')
@@ -191,24 +201,20 @@ function renderDetail(card, status) {
   parts.push('---')
   parts.push(`<!-- 本页由 website/scripts/生成网站页面.mjs 自动生成，请勿手工修改；源文件：${card.relPath} -->`)
   parts.push('')
-  if (card.slug === 'originals') {
-    parts.push('<div class="wd-original-title">')
-    parts.push(`<h1>${y['标题'] || card.slugOf}</h1>`)
-    parts.push('</div>')
-    parts.push('')
-    parts.push(originalHeader(card))
-    parts.push('')
-    parts.push(statusBanner(card, status))
-    parts.push(tagRow(card, status))
-  } else {
-    parts.push(`# ${y['标题'] || card.slugOf}`)
-    parts.push('')
-    parts.push(statusBanner(card, status))
-    parts.push(tagRow(card, status))
-  }
-  if (card.slug !== 'originals') {
-    parts.push(metaTable(card))
-  }
+  parts.push('<div class="wd-original-title">')
+  parts.push(`<h1>${y['标题'] || card.slugOf}</h1>`)
+  parts.push('</div>')
+  parts.push('')
+  parts.push(docHeader(card))
+  parts.push('')
+  parts.push(statusBanner(card, status))
+  parts.push(tagRow(card, status))
+  parts.push('<details class="wd-meta-detail">')
+  parts.push('<summary>查看完整元信息</summary>')
+  parts.push('')
+  parts.push(metaTable(card))
+  parts.push('')
+  parts.push('</details>')
   parts.push('')
   parts.push('## 公开摘要')
   parts.push('')

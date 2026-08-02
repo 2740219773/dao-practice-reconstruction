@@ -266,6 +266,23 @@ html {
   .wd-route-arrow { transform: rotate(90deg); padding: 0.1rem 0.4rem; }
 }
 
+/* —— 详情页完整元信息折叠（WEB-002） —— */
+.wd-meta-detail {
+  margin: 0.4rem 0 1.2rem;
+  border: 1px dashed var(--wd-line);
+  border-radius: 8px;
+  background: var(--wd-paper-3);
+  padding: 0.55rem 1rem;
+}
+.wd-meta-detail summary {
+  cursor: pointer;
+  font-size: 0.85em;
+  font-weight: 700;
+  color: var(--wd-ink-3);
+  padding: 0.15rem 0;
+}
+.wd-meta-detail summary:hover { color: var(--wd-vermilion-3); }
+
 /* —— 紧凑统计栏（WEB-001 收尾） —— */
 .wd-stat-compact {
   display: flex;
