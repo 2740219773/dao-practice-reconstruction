@@ -6,7 +6,9 @@ function blockContainer(md, name) {
   md.use(container, name, {
     render(tokens, idx) {
       if (tokens[idx].nesting === 1) {
-        return `<div class="block block-${name}"><p class="block-title">${tokens[idx].info.trim().replace(/^${name}\s*/i, '') || ''}</p>`
+        // 注意：模板字符串中 \s 会退化为 s，必须用 new RegExp 构造
+        const strip = new RegExp(`^${name}\\s*`, 'i')
+        return `<div class="block block-${name}"><p class="block-title">${tokens[idx].info.trim().replace(strip, '') || ''}</p>`
       }
       return `</div>\n`
     }

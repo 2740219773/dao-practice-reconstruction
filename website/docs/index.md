@@ -1,35 +1,74 @@
 ---
 layout: home
 
-hero:
-  name: 问道志
-  text: 传统道家修炼知识重构与研究计划
-  tagline: 道可道，非常道。把高度抽象、依赖师承解释和个人悟性的修炼知识，转化为有来源、有语境、有争议、可追溯、可修订的现代知识体系。
-  actions:
-    - theme: brand
-      text: 概念库
-      link: /concepts/
-    - theme: alt
-      text: 文献库
-      link: /library/
-    - theme: alt
-      text: 研究方法
-      link: /project/method/
-
-features:
-  - title: "「静」专题阅读路线"
-    details: 围绕第一阶段主线核心概念"静"的十站阅读路线：从《道德经》原文出发，经历代注释、概念梳理、开放争议，到安全边界。
-    link: /topics/
-  - title: 争议与开放问题
-    details: 每个争议至少并列两种解释，不提前合并。查看目前研究中的开放问题与待决争议。
-    link: /disputes/
-  - title: 当代传播观察
-    details: 对当代网络修炼传播材料的资料性整理：哪些说法有出处、哪些是整理者归纳，逐条标明待核事项。
-    link: /contemporary/
-  - title: 安全边界
-    details: 第一阶段只开放知识整理与不干预人体的内容；中高风险实践内容只建研究索引，不转化为公众操作教程。
-    link: /safety/
+# 首页不再使用 VitePress 默认 hero/features 渲染，
+# 由下方自定义品牌区（.wd-hero）与专题大卡（.wd-topic）呈现。
+# frontmatter 仅保留 layout: home 与元信息。
 ---
+
+<div class="wd-hero">
+
+<div class="wd-hero-side">
+
+<div class="wd-brand-seal" aria-hidden="true">问道志</div>
+
+</div>
+
+<div class="wd-hero-main">
+
+<div class="wd-hero-tagline">传统道家修炼知识重构与研究计划</div>
+
+<h1 class="wd-hero-title">问道志</h1>
+
+<p class="wd-hero-desc">把高度抽象、依赖师承解释和个人悟性的修炼知识，转化为<strong>有来源、有语境、有争议、可追溯、可修订</strong>的现代知识体系。</p>
+
+<div class="wd-hero-actions">
+
+<a class="wd-btn wd-btn-brand" href="/originals/原文-0001-道德经第十六章">进入「静」专题</a>
+<a class="wd-btn wd-btn-ink" href="/library/">浏览知识库</a>
+
+</div>
+
+<p class="wd-hero-note">「道可道，非常道。」—— 本项目不预设任何传统说法必然正确，也不把个人体验直接视为客观规律。</p>
+
+</div>
+
+</div>
+
+<div class="wd-section wd-topic">
+
+## 当前专题 · 静
+
+从「守静笃」到心斋与坐忘，再到后世静坐体系：本专题整理「静」在六部核心文献中的来源、解释与边界。
+
+<div class="wd-topic-body">
+
+<div class="wd-topic-intro">
+
+「静」是第一阶段主线的起点。围绕它展开的，是一整套关于文献来源、概念分层、开放争议与安全边界的整理方法——这也是整个问道志的工作方式。
+
+- [进入「静」专题阅读路线](/topics/)
+- [「静」概念卡（可公开草稿）](/concepts/)
+
+</div>
+
+<div class="wd-topic-route">
+
+**文献关系路线**
+
+道德经 → 庄子 → 管子·内业 → 坐忘论 → 近现代解释 → 当代传播
+
+<div class="wd-route-steps">
+
+<span>道德经</span><span>庄子</span><span>内业</span><span>坐忘论</span><span>近现代</span><span>当代传播</span>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
 
 <div class="wd-section">
 
@@ -39,7 +78,7 @@ features:
 
 <div class="wd-grid">
 
-<div class="wd-card">
+<div class="wd-card wd-card-hl">
 
 ### [静](/concepts/)
 
@@ -93,13 +132,33 @@ features:
 
 <div class="wd-section">
 
+## 研究路径
+
+资料不会自动变成知识。每一份材料都要经过以下步骤，才能进入知识库：
+
+<div class="wd-path">
+
+<div class="wd-path-item"><span class="wd-path-num">01</span><strong>发现资料</strong><small>文献、原文、当代传播材料</small></div>
+<div class="wd-path-item"><span class="wd-path-num">02</span><strong>核对原文</strong><small>底本、页码、异文逐字比对</small></div>
+<div class="wd-path-item"><span class="wd-path-num">03</span><strong>拆解概念</strong><small>文献原义与项目归纳分层</small></div>
+<div class="wd-path-item"><span class="wd-path-num">04</span><strong>记录争议</strong><small>至少保留两种解释</small></div>
+<div class="wd-path-item"><span class="wd-path-num">05</span><strong>对照现代研究</strong><small>解释与检验，不找科学包装</small></div>
+<div class="wd-path-item"><span class="wd-path-num">06</span><strong>风险审查</strong><small>安全边界与异常事件处理</small></div>
+<div class="wd-path-item"><span class="wd-path-num">07</span><strong>形成暂定结论</strong><small>可追溯、可修订</small></div>
+
+</div>
+
+</div>
+
+<div class="wd-section">
+
 ## 目前能确认与不能确认
 
 以「静」为例，展示本项目的结论边界——区分有原文直接支持的内容、项目归纳的内容与尚无充分依据的内容：
 
 <div class="wd-threecol">
 
-<div class="wd-card">
+<div class="wd-card wd-evidence wd-evidence-yes">
 
 **原文能够直接确认（有原文直接支持）**
 
@@ -108,7 +167,7 @@ features:
 
 </div>
 
-<div class="wd-card">
+<div class="wd-card wd-evidence wd-evidence-mid">
 
 **项目当前归纳（尚未逐段确认）**
 
@@ -116,7 +175,7 @@ features:
 
 </div>
 
-<div class="wd-card">
+<div class="wd-card wd-evidence wd-evidence-no">
 
 **尚无充分依据（不当作结论）**
 

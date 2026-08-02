@@ -165,6 +165,20 @@ function tagRow(card, status) {
   return `<p class="tag-row">${tags.join(' ')}</p>`
 }
 
+/** 原文页题签页眉（WEB-001：书卷式版式） */
+function originalHeader(card) {
+  const y = card.yaml
+  const row = (label, v) => (v ? `<span class="wd-oh-item"><b>${label}</b>${v}</span>` : '')
+  return [
+    '<div class="wd-original-header">',
+    `<div class="wd-oh-seal">${y['编号'] || '原文'}</div>`,
+    '<div class="wd-oh-main">',
+    `<div class="wd-oh-meta">${row('所属文献', y['所属文献'])}${row('章节', y['章节'])}${row('卷次', y['卷次'])}${row('使用版本', y['使用版本'])}${row('页码', y['页码状态'] === '已核对' ? '已核对' : '页码待补录')}</div>`,
+    '</div>',
+    '</div>'
+  ].join('\n')
+}
+
 /** 生成单张详情页 */
 function renderDetail(card, status) {
   const y = card.yaml
@@ -176,11 +190,24 @@ function renderDetail(card, status) {
   parts.push('---')
   parts.push(`<!-- 本页由 website/scripts/生成网站页面.mjs 自动生成，请勿手工修改；源文件：${card.relPath} -->`)
   parts.push('')
-  parts.push(`# ${y['标题'] || card.slugOf}`)
-  parts.push('')
-  parts.push(statusBanner(card, status))
-  parts.push(tagRow(card, status))
-  parts.push(metaTable(card))
+  if (card.slug === 'originals') {
+    parts.push('<div class="wd-original-title">')
+    parts.push(`<h1>${y['标题'] || card.slugOf}</h1>`)
+    parts.push('</div>')
+    parts.push('')
+    parts.push(originalHeader(card))
+    parts.push('')
+    parts.push(statusBanner(card, status))
+    parts.push(tagRow(card, status))
+  } else {
+    parts.push(`# ${y['标题'] || card.slugOf}`)
+    parts.push('')
+    parts.push(statusBanner(card, status))
+    parts.push(tagRow(card, status))
+  }
+  if (card.slug !== 'originals') {
+    parts.push(metaTable(card))
+  }
   parts.push('')
   parts.push('## 公开摘要')
   parts.push('')
