@@ -205,6 +205,14 @@ html {
 @media (max-width: 720px) {
   .wd-twocol { grid-template-columns: 1fr; }
 }
+.wd-threecol {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+}
+@media (max-width: 960px) {
+  .wd-threecol { grid-template-columns: 1fr; }
+}
 
 /* 表格窄屏横向滚动 */
 .vp-doc .table-wrapper {

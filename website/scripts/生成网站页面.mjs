@@ -10,7 +10,8 @@
  *  - 生成物（docs/library|originals|concepts/ 下由本脚本写出的文件）视为构建产物，
  *    已加入 .gitignore；知识卡原件与 Git 历史始终是源头。
  */
-import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { execSync } from 'node:child_process'
 import path from 'node:path'
 import { readAllCards, REPO_ROOT, splitChapters } from './读取知识卡.mjs'
 import { validateAllCards, PUBLISHABLE, ALLOWLISTS } from './校验公开字段.mjs'
@@ -275,33 +276,26 @@ function renderStatsSection(cards, publishable) {
   ].join('\n')
 }
 
-/** 首页「最近整理」区块：按最后修改日期倒序分组（最多 5 组），组内按类型分组、按编号排序 */
-function renderRecentSection(cards) {
-  const byDate = new Map()
-  for (const c of cards) {
-    const d = displayValue(c.yaml['最后修改日期'])
-    if (!byDate.has(d)) byDate.set(d, [])
-    byDate.get(d).push(c)
+/** 首页「最近整理」区块：按最近提交的整理事件生成时间线（最多 6 条，每条链接到对应提交） */
+function renderRecentSection() {
+  if (!existsSync(path.join(REPO_ROOT, '.git'))) return '（仓库未初始化，暂无法读取整理事件）'
+  let out
+  try {
+    out = execSync(
+      "git log -n 6 --date=format:%m-%d --pretty=format:%h%x1f%ad%x1f%s",
+      { cwd: REPO_ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }
+    ).trim()
+  } catch {
+    return '（无法读取提交历史，稍后自动恢复）'
   }
-  const clipTitle = (t) => (t && t.length > 16 ? t.slice(0, 16) + '…' : t || '（无标题）')
-  const dateLines = []
-  for (const d of [...byDate.keys()].sort((a, b) => (a < b ? 1 : -1)).slice(0, 5)) {
-    const byType = new Map()
-    for (const c of byDate.get(d)) {
-      if (!byType.has(c.slug)) byType.set(c.slug, [])
-      byType.get(c.slug).push(c)
-    }
-    const typeLines = []
-    for (const slug of STAT_ORDER) {
-      const list = byType.get(slug)
-      if (!list || list.length === 0) continue
-      list.sort((a, b) => String(a.yaml['编号']).localeCompare(String(b.yaml['编号']), 'zh'))
-      const shown = list.slice(0, 3).map((c) => `${c.yaml['编号']}《${clipTitle(c.yaml['标题'])}》`)
-      typeLines.push(`  - ${TYPE_LABELS[slug]} ${list.length} 张：${shown.join('、')}${list.length > 3 ? '、等' : ''}`)
-    }
-    dateLines.push(`- **${d}**（共 ${byDate.get(d).length} 张）：\n${typeLines.join('\n')}`)
-  }
-  return dateLines.join('\n')
+  if (!out) return '（暂无整理事件）'
+  const repoUrl = 'https://github.com/2740219773/dao-practice-reconstruction'
+  return out.split('\n').map((line) => {
+    const [hash, date, subject] = line.split('\x1f')
+    // 事件名取提交信息去掉「type(scope): 」前缀，如「docs(研究): 建立…」→「建立…」
+    const name = String(subject).replace(/^[a-z]+\([^)]*\):\s*/, '')
+    return `- **${date}**　[${name}](${repoUrl}/commit/${hash})`
+  }).join('\n')
 }
 
 /** 替换首页占位符区块（<!-- GEN:BEGIN X --> … <!-- GEN:END X -->）之间的内容 */
@@ -321,7 +315,7 @@ function updateHomeSections(cards, publishable) {
   const nl = raw.includes('\r\n') ? '\r\n' : '\n'
   let text = raw
   text = replaceSection(text, '内容统计', renderStatsSection(cards, publishable))
-  text = replaceSection(text, '最近整理', renderRecentSection(cards))
+  text = replaceSection(text, '最近整理', renderRecentSection())
   // 卡片数据未变化时输出保持稳定，避免无谓的 git 差异
   writeFileSync(indexFile, text.replace(/\r?\n/g, nl), 'utf8')
 }
