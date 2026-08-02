@@ -242,9 +242,14 @@ function renderIndex(slug, cards) {
   // 索引页为构建时生成物，不在 Git 中，关闭 VitePress 的 lastUpdated
   parts.push('lastUpdated: false')
   parts.push('---')
-  parts.push(`# ${title}`)
-  parts.push('')
-  parts.push('> 本站只展示经过选择并公开的内容（发布状态为「可公开草稿」或「正式公开」）。未审核、内部预览、已撤回或缺少发布字段的卡片不生成页面；知识卡原件与修订历史完整保留在[项目仓库](https://github.com/2740219773/dao-practice-reconstruction)。')
+  // 题签式标题区（WEB-003：与详情页书卷式体系一致）
+  parts.push('<div class="wd-index-header">')
+  parts.push(`<div class="wd-oh-seal">${title}</div>`)
+  parts.push('<div class="wd-index-header-main">')
+  parts.push(`<h1>${title}</h1>`)
+  parts.push('<p class="wd-index-note">本站只展示经过选择并公开的内容（发布状态为「可公开草稿」或「正式公开」）。未审核、内部预览、已撤回或缺少发布字段的卡片不生成页面；知识卡原件与修订历史完整保留在[项目仓库](https://github.com/2740219773/dao-practice-reconstruction)。</p>')
+  parts.push('</div>')
+  parts.push('</div>')
   parts.push('')
   if (slug === 'library') {
     const byGroup = new Map(LIBRARY_GROUPS.map((g) => [g.key, []]))
@@ -253,13 +258,13 @@ function renderIndex(slug, cards) {
     for (const g of LIBRARY_GROUPS) {
       const list = byGroup.get(g.key)
       if (!list || list.length === 0) continue
-      parts.push(`## ${g.label}`)
+      parts.push(`<h2 class="wd-index-group">${g.label}</h2>`)
       parts.push('')
       parts.push(rows(slug, list))
       parts.push('')
     }
     if (others.length) {
-      parts.push('## 其他')
+      parts.push('<h2 class="wd-index-group">其他</h2>')
       parts.push('')
       parts.push(rows(slug, others))
       parts.push('')
@@ -398,20 +403,24 @@ function updateHomeSections(cards, publishable) {
 
 /** 索引表格行 */
 function rows(slug, cards) {
-  const head = {
-    library: ['编号', '文献', '发布状态'],
-    originals: ['编号', '标题', '引文核对', '发布状态'],
-    concepts: ['编号', '概念', '发布状态']
-  }[slug]
   const line = (c) => {
     const y = c.yaml
-    const link = `[${y['标题'] || c.slugOf}](./${c.slugOf})`
-    if (slug === 'originals') {
-      return `| ${y['编号']} | ${link} | ${y['引文核对状态'] || '未知'} | ${y['网站发布状态']} |`
-    }
-    return `| ${y['编号']} | ${link} | ${y['网站发布状态']} |`
+    const cls = y['网站发布状态'] === '正式公开' ? 'tag-publish-public' : 'tag-publish-draft'
+    const status = y['网站发布状态'] || '未知'
+    const quote = slug === 'originals'
+      ? `\n<div class="wd-index-quote">引文：${y['引文核对状态'] || '未知'}</div>`
+      : ''
+    return [
+      '<div class="wd-index-item">',
+      `<div class="wd-index-seal">${y['编号'] || c.slugOf}</div>`,
+      '<div class="wd-index-main">',
+      `<a class="wd-index-title" href="./${c.slugOf}">${y['标题'] || c.slugOf}</a>${quote}`,
+      '</div>',
+      `<span class="tag ${cls}">${status}</span>`,
+      '</div>'
+    ].join('\n')
   }
-  return `| ${head.join(' | ')} |\n| ${head.map(() => '----').join(' | ')} |\n` + cards.map(line).join('\n')
+  return cards.map(line).join('\n')
 }
 
 async function main() {

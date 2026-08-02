@@ -489,6 +489,106 @@ html {
   }
 }
 
+/* ============ WEB-003 索引页（书卷式） ============ */
+.wd-index-header {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 1.2rem;
+  align-items: center;
+  border: 1px solid var(--wd-line);
+  border-radius: 10px;
+  background:
+    linear-gradient(180deg, rgba(138, 46, 46, 0.04), rgba(138, 46, 46, 0) 45%),
+    var(--wd-paper-3);
+  padding: 1.4rem 1.6rem;
+  margin: 0.4rem 0 1.8rem;
+}
+.wd-index-header .wd-oh-seal {
+  writing-mode: vertical-rl;
+  letter-spacing: 0.3em;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--wd-paper);
+  background: var(--wd-vermilion);
+  border-radius: 6px;
+  padding: 0.9rem 0.45rem;
+  text-align: center;
+  justify-self: center;
+  align-self: center;
+}
+.wd-index-header-main h1 {
+  margin: 0 0 0.5rem;
+  font-size: 1.9rem;
+  letter-spacing: 0.08em;
+}
+.wd-index-note {
+  margin: 0;
+  font-size: 0.9em;
+  color: var(--wd-ink-2);
+  line-height: 1.8;
+}
+.wd-index-group {
+  font-size: 1.05rem;
+  color: var(--wd-vermilion-3);
+  margin: 1.6rem 0 0.7rem;
+  padding-left: 0.6rem;
+  border-left: 4px solid var(--wd-vermilion);
+}
+.wd-index-item {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  border: 1px solid var(--wd-line);
+  border-radius: 8px;
+  background: var(--wd-paper-3);
+  padding: 0.7rem 1rem;
+  margin-bottom: 0.6rem;
+  transition: border-color 0.15s, transform 0.15s;
+}
+.wd-index-item:hover {
+  border-color: var(--wd-vermilion);
+  transform: translateY(-1px);
+}
+.wd-index-seal {
+  flex-shrink: 0;
+  min-width: 86px;
+  text-align: center;
+  font-size: 0.78em;
+  font-weight: 800;
+  color: var(--wd-vermilion-3);
+  background: var(--wd-vermilion-soft);
+  border: 1px solid rgba(138, 46, 46, 0.3);
+  border-radius: 5px;
+  padding: 0.35em 0.5em;
+  letter-spacing: 0.05em;
+}
+.wd-index-main {
+  flex: 1;
+  min-width: 0;
+}
+.wd-index-title {
+  font-weight: 700;
+  color: var(--wd-ink);
+  text-decoration: none;
+  font-size: 1.02em;
+}
+.wd-index-title:hover { color: var(--wd-vermilion); }
+.wd-index-quote {
+  margin-top: 0.25rem;
+  font-size: 0.78em;
+  color: var(--wd-ink-3);
+}
+.wd-index-item .tag { flex-shrink: 0; }
+@media (max-width: 640px) {
+  .wd-index-header {
+    grid-template-columns: 64px 1fr;
+    padding: 1rem;
+  }
+  .wd-index-header .wd-oh-seal { font-size: 0.9rem; letter-spacing: 0.2em; }
+  .wd-index-item { flex-wrap: wrap; }
+  .wd-index-item .tag { margin-left: auto; }
+}
+
 /* ============ WEB-001 移动端适配 ============ */
 @media (max-width: 960px) {
   .wd-hero {
