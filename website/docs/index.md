@@ -166,7 +166,7 @@ features:
 <div class="wd-stat-label">争议卡</div>
 </div>
 <div class="wd-stat-item">
-<div class="wd-stat-num">5</div>
+<div class="wd-stat-num">15</div>
 <div class="wd-stat-label">现代研究卡</div>
 </div>
 <div class="wd-stat-item">
@@ -220,12 +220,12 @@ features:
 
 <!-- GEN:BEGIN 最近整理 -->
 
+- **08-02**　[建立第一批反方现代研究卡（正念认知/心跳计数/思维抑制/慢呼吸/不良反应方法学）](https://github.com/2740219773/dao-practice-reconstruction/commit/867af06)
 - **08-02**　[建立第一批现代研究卡与风险资料卡](https://github.com/2740219773/dao-practice-reconstruction/commit/d88f7d6)
 - **08-02**　[建立第一批假说卡](https://github.com/2740219773/dao-practice-reconstruction/commit/f29c5db)
 - **08-02**　[建立第一批主张卡与争议卡](https://github.com/2740219773/dao-practice-reconstruction/commit/ac81cfe)
 - **08-02**　[建立虚心气息身概念卡](https://github.com/2740219773/dao-practice-reconstruction/commit/9abd4cd)
 - **08-02**　[建立坐忘论收心断缘泰定原文卡](https://github.com/2740219773/dao-practice-reconstruction/commit/9f27695)
-- **08-02**　[建立内业静心气第一批原文卡](https://github.com/2740219773/dao-practice-reconstruction/commit/fa277b3)
 
 <!-- GEN:END 最近整理 -->
 
