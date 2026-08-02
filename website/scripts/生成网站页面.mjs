@@ -173,7 +173,7 @@ function originalHeader(card) {
     '<div class="wd-original-header">',
     `<div class="wd-oh-seal">${y['编号'] || '原文'}</div>`,
     '<div class="wd-oh-main">',
-    `<div class="wd-oh-meta">${row('所属文献', y['所属文献'])}${row('章节', y['章节'])}${row('卷次', y['卷次'])}${row('使用版本', y['使用版本'])}${row('页码', y['页码状态'] === '已核对' ? '已核对' : '页码待补录')}</div>`,
+    `<div class="wd-oh-meta">${row('所属文献', y['所属文献'])}${row('章节', y['章节'])}${row('卷次', y['卷次'])}${row('使用版本', y['使用版本'])}${row('页码', y['页码'] || '待补录')}${row('页码状态', y['页码状态'] && y['页码状态'] !== '待补录' ? y['页码状态'] : '')}</div>`,
     '</div>',
     '</div>'
   ].join('\n')
@@ -288,10 +288,20 @@ function renderStatsSection(cards, publishable) {
     pubDetail[s] = (pubDetail[s] || 0) + 1
   }
   const total = Object.values(pub).reduce((a, b) => a + b, 0)
+  const totalAll = Object.values(all).reduce((a, b) => a + b, 0)
+  const pending = totalAll - total
   return [
-    '### 仓库已建立内容',
+    '<!-- 紧凑数字栏：对普通访问者只显示三个总数，详细分类折叠 -->',
+    '<div class="wd-stat-compact">',
+    `<div class="wd-stat-item"><div class="wd-stat-num">${totalAll}</div><div class="wd-stat-label">知识卡总计</div></div>`,
+    `<div class="wd-stat-item"><div class="wd-stat-num">${total}</div><div class="wd-stat-label">已公开</div></div>`,
+    `<div class="wd-stat-item"><div class="wd-stat-num">${pending}</div><div class="wd-stat-label">整理中（未公开）</div></div>`,
+    '</div>',
     '',
-    '全部知识卡（含未公开，构建时自动统计）：',
+    '<details class="wd-stat-detail">',
+    '<summary>按类型查看（知识卡 ' + totalAll + ' 张，构建时自动统计）</summary>',
+    '',
+    '### 仓库已建立内容',
     '',
     '<div class="wd-stat">' + statItems(all) + '\n</div>',
     '',
@@ -300,7 +310,9 @@ function renderStatsSection(cards, publishable) {
     '发布状态为「可公开草稿／正式公开」：' + (Object.entries(pubDetail).map(([s, n]) => `${s} ${n} 张`).join('，') || '暂无'),
     '',
     '<div class="wd-stat">' + statItems(pub) +
-      '\n<div class="wd-stat-item">\n<div class="wd-stat-num">' + total + '</div>\n<div class="wd-stat-label">公开页合计</div>\n</div>\n</div>'
+      '\n<div class="wd-stat-item">\n<div class="wd-stat-num">' + total + '</div>\n<div class="wd-stat-label">公开页合计</div>\n</div>\n</div>',
+    '',
+    '</details>'
   ].join('\n')
 }
 

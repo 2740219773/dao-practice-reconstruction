@@ -31,6 +31,9 @@ export default defineConfig({
   base: '/',
   cleanUrls: true,
   lastUpdated: true,
+  // 自定义配色仅覆盖暖白浅色主题，未提供 .dark 变量；
+  // 关闭外观切换防止明暗混搭（深色主题由未来 WEB-003 工作包单独建立）
+  appearance: false,
   markdown: {
     config: markdownConfig
   },

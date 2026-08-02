@@ -24,7 +24,7 @@ layout: home
 
 <div class="wd-hero-actions">
 
-<a class="wd-btn wd-btn-brand" href="/originals/原文-0001-道德经第十六章">进入「静」专题</a>
+<a class="wd-btn wd-btn-brand" href="/topics/">进入「静」专题</a>
 <a class="wd-btn wd-btn-ink" href="/library/">浏览知识库</a>
 
 </div>
@@ -54,13 +54,21 @@ layout: home
 
 <div class="wd-topic-route">
 
-**文献关系路线**
-
-道德经 → 庄子 → 管子·内业 → 坐忘论 → 近现代解释 → 当代传播
+**文献关系路线**（阅读顺序，不代表理论继承关系）
 
 <div class="wd-route-steps">
 
-<span>道德经</span><span>庄子</span><span>内业</span><span>坐忘论</span><span>近现代</span><span>当代传播</span>
+<span class="wd-route-step"><b>道德经</b><small>「致虚极，守静笃」</small></span>
+<span class="wd-route-arrow">↓</span>
+<span class="wd-route-step"><b>庄子</b><small>心斋 · 坐忘</small></span>
+<span class="wd-route-arrow">↓</span>
+<span class="wd-route-step"><b>管子·内业</b><small>静 · 心 · 气</small></span>
+<span class="wd-route-arrow">↓</span>
+<span class="wd-route-step"><b>坐忘论</b><small>收心 · 泰定</small></span>
+<span class="wd-route-arrow">↓</span>
+<span class="wd-route-step"><b>近现代解释</b><small>传承与实践</small></span>
+<span class="wd-route-arrow">↓</span>
+<span class="wd-route-step"><b>当代传播</b><small>来源与边界</small></span>
 
 </div>
 
@@ -195,9 +203,17 @@ layout: home
 
 <!-- GEN:BEGIN 内容统计 -->
 
-### 仓库已建立内容
+<!-- 紧凑数字栏：对普通访问者只显示三个总数，详细分类折叠 -->
+<div class="wd-stat-compact">
+<div class="wd-stat-item"><div class="wd-stat-num">68</div><div class="wd-stat-label">知识卡总计</div></div>
+<div class="wd-stat-item"><div class="wd-stat-num">3</div><div class="wd-stat-label">已公开</div></div>
+<div class="wd-stat-item"><div class="wd-stat-num">65</div><div class="wd-stat-label">整理中（未公开）</div></div>
+</div>
 
-全部知识卡（含未公开，构建时自动统计）：
+<details class="wd-stat-detail">
+<summary>按类型查看（知识卡 68 张，构建时自动统计）</summary>
+
+### 仓库已建立内容
 
 <div class="wd-stat">
 <div class="wd-stat-item">
@@ -264,6 +280,8 @@ layout: home
 <div class="wd-stat-label">公开页合计</div>
 </div>
 </div>
+
+</details>
 
 <!-- GEN:END 内容统计 -->
 
