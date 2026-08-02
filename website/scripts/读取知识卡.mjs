@@ -11,12 +11,22 @@ import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-/** 知识卡目录与对应站点栏目（未来扩展类型时在此追加） */
+/** 知识卡目录与对应站点栏目（生成页面只处理 library/originals/concepts；其余类型仅参与统计） */
 export const CARD_DIRS = [
   { dir: '02-文献卡', slug: 'library', label: '文献库', keyField: '文献类型' },
   { dir: '03-原文卡', slug: 'originals', label: '原文库', keyField: '所属文献' },
-  { dir: '04-概念卡', slug: 'concepts', label: '概念库', keyField: '概念类别' }
+  { dir: '04-概念卡', slug: 'concepts', label: '概念库', keyField: '概念类别' },
+  { dir: '05-主张卡', slug: 'claims', label: '主张库', keyField: '主张类型' },
+  { dir: '06-假说卡', slug: 'hypotheses', label: '假说库', keyField: '假说类型' },
+  { dir: '07-争议卡', slug: 'disputes', label: '争议库', keyField: '争议类型' },
+  { dir: '08-现代研究卡', slug: 'research', label: '现代研究库', keyField: '研究主题' },
+  { dir: '09-风险资料卡', slug: 'risks', label: '风险资料库', keyField: '风险类型' },
+  { dir: '10-项目决策', slug: 'decisions', label: '决策库', keyField: '决策类型' },
+  { dir: '14-当代传播资料卡', slug: 'contemporary', label: '当代传播资料库', keyField: '资料类型' }
 ]
+
+/** 知识卡目录中的非卡片文件（如目录 README），扫描时排除 */
+const EXCLUDE_FILES = ['README.md']
 
 /** 项目仓库根目录（相对本文件：website/scripts/ → 上两级） */
 export const REPO_ROOT = fileURLToPath(new URL('../..', import.meta.url))
@@ -28,7 +38,10 @@ export const REPO_ROOT = fileURLToPath(new URL('../..', import.meta.url))
 export async function readAllCards() {
   const cards = []
   for (const { dir, slug, label } of CARD_DIRS) {
-    const files = await fg(`${dir}/*.md`, { cwd: REPO_ROOT, absolute: true, onlyFiles: true })
+    // 排除目录内的非卡片说明文件（如 README.md）
+    const files = await fg([`${dir}/*.md`, `!${dir}/${EXCLUDE_FILES.join(`,!${dir}/`)}`], {
+      cwd: REPO_ROOT, absolute: true, onlyFiles: true
+    })
     for (const file of files) {
       const relPath = path.relative(REPO_ROOT, file).replace(/\\/g, '/')
       // 注意：gray-matter 直接传文件路径在本环境解析不出 frontmatter，须先读内容再传字符串
@@ -42,7 +55,8 @@ export async function readAllCards() {
         body: content.trim(),
         slugOf: fileNameToSlug(file)
       })
-      if (!id.startsWith('文献-') && !id.startsWith('原文-') && !id.startsWith('概念-')) {
+      const PREFIX_OK = ['文献-', '原文-', '概念-', '主张-', '假说-', '争议-', '现代研究-', '风险资料-', '决策-', '传播资料-']
+      if (!PREFIX_OK.some((p) => id.startsWith(p))) {
         console.warn(`  [警告] ${relPath}：编号「${id}」与所在目录 ${dir} 不符，仍按目录类型处理`)
       }
     }

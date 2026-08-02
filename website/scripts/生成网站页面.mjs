@@ -10,13 +10,21 @@
  *  - 生成物（docs/library|originals|concepts/ 下由本脚本写出的文件）视为构建产物，
  *    已加入 .gitignore；知识卡原件与 Git 历史始终是源头。
  */
-import { mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { readAllCards, REPO_ROOT, splitChapters } from './读取知识卡.mjs'
 import { validateAllCards, PUBLISHABLE, ALLOWLISTS } from './校验公开字段.mjs'
 
 /** 输出目录：website/docs/{slug} */
 const DOCS_DIR = path.join(REPO_ROOT, 'website', 'docs')
+
+/** 统计显示顺序与名称（与 读取知识卡.mjs 的 CARD_DIRS 对应） */
+const STAT_ORDER = ['library', 'originals', 'concepts', 'claims', 'hypotheses', 'disputes', 'research', 'risks', 'decisions', 'contemporary']
+const TYPE_LABELS = {
+  library: '文献卡', originals: '原文卡', concepts: '概念卡', claims: '主张卡',
+  hypotheses: '假说卡', disputes: '争议卡', research: '现代研究卡',
+  risks: '风险资料卡', decisions: '决策卡', contemporary: '当代传播资料卡'
+}
 
 /** 文献库索引按「资料性质」分组（其他取值归入"其他"） */
 const LIBRARY_GROUPS = [
@@ -231,6 +239,93 @@ function renderIndex(slug, cards) {
   return parts.join('\n') + '\n'
 }
 
+/** 首页「内容统计」区块（占位符内容，由构建脚本生成） */
+function renderStatsSection(cards, publishable) {
+  const count = (list) => {
+    const m = {}
+    for (const c of list) m[c.slug] = (m[c.slug] || 0) + 1
+    return m
+  }
+  const statItems = (m) =>
+    STAT_ORDER.filter((slug) => (m[slug] || 0) > 0)
+      .map((slug) =>
+        `\n<div class="wd-stat-item">\n<div class="wd-stat-num">${m[slug]}</div>\n<div class="wd-stat-label">${TYPE_LABELS[slug]}</div>\n</div>`)
+      .join('')
+  const all = count(cards)
+  const pub = count(publishable)
+  const pubDetail = {}
+  for (const c of publishable) {
+    const s = c.yaml['网站发布状态']
+    pubDetail[s] = (pubDetail[s] || 0) + 1
+  }
+  const total = Object.values(pub).reduce((a, b) => a + b, 0)
+  return [
+    '### 仓库已建立内容',
+    '',
+    '全部知识卡（含未公开，构建时自动统计）：',
+    '',
+    '<div class="wd-stat">' + statItems(all) + '\n</div>',
+    '',
+    '### 网站已公开内容',
+    '',
+    '发布状态为「可公开草稿／正式公开」：' + (Object.entries(pubDetail).map(([s, n]) => `${s} ${n} 张`).join('，') || '暂无'),
+    '',
+    '<div class="wd-stat">' + statItems(pub) +
+      '\n<div class="wd-stat-item">\n<div class="wd-stat-num">' + total + '</div>\n<div class="wd-stat-label">公开页合计</div>\n</div>\n</div>'
+  ].join('\n')
+}
+
+/** 首页「最近整理」区块：按最后修改日期倒序分组（最多 5 组），组内按类型分组、按编号排序 */
+function renderRecentSection(cards) {
+  const byDate = new Map()
+  for (const c of cards) {
+    const d = displayValue(c.yaml['最后修改日期'])
+    if (!byDate.has(d)) byDate.set(d, [])
+    byDate.get(d).push(c)
+  }
+  const clipTitle = (t) => (t && t.length > 16 ? t.slice(0, 16) + '…' : t || '（无标题）')
+  const dateLines = []
+  for (const d of [...byDate.keys()].sort((a, b) => (a < b ? 1 : -1)).slice(0, 5)) {
+    const byType = new Map()
+    for (const c of byDate.get(d)) {
+      if (!byType.has(c.slug)) byType.set(c.slug, [])
+      byType.get(c.slug).push(c)
+    }
+    const typeLines = []
+    for (const slug of STAT_ORDER) {
+      const list = byType.get(slug)
+      if (!list || list.length === 0) continue
+      list.sort((a, b) => String(a.yaml['编号']).localeCompare(String(b.yaml['编号']), 'zh'))
+      const shown = list.slice(0, 3).map((c) => `${c.yaml['编号']}《${clipTitle(c.yaml['标题'])}》`)
+      typeLines.push(`  - ${TYPE_LABELS[slug]} ${list.length} 张：${shown.join('、')}${list.length > 3 ? '、等' : ''}`)
+    }
+    dateLines.push(`- **${d}**（共 ${byDate.get(d).length} 张）：\n${typeLines.join('\n')}`)
+  }
+  return dateLines.join('\n')
+}
+
+/** 替换首页占位符区块（<!-- GEN:BEGIN X --> … <!-- GEN:END X -->）之间的内容 */
+function replaceSection(text, name, content) {
+  const beginTag = `<!-- GEN:BEGIN ${name} -->`
+  const endTag = `<!-- GEN:END ${name} -->`
+  const b = text.indexOf(beginTag)
+  const e = text.indexOf(endTag)
+  if (b < 0 || e < 0) throw new Error(`首页 index.md 缺少占位符：${beginTag} / ${endTag}`)
+  return text.slice(0, b + beginTag.length) + '\n\n' + content.trim() + '\n\n' + text.slice(e)
+}
+
+/** 更新首页统计与最近整理（docs/index.md 为手工维护的源文件，只替换占位符区块） */
+function updateHomeSections(cards, publishable) {
+  const indexFile = path.join(DOCS_DIR, 'index.md')
+  const raw = readFileSync(indexFile, 'utf8')
+  const nl = raw.includes('\r\n') ? '\r\n' : '\n'
+  let text = raw
+  text = replaceSection(text, '内容统计', renderStatsSection(cards, publishable))
+  text = replaceSection(text, '最近整理', renderRecentSection(cards))
+  // 卡片数据未变化时输出保持稳定，避免无谓的 git 差异
+  writeFileSync(indexFile, text.replace(/\r?\n/g, nl), 'utf8')
+}
+
 /** 索引表格行 */
 function rows(slug, cards) {
   const head = {
@@ -252,7 +347,7 @@ function rows(slug, cards) {
 async function main() {
   console.log('[生成] 步骤 1/3：扫描知识卡…')
   const cards = await readAllCards()
-  console.log(`[生成] 扫描到 ${cards.length} 张卡（文献/原文/概念）`)
+  console.log(`[生成] 扫描到 ${cards.length} 张卡（全部知识卡类型）`)
 
   console.log('[生成] 步骤 2/3：校验公开字段…')
   const publishable = validateAllCards(cards)
@@ -283,6 +378,10 @@ async function main() {
     }
     console.log(`  ✓ ${slug}/index.md（${list.length} 张公开卡）`)
   }
+
+  console.log('[生成] 步骤 4/4：更新首页内容统计与最近整理…')
+  updateHomeSections(cards, publishable)
+  console.log('  ✓ docs/index.md（内容统计 + 最近整理）')
   console.log('[生成] 完成。')
 }
 

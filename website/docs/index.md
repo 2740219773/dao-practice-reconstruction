@@ -43,7 +43,7 @@ features:
 
 ### [静](/concepts/)
 
-概念卡已上线，整理其在《道德经》《庄子》等文献中的多重含义与常见误解。
+已上线（可公开草稿），整理其在《道德经》《庄子》等文献中的多重含义与常见误解。
 
 </div>
 
@@ -51,7 +51,7 @@ features:
 
 ### [虚](/concepts/)
 
-整理中：待「心斋」「致虚极」等原文卡完成后建立。
+概念卡已建立，尚未公开；完成核对与审核后按公开原则分批上线。
 
 </div>
 
@@ -59,7 +59,7 @@ features:
 
 ### [心](/concepts/)
 
-整理中：心斋原文卡推进中。
+概念卡已建立，尚未公开；完成核对与审核后按公开原则分批上线。
 
 </div>
 
@@ -67,7 +67,7 @@ features:
 
 ### [气](/concepts/)
 
-整理中：与《管子·内业》《坐忘论》原文卡并行推进。
+概念卡已建立，尚未公开；完成核对与审核后按公开原则分批上线。
 
 </div>
 
@@ -75,7 +75,7 @@ features:
 
 ### [息](/concepts/)
 
-整理中。
+概念卡已建立，尚未公开；完成核对与审核后按公开原则分批上线。
 
 </div>
 
@@ -83,7 +83,7 @@ features:
 
 ### [身](/concepts/)
 
-整理中。
+概念卡已建立，尚未公开；完成核对与审核后按公开原则分批上线。
 
 </div>
 
@@ -125,35 +125,101 @@ features:
 
 <div class="wd-section">
 
-## 公开内容统计
+## 内容统计
 
-当前正式展示的内容（其余知识卡仍在整理与核对中）：
+<!-- GEN:BEGIN 内容统计 -->
+
+### 仓库已建立内容
+
+全部知识卡（含未公开，构建时自动统计）：
 
 <div class="wd-stat">
+<div class="wd-stat-item">
+<div class="wd-stat-num">7</div>
+<div class="wd-stat-label">文献卡</div>
+</div>
+<div class="wd-stat-item">
+<div class="wd-stat-num">15</div>
+<div class="wd-stat-label">原文卡</div>
+</div>
+<div class="wd-stat-item">
+<div class="wd-stat-num">6</div>
+<div class="wd-stat-label">概念卡</div>
+</div>
+<div class="wd-stat-item">
+<div class="wd-stat-num">5</div>
+<div class="wd-stat-label">主张卡</div>
+</div>
+<div class="wd-stat-item">
+<div class="wd-stat-num">5</div>
+<div class="wd-stat-label">假说卡</div>
+</div>
+<div class="wd-stat-item">
+<div class="wd-stat-num">5</div>
+<div class="wd-stat-label">争议卡</div>
+</div>
+<div class="wd-stat-item">
+<div class="wd-stat-num">5</div>
+<div class="wd-stat-label">决策卡</div>
+</div>
+<div class="wd-stat-item">
+<div class="wd-stat-num">1</div>
+<div class="wd-stat-label">当代传播资料卡</div>
+</div>
+</div>
 
+### 网站已公开内容
+
+发布状态为「可公开草稿／正式公开」：可公开草稿 3 张
+
+<div class="wd-stat">
 <div class="wd-stat-item">
 <div class="wd-stat-num">1</div>
 <div class="wd-stat-label">文献卡</div>
 </div>
-
 <div class="wd-stat-item">
 <div class="wd-stat-num">1</div>
 <div class="wd-stat-label">原文卡</div>
 </div>
-
 <div class="wd-stat-item">
 <div class="wd-stat-num">1</div>
 <div class="wd-stat-label">概念卡</div>
 </div>
-
 <div class="wd-stat-item">
 <div class="wd-stat-num">3</div>
 <div class="wd-stat-label">公开页合计</div>
 </div>
+</div>
+
+<!-- GEN:END 内容统计 -->
+
+仓库为源头，网站为展示层：知识卡原件与修订历史完整保留在[项目仓库](https://github.com/2740219773/dao-practice-reconstruction)；每批内容经核对与审核后上线，「可公开草稿」页会明确标注核对状态，正式公开前逐项复核。
 
 </div>
 
-每批内容经核对与审核后上线；「可公开草稿」页会明确标注核对状态，正式公开前逐项复核。
+<div class="wd-section">
+
+## 最近整理
+
+按知识卡「最后修改日期」自动汇总：
+
+<!-- GEN:BEGIN 最近整理 -->
+
+- **2026-08-02**（共 31 张）：
+  - 原文卡 10 张：原文-0005《敢问心斋（庄子·人间世·心斋）》、原文-0007《凡物之精，此则为生（管子·内业·…》、原文-0008《凡心之刑，自充自盈（管子·内业·…》、等
+  - 概念卡 5 张：概念-0002《虚》、概念-0003《心》、概念-0004《气》、等
+  - 主张卡 5 张：主张-0001《“静”就是完全没有念头》、主张-0002《“专气致柔”是一种具体的呼吸功法》、主张-0003《心斋和坐忘是同一种具体方法》、等
+  - 假说卡 5 张：假说-0001《安静状态下部分呼吸变化可能是身心…》、假说-0002《庄子的忘类表述与静的状态义可能是…》、假说-0003《内业气德智链与道德经虚静明链可能…》、等
+  - 争议卡 5 张：争议-0001《“静”是状态还是方法》、争议-0002《“虚”与“静”是否同一回事》、争议-0003《“收心”是否等于压制念头》、等
+  - 决策卡 1 张：决策-0005《新增"参考网站库"目录（研究辅助…》
+- **2026-08-01**（共 18 张）：
+  - 文献卡 7 张：文献-0001《道德经》、文献-0002《庄子》、文献-0003《管子·内业》、等
+  - 原文卡 5 张：原文-0001《致虚极，守静笃（道德经·第十六章…》、原文-0002《载营魄抱一，专气致柔（道德经·第…》、原文-0003《为道日损（道德经·第四十八章）》、等
+  - 概念卡 1 张：概念-0001《静》
+  - 决策卡 4 张：决策-0001《统一编号、状态与 YAML 写法…》、决策-0002《知识分层改为七层、知识卡属性字段…》、决策-0003《新增"当代传播资料"类别及处理流…》、等
+  - 当代传播资料卡 1 张：传播资料-0001《玄丹道阁筑基打坐初级入门系列》
+
+<!-- GEN:END 最近整理 -->
 
 </div>
 
