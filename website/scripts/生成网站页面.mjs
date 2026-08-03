@@ -386,14 +386,15 @@ function renderStatsSection(cards, publishable) {
     .filter((k) => layerAll[k] > 0)
     .map((k) => `${LAYER_GROUPS[k].label} ${layerAll[k]}`)
     .join('，')
-  // 已公开分层描述（entry 有公开时单独列出，避免 63 vs 20 口径不一致）
+  // 已公开分层描述（entry 有公开时单独列出，避免口径不一致）
+  // 口径说明：知识层已公开 = 已生成页面的知识卡；入口层已公开 = 发布状态可公开但暂未生成页面（入口层页面由未来网站批次生成）
   const pubBreakdown = [`正式知识已公开 ${knowledgePub}`]
-  if (entryPub > 0) pubBreakdown.push(`用户入口已公开 ${entryPub}`)
+  if (entryPub > 0) pubBreakdown.push(`用户入口已公开 ${entryPub}（待建页）`)
   return [
     '<!-- 紧凑数字栏：知识卡总计只计正式知识层，已公开按知识层/入口层拆分 -->',
     '<div class="wd-stat-compact">',
     `<div class="wd-stat-item"><div class="wd-stat-num">${totalAll}</div><div class="wd-stat-label">正式知识卡</div></div>`,
-    `<div class="wd-stat-item"><div class="wd-stat-num">${totalPub}</div><div class="wd-stat-label">公开页面总数</div></div>`,
+    `<div class="wd-stat-item"><div class="wd-stat-num">${knowledgePub}</div><div class="wd-stat-label">知识层已公开</div></div>`,
     `<div class="wd-stat-item"><div class="wd-stat-num">${pending}</div><div class="wd-stat-label">整理中（未公开）</div></div>`,
     '</div>',
     layerSummary ? `<p class="wd-stat-note">非知识层：${layerSummary}（用户入口／社区观察／治理记录不计入知识卡总数）</p>` : '',
@@ -418,7 +419,7 @@ function renderStatsSection(cards, publishable) {
       '（' + (Object.entries(pubDetail).map(([s, n]) => `${s} ${n} 张`).join('，') || '暂无') + '）',
     '',
     '<div class="wd-stat">' + statItems(pub) +
-      '\n<div class="wd-stat-item">\n<div class="wd-stat-num">' + totalPub + '</div>\n<div class="wd-stat-label">公开页合计</div>\n</div>\n</div>',
+      '\n<div class="wd-stat-item">\n<div class="wd-stat-num">' + knowledgePub + '</div>\n<div class="wd-stat-label">知识层公开页合计</div>\n</div>\n</div>',
     '',
     '</details>'
   ].join('\n')
