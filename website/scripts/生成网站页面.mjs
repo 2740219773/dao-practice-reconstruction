@@ -54,7 +54,8 @@ const META_FIELDS = {
   ],
   originals: [
     ['编号', '编号'], ['所属文献', '所属文献'], ['章节', '章节'], ['卷次', '卷次'],
-    ['使用版本', '使用版本'], ['页码状态', '页码状态'], ['引文核对状态', '引文核对状态'],
+    ['使用版本', '使用版本'], ['页码状态', '页码状态'], ['网络文本核对状态', '网络文本核对状态'],
+    ['指定底本核对状态', '指定底本核对状态'],
     ['文献可靠等级', '文献可靠等级'], ['最高推论层级', '最高推论层级'],
     ['反证状态', '反证状态'], ['风险等级', '风险等级'],
     ['最后修改日期', '最后修改日期'], ['最后修改人员', '最后修改人员']
@@ -85,7 +86,7 @@ function statusBanner(card, status) {
     s += '本页内容已通过项目审核，正式公开。'
   }
   if (card.slug === 'originals') {
-    s += '\n\n- 引文核对状态：' + (y['引文核对状态'] || '未知')
+    s += '\n\n- 引文核对状态：' + citationSummary(y)
     if (y['指定底本核对状态'] && y['指定底本核对状态'] !== '已复核') s += '\n- 指定底本核对状态：' + y['指定底本核对状态']
     if (y['页码状态'] && y['页码状态'] !== '已核对') s += '\n- 页码状态：' + y['页码状态']
     s += '\n- 最高推论层级：' + (y['最高推论层级'] || '未知')
@@ -164,6 +165,17 @@ function tagRow(card, status) {
   if (y['文献可靠等级']) tags.push(`<span class="tag tag-evidence">证据：${y['文献可靠等级']}</span>`)
   if (y['风险等级']) tags.push(`<span class="tag tag-risk">风险：${y['风险等级']}</span>`)
   return `<p class="tag-row">${tags.join(' ')}</p>`
+}
+
+/** 核对状态组合展示（单一数据源：网络文本核对状态 + 指定底本核对状态，程序自动组合） */
+function citationSummary(y) {
+  const net = y['网络文本核对状态']
+  const ed = y['指定底本核对状态']
+  if (!net && !ed) return '未知'
+  const a = net === '已逐字核对' ? '网络文本已核对' : net === '未核对' ? '网络文本未核对' : net
+  const b = ed === '已复核' ? '指定底本已复核' : ed === '未复核' ? '指定底本待复核' : ed
+  if (a && b) return `${a}，${b}`
+  return a || b
 }
 
 /** 详情页书卷式题签页眉（WEB-001 原文页样板 → WEB-002 通用化：文献/概念页同体系） */
@@ -408,7 +420,7 @@ function rows(slug, cards) {
     const cls = y['网站发布状态'] === '正式公开' ? 'tag-publish-public' : 'tag-publish-draft'
     const status = y['网站发布状态'] || '未知'
     const quote = slug === 'originals'
-      ? `\n<div class="wd-index-quote">引文：${y['引文核对状态'] || '未知'}</div>`
+      ? `\n<div class="wd-index-quote">引文：${citationSummary(y)}</div>`
       : ''
     return [
       '<div class="wd-index-item">',
