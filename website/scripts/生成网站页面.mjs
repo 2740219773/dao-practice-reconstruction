@@ -91,6 +91,25 @@ const META_FIELDS = {
     ['出版或记录年代', '出版或记录年代'], ['资料类型', '资料类型'], ['观察方式', '观察方式'],
     ['可验证程度', '可验证程度'], ['所含实践最高风险', '所含实践最高风险'],
     ['卡片发布风险', '卡片发布风险'], ['最后修改日期', '最后修改日期'], ['最后修改人员', '最后修改人员']
+  ],
+  // 最小网站扩展（TOPIC-001 阶段 6）
+  claims: [
+    ['编号', '编号'], ['主张类型', '主张类型'], ['当前判断', '当前判断'],
+    ['来源可信等级', '来源可信等级'], ['反证状态', '反证状态'], ['风险等级', '风险等级'],
+    ['最后修改日期', '最后修改日期'], ['最后修改人员', '最后修改人员']
+  ],
+  disputes: [
+    ['编号', '编号'], ['来源可信等级', '来源可信等级'], ['反证状态', '反证状态'], ['风险等级', '风险等级'],
+    ['最后修改日期', '最后修改日期'], ['最后修改人员', '最后修改人员']
+  ],
+  research: [
+    ['编号', '编号'], ['研究主题', '研究主题'], ['现代证据等级', '现代证据等级'], ['对应强度', '对应强度'],
+    ['DOI', 'DOI'], ['PMID', 'PMID'], ['全文核对状态', '全文核对状态'], ['卡片发布风险', '卡片发布风险'],
+    ['所含实践最高风险', '所含实践最高风险'], ['最后修改日期', '最后修改日期'], ['最后修改人员', '最后修改人员']
+  ],
+  risks: [
+    ['编号', '编号'], ['风险类型', '风险类型'], ['严重程度', '严重程度'], ['卡片发布风险', '卡片发布风险'],
+    ['所含实践最高风险', '所含实践最高风险'], ['最后修改日期', '最后修改日期'], ['最后修改人员', '最后修改人员']
   ]
 }
 
@@ -209,7 +228,11 @@ function docHeader(card) {
   const fields = {
     originals: ['所属文献', '章节', '卷次', '使用版本'],
     library: ['其他名称', '传统署名', '大致年代', '文献类型', '资料性质', '使用版本'],
-    concepts: ['概念类别', '主要时期', '涉及传统', '当前定义状态']
+    concepts: ['概念类别', '主要时期', '涉及传统', '当前定义状态'],
+    claims: ['主张类型', '当前判断'],
+    disputes: ['来源可信等级', '反证状态'],
+    research: ['研究主题', '现代证据等级'],
+    risks: ['风险类型', '严重程度']
   }[card.slug] || []
   const meta = fields.map((f) => row(f, y[f])).join('')
   // 原文页保留页码/页码状态两字段（WEB-001 收尾约定）
@@ -273,6 +296,7 @@ function renderDetail(card, status) {
 function renderIndex(slug, cards) {
   const title = {
     library: '文献库', originals: '原文库', concepts: '概念库',
+    claims: '主张库', disputes: '争议库', research: '现代研究库', risks: '风险资料库',
     daoyin: '导引术', 'medical-observations': '医学观察' // 预留（三类独立模块）
   }[slug]
   const parts = []
@@ -511,10 +535,10 @@ async function main() {
   console.log(`[生成] 可公开 ${publishable.length} 张（${PUBLISHABLE.join('／')}）`)
 
   console.log('[生成] 步骤 3/3：清理旧生成页并生成索引页与详情页…')
-  // 页面类型预留（决策：三类独立模块）：daoyin（导引术）、medical-observations（医学观察）
-  // 已登记于 CARD_DIRS／STAT_ORDER／TYPE_LABELS／META_FIELDS／renderIndex 标题表；
-  // 对应模块尚无公开内容前不进入生成循环（不上线空页面），待首批可公开卡出现后加入下方数组。
-  for (const slug of ['library', 'originals', 'concepts']) {
+  // 页面类型：library/originals/concepts/claims/disputes/research/risks 进入生成循环
+  // （TOPIC-001 阶段 6 最小网站扩展：仅 TOPIC-001 引用卡建页，不借此公开整个研究库）；
+  // daoyin（导引术）、medical-observations（医学观察）仍为预留，不进入生成循环。
+  for (const slug of ['library', 'originals', 'concepts', 'claims', 'disputes', 'research', 'risks']) {
     // 先清空旧生成详情页（撤回/取消公开的卡必须从网站消失），index.md 随后整体重写
     const dir = path.join(DOCS_DIR, slug)
     mkdirSync(dir, { recursive: true })

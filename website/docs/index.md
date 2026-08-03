@@ -246,8 +246,8 @@ layout: home
 <!-- 紧凑数字栏：知识卡总计只计正式知识层，已公开按知识层/入口层拆分 -->
 <div class="wd-stat-compact">
 <div class="wd-stat-item"><div class="wd-stat-num">63</div><div class="wd-stat-label">正式知识卡</div></div>
-<div class="wd-stat-item"><div class="wd-stat-num">5</div><div class="wd-stat-label">公开页面总数</div></div>
-<div class="wd-stat-item"><div class="wd-stat-num">58</div><div class="wd-stat-label">整理中（未公开）</div></div>
+<div class="wd-stat-item"><div class="wd-stat-num">18</div><div class="wd-stat-label">公开页面总数</div></div>
+<div class="wd-stat-item"><div class="wd-stat-num">45</div><div class="wd-stat-label">整理中（未公开）</div></div>
 </div>
 <p class="wd-stat-note">非知识层：内部治理记录 6（用户入口／社区观察／治理记录不计入知识卡总数）</p>
 
@@ -312,7 +312,7 @@ layout: home
 
 ### 网站已公开内容
 
-发布状态为「可公开草稿／正式公开」：正式知识已公开 5（可公开草稿 5 张）
+发布状态为「可公开草稿／正式公开」：正式知识已公开 18（可公开草稿 18 张）
 
 <div class="wd-stat">
 <div class="wd-stat-item">
@@ -328,7 +328,19 @@ layout: home
 <div class="wd-stat-label">概念卡</div>
 </div>
 <div class="wd-stat-item">
-<div class="wd-stat-num">5</div>
+<div class="wd-stat-num">1</div>
+<div class="wd-stat-label">争议卡</div>
+</div>
+<div class="wd-stat-item">
+<div class="wd-stat-num">8</div>
+<div class="wd-stat-label">现代研究卡</div>
+</div>
+<div class="wd-stat-item">
+<div class="wd-stat-num">4</div>
+<div class="wd-stat-label">风险资料卡</div>
+</div>
+<div class="wd-stat-item">
+<div class="wd-stat-num">18</div>
 <div class="wd-stat-label">公开页合计</div>
 </div>
 </div>

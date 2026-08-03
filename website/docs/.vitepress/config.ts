@@ -71,7 +71,10 @@ export default defineConfig({
         items: [
           { text: '文献库', link: '/library/' },
           { text: '原文库', link: '/originals/' },
-          { text: '概念库', link: '/concepts/' }
+          { text: '概念库', link: '/concepts/' },
+          { text: '主张库', link: '/claims/' },
+          { text: '现代研究库', link: '/research/' },
+          { text: '风险资料库', link: '/risks/' }
         ]
       },
       {
@@ -99,6 +102,9 @@ export default defineConfig({
           { text: '文献库', link: '/library/' },
           { text: '原文库', link: '/originals/' },
           { text: '概念库', link: '/concepts/' },
+          { text: '主张库', link: '/claims/' },
+          { text: '现代研究库', link: '/research/' },
+          { text: '风险资料库', link: '/risks/' },
           { text: '"静"专题', link: '/topics/' },
           { text: '争议与开放问题', link: '/disputes/' },
           { text: '当代传播观察', link: '/contemporary/' }
