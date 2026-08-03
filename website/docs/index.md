@@ -35,6 +35,46 @@ layout: home
 
 </div>
 
+<div class="wd-section">
+
+## 三个研究方向
+
+项目研究内容分为三条相互独立、完全平级的主线；架构上平行，执行上串行。当前正在推进第一条（概念与思想研究），导引术与医学观察两个方向的工作包与模板已建立，进入实际研究前不提前上线内容。
+
+<div class="wd-grid">
+
+<div class="wd-card wd-card-hl">
+
+### [概念与思想研究](/topics/)
+
+首批专题「静」：概念在传统文献中的含义、过程还是状态、是否等于无念、现代有限对应与传播说法的证据问题。
+
+</div>
+
+<div class="wd-card">
+
+### 导引术与身体训练
+
+首批专题八段锦（五禽戏为第二个）：历史来源、版本演变、动作结构、呼吸意念要求、功效主张、现代研究与禁忌风险。
+
+<span class="tag tag-publish-other">待建立</span>
+
+</div>
+
+<div class="wd-card">
+
+### 医学观察与身体经验
+
+首批专题《内证观察笔记》：观察者记录了什么、作者如何解释、有无独立验证与替代解释、哪些可作假说、哪些不能作医学结论。
+
+<span class="tag tag-publish-other">待建立</span>
+
+</div>
+
+</div>
+
+</div>
+
 <div class="wd-section wd-topic">
 
 ## 当前专题 · 静

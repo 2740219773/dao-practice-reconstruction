@@ -21,11 +21,12 @@ import { validateAllCards, PUBLISHABLE, ALLOWLISTS } from './校验公开字段.
 const DOCS_DIR = path.join(REPO_ROOT, 'website', 'docs')
 
 /** 统计显示顺序与名称（与 读取知识卡.mjs 的 CARD_DIRS 对应） */
-const STAT_ORDER = ['library', 'originals', 'concepts', 'claims', 'hypotheses', 'disputes', 'research', 'risks', 'decisions', 'contemporary']
+const STAT_ORDER = ['library', 'originals', 'concepts', 'claims', 'hypotheses', 'disputes', 'research', 'risks', 'decisions', 'contemporary', 'daoyin', 'medical-observations']
 const TYPE_LABELS = {
   library: '文献卡', originals: '原文卡', concepts: '概念卡', claims: '主张卡',
   hypotheses: '假说卡', disputes: '争议卡', research: '现代研究卡',
-  risks: '风险资料卡', decisions: '决策卡', contemporary: '当代传播资料卡'
+  risks: '风险资料卡', decisions: '决策卡', contemporary: '当代传播资料卡',
+  daoyin: '导引术资料卡', 'medical-observations': '医学观察资料卡'
 }
 
 /** 文献库索引按「资料性质」分组（其他取值归入"其他"） */
@@ -67,6 +68,19 @@ const META_FIELDS = {
     ['现代证据等级', '现代证据等级'], ['对应强度', '对应强度'],
     ['反证状态', '反证状态'], ['风险等级', '风险等级'],
     ['最后修改日期', '最后修改日期'], ['最后修改人员', '最后修改人员']
+  ],
+  // 预留（决策：三类独立模块）：导引术与医学观察页面类型，待对应模块有公开内容后启用生成
+  daoyin: [
+    ['编号', '编号'], ['名称', '名称'], ['其他名称', '其他名称'], ['资料类型', '资料类型'],
+    ['历史时期', '历史时期'], ['最早可核来源', '最早可核来源'], ['当前采用版本', '当前采用版本'],
+    ['版本制定机构', '版本制定机构'], ['动作数量', '动作数量'], ['所含实践最高风险', '所含实践最高风险'],
+    ['卡片发布风险', '卡片发布风险'], ['最后修改日期', '最后修改日期'], ['最后修改人员', '最后修改人员']
+  ],
+  'medical-observations': [
+    ['编号', '编号'], ['资料名称', '资料名称'], ['作者或讲述者', '作者或讲述者'],
+    ['出版或记录年代', '出版或记录年代'], ['资料类型', '资料类型'], ['观察方式', '观察方式'],
+    ['可验证程度', '可验证程度'], ['所含实践最高风险', '所含实践最高风险'],
+    ['卡片发布风险', '卡片发布风险'], ['最后修改日期', '最后修改日期'], ['最后修改人员', '最后修改人员']
   ]
 }
 
@@ -247,7 +261,10 @@ function renderDetail(card, status) {
 
 /** 生成索引页 */
 function renderIndex(slug, cards) {
-  const title = { library: '文献库', originals: '原文库', concepts: '概念库' }[slug]
+  const title = {
+    library: '文献库', originals: '原文库', concepts: '概念库',
+    daoyin: '导引术', 'medical-observations': '医学观察' // 预留（三类独立模块）
+  }[slug]
   const parts = []
   parts.push('---')
   parts.push(`title: ${title}`)
@@ -451,6 +468,9 @@ async function main() {
   console.log(`[生成] 可公开 ${publishable.length} 张（${PUBLISHABLE.join('／')}）`)
 
   console.log('[生成] 步骤 3/3：清理旧生成页并生成索引页与详情页…')
+  // 页面类型预留（决策：三类独立模块）：daoyin（导引术）、medical-observations（医学观察）
+  // 已登记于 CARD_DIRS／STAT_ORDER／TYPE_LABELS／META_FIELDS／renderIndex 标题表；
+  // 对应模块尚无公开内容前不进入生成循环（不上线空页面），待首批可公开卡出现后加入下方数组。
   for (const slug of ['library', 'originals', 'concepts']) {
     // 先清空旧生成详情页（撤回/取消公开的卡必须从网站消失），index.md 随后整体重写
     const dir = path.join(DOCS_DIR, slug)
