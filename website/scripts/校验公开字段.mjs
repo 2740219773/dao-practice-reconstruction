@@ -1,9 +1,13 @@
 /**
  * 校验公开字段.mjs
- * 依据《决策-0004》校验知识卡的网站发布字段：
- *  1. 「网站发布状态」只允许五种取值：不公开／内部预览／可公开草稿／正式公开／已撤回；
- *  2. 「可公开草稿／正式公开」两张卡必须同时具备「公开摘要」「公开注意事项」，且不能是占位符「待补录」；
- *  3. 缺失字段一律按「不公开」处理（决策-0004：存量卡缺失按不公开），不报错。
+ * 按《项目结构总图》四层分别校验（框架收口 2026-08-03）：
+ *  - knowledge（正式知识层）：检查编号/标题、公开字段、章节白名单、风险字段；
+ *  - entry（用户入口层）：检查入口必需字段（问题卡/辨析卡各自字段）与公开字段；
+ *  - observation（采集观察层）：只检查记录字段，不检查公开字段，不进入公开流程；
+ *  - governance（治理审校层）：只检查治理字段，不进入公开流程。
+ *
+ * 依据《决策-0004》：发布状态只允许五种取值；「可公开草稿／正式公开」必须同时具备
+ * 「公开摘要」「公开注意事项」；缺失字段按「不公开」处理。
  * 校验失败返回错误列表，由调用方决定终止构建。
  */
 import { z } from 'zod'
@@ -14,7 +18,8 @@ export const PUBLISHABLE = ['可公开草稿', '正式公开'] // 生成器只�
 
 /**
  * 各类型详情页章节白名单（章节号 → 站点章节标题）：
- * 可公开卡必须包含 include 中列出的全部章节，缺失即构建失败，防止正文静默丢失
+ * 可公开知识卡必须包含 include 中列出的全部章节，缺失即构建失败，防止正文静默丢失
+ * 仅适用于正式知识层（knowledge）
  */
 export const ALLOWLISTS = {
   library: {
@@ -48,7 +53,8 @@ export const ALLOWLISTS = {
 }
 
 /**
- * 校验可公开卡是否包含全部必需展示章节（防章节被删除/改名后页面只剩标题与元数据）
+ * 校验可公开知识卡是否包含全部必需展示章节（防章节被删除/改名后页面只剩标题与元数据）
+ * 仅正式知识层使用
  * @returns {string[]} 缺失章节说明（空数组 = 通过）
  */
 export function checkRequiredChapters(card) {
@@ -71,7 +77,13 @@ const statusSchema = z.enum(PUBLISH_STATUSES, {
   message: `网站发布状态必须为：${PUBLISH_STATUSES.join('／')}`
 })
 
-const cardFields = z.object({
+/** 通用基础字段（四层均要求有编号） */
+const idField = z.object({
+  编号: z.string({ errorMap: () => ({ message: '缺少「编号」' }) })
+}).passthrough()
+
+/** 知识层/入口层基础：编号 + 标题 */
+const titledField = z.object({
   编号: z.string({ errorMap: () => ({ message: '缺少「编号」' }) }),
   标题: z.string({ errorMap: () => ({ message: '缺少「标题」' }) }),
   网站发布状态: statusSchema.optional(),
@@ -105,12 +117,27 @@ export function checkRiskFields(card) {
   return errors
 }
 
-/**
- * 校验单张卡，返回 { ok, status, errors: string[] }
- */
-export function validateCard(card) {
+/** 公开字段校验（知识层/入口层可公开时，必须填写公开摘要与注意事项） */
+function checkPublicFields(parsed) {
   const errors = []
-  const parsed = cardFields.safeParse(card.yaml)
+  const status = parsed.data['网站发布状态']
+  if (PUBLISHABLE.includes(status)) {
+    const summary = parsed.data['公开摘要']
+    const notice = parsed.data['公开注意事项']
+    if (!summary || summary.trim() === '' || summary.trim() === '待补录') {
+      errors.push(`「${status}」状态下必须填写「公开摘要」`)
+    }
+    if (!notice || notice.trim() === '' || notice.trim() === '待补录') {
+      errors.push(`「${status}」状态下必须填写「公开注意事项」`)
+    }
+  }
+  return errors
+}
+
+/** 正式知识层校验（编号/标题/公开字段/风险字段；章节白名单由 validateAllCards 检查） */
+export function validateKnowledgeCard(card) {
+  const errors = []
+  const parsed = titledField.safeParse(card.yaml)
   if (!parsed.success) {
     for (const issue of parsed.error.issues) {
       errors.push(`${issue.path.join('.') || '字段'}：${issue.message}`)
@@ -119,16 +146,52 @@ export function validateCard(card) {
   // 风险字段类型校验（映射表 V0.4：现代研究卡/风险资料卡必须用拆分后字段）
   for (const e of checkRiskFields(card)) errors.push(e)
   const status = parsed.success ? parsed.data['网站发布状态'] : undefined
-  if (parsed.success && status) {
-    const summary = parsed.data['公开摘要']
-    const notice = parsed.data['公开注意事项']
-    if (PUBLISHABLE.includes(status)) {
-      if (!summary || summary.trim() === '' || summary.trim() === '待补录') {
-        errors.push(`「${status}」状态下必须填写「公开摘要」`)
-      }
-      if (!notice || notice.trim() === '' || notice.trim() === '待补录') {
-        errors.push(`「${status}」状态下必须填写「公开注意事项」`)
-      }
+  if (parsed.success) {
+    for (const e of checkPublicFields(parsed)) errors.push(e)
+  }
+  return {
+    ok: errors.length === 0,
+    status,
+    errors,
+    publishable: !!status && PUBLISHABLE.includes(status)
+  }
+}
+
+/** 入口必需字段（按类型；问题卡用"问题"、辨析卡用"概念甲/概念乙"作标题字段，不强制通用"标题"） */
+const ENTRY_REQUIRED_FIELDS = {
+  questions: ['问题', '问题分类'],
+  discriminations: ['概念甲', '概念乙']
+}
+
+/** 用户入口层校验（入口必需字段 + 公开字段；标题字段按类型，不强制通用"标题"） */
+export function validateEntryCard(card) {
+  const errors = []
+  // 入口层不强制通用「标题」（问题卡用「问题」、辨析卡用「概念甲/概念乙」），仅要求编号
+  const parsed = idField.safeParse(card.yaml)
+  if (!parsed.success) {
+    for (const issue of parsed.error.issues) {
+      errors.push(`${issue.path.join('.') || '字段'}：${issue.message}`)
+    }
+  }
+  const required = ENTRY_REQUIRED_FIELDS[card.slug] || []
+  for (const f of required) {
+    if (!card.yaml[f] || String(card.yaml[f]).trim() === '') {
+      errors.push(`缺少入口必需字段「${f}」`)
+    }
+  }
+  // 发布状态合法性
+  const status = card.yaml['网站发布状态']
+  if (status && !PUBLISH_STATUSES.includes(status)) {
+    errors.push(`网站发布状态必须为：${PUBLISH_STATUSES.join('／')}`)
+  }
+  if (status && PUBLISHABLE.includes(status)) {
+    const summary = card.yaml['公开摘要']
+    const notice = card.yaml['公开注意事项']
+    if (!summary || summary.trim() === '' || summary.trim() === '待补录') {
+      errors.push(`「${status}」状态下必须填写「公开摘要」`)
+    }
+    if (!notice || notice.trim() === '' || notice.trim() === '待补录') {
+      errors.push(`「${status}」状态下必须填写「公开注意事项」`)
     }
   }
   return {
@@ -139,9 +202,78 @@ export function validateCard(card) {
   }
 }
 
+/** 采集观察层校验（只检查记录字段，不检查公开字段，不进入公开流程） */
+export function validateObservationRecord(card) {
+  const errors = []
+  const parsed = idField.safeParse(card.yaml)
+  if (!parsed.success) {
+    for (const issue of parsed.error.issues) {
+      errors.push(`${issue.path.join('.') || '字段'}：${issue.message}`)
+    }
+  }
+  for (const f of ['社区问题', '来源平台', '处理状态']) {
+    if (!card.yaml[f] || String(card.yaml[f]).trim() === '') {
+      errors.push(`缺少记录字段「${f}」`)
+    }
+  }
+  return {
+    ok: errors.length === 0,
+    status: undefined,
+    errors,
+    publishable: false // 观察记录不进入公开流程
+  }
+}
+
+/** 治理层必需字段（按类型） */
+const GOVERNANCE_REQUIRED_FIELDS = {
+  decisions: ['标题', '决策类型', '提出日期'],
+  'ai-reviews': ['内容名称', '审校对象编号', '人工复核人']
+}
+
+/** 治理审校层校验（只检查治理字段，不进入公开流程） */
+export function validateGovernanceRecord(card) {
+  const errors = []
+  const parsed = idField.safeParse(card.yaml)
+  if (!parsed.success) {
+    for (const issue of parsed.error.issues) {
+      errors.push(`${issue.path.join('.') || '字段'}：${issue.message}`)
+    }
+  }
+  const required = GOVERNANCE_REQUIRED_FIELDS[card.slug] || []
+  for (const f of required) {
+    if (!card.yaml[f] || String(card.yaml[f]).trim() === '') {
+      errors.push(`缺少治理字段「${f}」`)
+    }
+  }
+  return {
+    ok: errors.length === 0,
+    status: undefined,
+    errors,
+    publishable: false // 治理记录不进入公开流程
+  }
+}
+
 /**
- * 校验全部卡片。发现任何错误即抛出（终止构建）。
- * @returns {Array} 可公开（可公开草稿/正式公开）的卡片
+ * 按层分发校验（《项目结构总图》四层）
+ */
+export function validateCard(card) {
+  switch (card.layer) {
+    case 'knowledge':
+      return validateKnowledgeCard(card)
+    case 'entry':
+      return validateEntryCard(card)
+    case 'observation':
+      return validateObservationRecord(card)
+    case 'governance':
+      return validateGovernanceRecord(card)
+    default:
+      return { ok: false, status: undefined, errors: [`未知层：${card.layer}`], publishable: false }
+  }
+}
+
+/**
+ * 校验全部记录。发现任何错误即抛出（终止构建）。
+ * @returns {Array} 可公开（可公开草稿/正式公开）的记录（知识层与入口层；观察/治理层永不公开）
  */
 export function validateAllCards(cards) {
   const failures = []
@@ -151,19 +283,21 @@ export function validateAllCards(cards) {
     if (!result.ok) {
       failures.push({ card, result })
     } else if (result.publishable) {
-      // 可公开卡必须包含全部必需展示章节（章节白名单见 ALLOWLISTS）
-      const missing = checkRequiredChapters(card)
-      if (missing.length > 0) {
-        failures.push({ card, result: { errors: missing } })
-      } else {
-        publishableCards.push(card)
+      // 仅正式知识层可公开卡检查必需展示章节（入口层正文结构不同，暂不生成详情页）
+      if (card.layer === 'knowledge') {
+        const missing = checkRequiredChapters(card)
+        if (missing.length > 0) {
+          failures.push({ card, result: { errors: missing } })
+          continue
+        }
       }
+      publishableCards.push(card)
     }
   }
   if (failures.length > 0) {
     const lines = failures.map(({ card, result }) =>
       `  ✗ ${card.relPath}\n     ${result.errors.join('\n     ')}`)
-    throw new Error(`知识卡公开字段校验失败（${failures.length} 张卡）：\n${lines.join('\n')}`)
+    throw new Error(`记录校验失败（${failures.length} 条）：\n${lines.join('\n')}`)
   }
   return publishableCards
 }

@@ -18,36 +18,36 @@ import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-/** 正式知识层（知识卡）——网站「知识卡总计」只统计本组 */
+/** 正式知识层（知识卡）——网站「知识卡总计」只统计本组；prefix = 目录必须对应的编号前缀 */
 export const KNOWLEDGE_DIRS = [
-  { dir: '02-文献卡', slug: 'library', label: '文献库', keyField: '文献类型' },
-  { dir: '03-原文卡', slug: 'originals', label: '原文库', keyField: '所属文献' },
-  { dir: '04-概念卡', slug: 'concepts', label: '概念库', keyField: '概念类别' },
-  { dir: '05-主张卡', slug: 'claims', label: '主张库', keyField: '主张类型' },
-  { dir: '06-假说卡', slug: 'hypotheses', label: '假说库', keyField: '假说类型' },
-  { dir: '07-争议卡', slug: 'disputes', label: '争议库', keyField: '争议类型' },
-  { dir: '08-现代研究卡', slug: 'research', label: '现代研究库', keyField: '研究主题' },
-  { dir: '09-风险资料卡', slug: 'risks', label: '风险资料库', keyField: '风险类型' },
-  { dir: '14-当代传播资料卡', slug: 'contemporary', label: '当代传播资料库', keyField: '资料类型' },
-  { dir: '16-导引术资料卡', slug: 'daoyin', label: '导引术资料库', keyField: '名称' },
-  { dir: '17-医学观察资料卡', slug: 'medical-observations', label: '医学观察资料库', keyField: '资料名称' }
+  { dir: '02-文献卡', slug: 'library', label: '文献库', keyField: '文献类型', prefix: '文献-' },
+  { dir: '03-原文卡', slug: 'originals', label: '原文库', keyField: '所属文献', prefix: '原文-' },
+  { dir: '04-概念卡', slug: 'concepts', label: '概念库', keyField: '概念类别', prefix: '概念-' },
+  { dir: '05-主张卡', slug: 'claims', label: '主张库', keyField: '主张类型', prefix: '主张-' },
+  { dir: '06-假说卡', slug: 'hypotheses', label: '假说库', keyField: '假说类型', prefix: '假说-' },
+  { dir: '07-争议卡', slug: 'disputes', label: '争议库', keyField: '争议类型', prefix: '争议-' },
+  { dir: '08-现代研究卡', slug: 'research', label: '现代研究库', keyField: '研究主题', prefix: '现代研究-' },
+  { dir: '09-风险资料卡', slug: 'risks', label: '风险资料库', keyField: '风险类型', prefix: '风险资料-' },
+  { dir: '14-当代传播资料卡', slug: 'contemporary', label: '当代传播资料库', keyField: '资料类型', prefix: '传播资料-' },
+  { dir: '16-导引术资料卡', slug: 'daoyin', label: '导引术资料库', keyField: '名称', prefix: '导引术-' },
+  { dir: '17-医学观察资料卡', slug: 'medical-observations', label: '医学观察资料库', keyField: '资料名称', prefix: '医学观察-' }
 ]
 
 /** 用户入口层（入口节点，不作为原始证据） */
 export const ENTRY_DIRS = [
-  { dir: '18-问题地图', slug: 'questions', label: '问题库', keyField: '问题分类' },
-  { dir: '19-概念辨析', slug: 'discriminations', label: '概念辨析库', keyField: '概念甲' }
+  { dir: '18-问题地图', slug: 'questions', label: '问题库', keyField: '问题分类', prefix: '问题-' },
+  { dir: '19-概念辨析', slug: 'discriminations', label: '概念辨析库', keyField: '概念甲', prefix: '辨析卡-' }
 ]
 
 /** 采集观察层（输入数据与需求样本，不作为权威答案） */
 export const OBSERVATION_DIRS = [
-  { dir: '20-社区观察', slug: 'community-observations', label: '社区观察库', keyField: '来源平台' }
+  { dir: '20-社区观察', slug: 'community-observations', label: '社区观察库', keyField: '来源平台', prefix: '观察记录-' }
 ]
 
 /** 治理审校层（决策/审校留痕，不公开、不计入知识卡） */
 export const GOVERNANCE_DIRS = [
-  { dir: '10-项目决策', slug: 'decisions', label: '决策库', keyField: '决策类型' },
-  { dir: '21-人工智能审校', slug: 'ai-reviews', label: 'AI审校库', keyField: '内容名称' }
+  { dir: '10-项目决策', slug: 'decisions', label: '决策库', keyField: '决策类型', prefix: '决策-' },
+  { dir: '21-人工智能审校', slug: 'ai-reviews', label: 'AI审校库', keyField: '内容名称', prefix: '审校记录-' }
 ]
 
 /** 兼容别名：全部层合并（供需要全量扫描的调用方使用） */
@@ -74,7 +74,7 @@ export async function readAllCards() {
     ...OBSERVATION_DIRS.map((d) => ({ ...d, layer: 'observation' })),
     ...GOVERNANCE_DIRS.map((d) => ({ ...d, layer: 'governance' }))
   ]
-  for (const { dir, slug, label, layer } of groups) {
+  for (const { dir, slug, label, layer, prefix } of groups) {
     // 排除目录内的非卡片说明文件（如 README.md）
     const files = await fg([`${dir}/*.md`, `!${dir}/${EXCLUDE_FILES.join(`,!${dir}/`)}`], {
       cwd: REPO_ROOT, absolute: true, onlyFiles: true
@@ -84,6 +84,10 @@ export async function readAllCards() {
       // 注意：gray-matter 直接传文件路径在本环境解析不出 frontmatter，须先读内容再传字符串
       const { data, content } = matter(readFileSync(file, 'utf8'))
       const id = String(data['编号'] ?? '未知编号')
+      // 目录—编号前缀严格绑定（框架收口 2026-08-03）：编号必须以本目录对应前缀开头，否则报错
+      if (!id.startsWith(prefix)) {
+        throw new Error(`目录—编号不一致：${relPath} 位于 ${dir}，编号「${id}」必须以「${prefix}」开头`)
+      }
       cards.push({
         dir, slug, label, layer,
         file,
@@ -92,10 +96,6 @@ export async function readAllCards() {
         body: content.trim(),
         slugOf: fileNameToSlug(file)
       })
-      const PREFIX_OK = ['文献-', '原文-', '概念-', '主张-', '假说-', '争议-', '现代研究-', '风险资料-', '决策-', '传播资料-', '导引术-', '医学观察-', '问题-', '辨析卡-', '观察记录-', '审校记录-']
-      if (!PREFIX_OK.some((p) => id.startsWith(p))) {
-        console.warn(`  [警告] ${relPath}：编号「${id}」与所在目录 ${dir} 不符，仍按目录类型处理`)
-      }
     }
   }
   return cards

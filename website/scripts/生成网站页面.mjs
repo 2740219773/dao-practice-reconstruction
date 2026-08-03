@@ -350,20 +350,26 @@ function renderStatsSection(cards, publishable) {
     const s = c.yaml['网站发布状态']
     pubDetail[s] = (pubDetail[s] || 0) + 1
   }
-  const total = Object.values(pub).reduce((a, b) => a + b, 0)
-  // 知识卡总计 = 正式知识层
+  // 已公开按层拆分（框架收口）：正式知识已公开 与 用户入口已公开 分开统计，口径一致
+  const knowledgePub = layerPub.knowledge
+  const entryPub = layerPub.entry
+  const totalPub = knowledgePub + entryPub
+  // 知识卡总计 = 正式知识层；整理中 = 知识层总数 − 知识层已公开
   const totalAll = layerAll.knowledge
-  const pending = totalAll - layerPub.knowledge
+  const pending = totalAll - knowledgePub
   // 非知识层单独统计
   const layerSummary = ['entry', 'observation', 'governance']
     .filter((k) => layerAll[k] > 0)
     .map((k) => `${LAYER_GROUPS[k].label} ${layerAll[k]}`)
     .join('，')
+  // 已公开分层描述（entry 有公开时单独列出，避免 63 vs 20 口径不一致）
+  const pubBreakdown = [`正式知识已公开 ${knowledgePub}`]
+  if (entryPub > 0) pubBreakdown.push(`用户入口已公开 ${entryPub}`)
   return [
-    '<!-- 紧凑数字栏：知识卡总计只计正式知识层，非知识层单独统计 -->',
+    '<!-- 紧凑数字栏：知识卡总计只计正式知识层，已公开按知识层/入口层拆分 -->',
     '<div class="wd-stat-compact">',
     `<div class="wd-stat-item"><div class="wd-stat-num">${totalAll}</div><div class="wd-stat-label">正式知识卡</div></div>`,
-    `<div class="wd-stat-item"><div class="wd-stat-num">${total}</div><div class="wd-stat-label">已公开</div></div>`,
+    `<div class="wd-stat-item"><div class="wd-stat-num">${totalPub}</div><div class="wd-stat-label">公开页面总数</div></div>`,
     `<div class="wd-stat-item"><div class="wd-stat-num">${pending}</div><div class="wd-stat-label">整理中（未公开）</div></div>`,
     '</div>',
     layerSummary ? `<p class="wd-stat-note">非知识层：${layerSummary}（用户入口／社区观察／治理记录不计入知识卡总数）</p>` : '',
@@ -384,10 +390,11 @@ function renderStatsSection(cards, publishable) {
     '',
     '### 网站已公开内容',
     '',
-    '发布状态为「可公开草稿／正式公开」：' + (Object.entries(pubDetail).map(([s, n]) => `${s} ${n} 张`).join('，') || '暂无'),
+    '发布状态为「可公开草稿／正式公开」：' + pubBreakdown.join('，') +
+      '（' + (Object.entries(pubDetail).map(([s, n]) => `${s} ${n} 张`).join('，') || '暂无') + '）',
     '',
     '<div class="wd-stat">' + statItems(pub) +
-      '\n<div class="wd-stat-item">\n<div class="wd-stat-num">' + total + '</div>\n<div class="wd-stat-label">公开页合计</div>\n</div>\n</div>',
+      '\n<div class="wd-stat-item">\n<div class="wd-stat-num">' + totalPub + '</div>\n<div class="wd-stat-label">公开页合计</div>\n</div>\n</div>',
     '',
     '</details>'
   ].join('\n')
