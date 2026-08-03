@@ -20,15 +20,23 @@ import { validateAllCards, PUBLISHABLE, ALLOWLISTS } from './校验公开字段.
 /** 输出目录：website/docs/{slug} */
 const DOCS_DIR = path.join(REPO_ROOT, 'website', 'docs')
 
-/** 统计显示顺序与名称（与 读取知识卡.mjs 的 CARD_DIRS 对应） */
-const STAT_ORDER = ['library', 'originals', 'concepts', 'claims', 'hypotheses', 'disputes', 'research', 'risks', 'decisions', 'contemporary', 'daoyin', 'medical-observations', 'questions', 'discriminations', 'community-observations', 'ai-reviews']
+/** 统计显示顺序与名称（与 读取知识卡.mjs 的 KNOWLEDGE_DIRS 等对应，按《项目结构总图》四层） */
+const STAT_ORDER = ['library', 'originals', 'concepts', 'claims', 'hypotheses', 'disputes', 'research', 'risks', 'contemporary', 'daoyin', 'medical-observations', 'questions', 'discriminations', 'community-observations', 'decisions', 'ai-reviews']
 const TYPE_LABELS = {
   library: '文献卡', originals: '原文卡', concepts: '概念卡', claims: '主张卡',
   hypotheses: '假说卡', disputes: '争议卡', research: '现代研究卡',
-  risks: '风险资料卡', decisions: '决策卡', contemporary: '当代传播资料卡',
+  risks: '风险资料卡', contemporary: '当代传播资料卡',
   daoyin: '导引术资料卡', 'medical-observations': '医学观察资料卡',
   questions: '问题卡', discriminations: '辨析卡',
-  'community-observations': '社区观察卡', 'ai-reviews': 'AI审校记录卡'
+  'community-observations': '社区观察卡', decisions: '决策卡', 'ai-reviews': 'AI审校记录卡'
+}
+
+/** 四层分组（《项目结构总图》）：知识卡总计只计正式知识层 */
+const LAYER_GROUPS = {
+  knowledge: { label: '正式知识卡', slugs: ['library', 'originals', 'concepts', 'claims', 'hypotheses', 'disputes', 'research', 'risks', 'contemporary', 'daoyin', 'medical-observations'] },
+  entry: { label: '用户入口节点', slugs: ['questions', 'discriminations'] },
+  observation: { label: '社区观察记录', slugs: ['community-observations'] },
+  governance: { label: '内部治理记录', slugs: ['decisions', 'ai-reviews'] }
 }
 
 /** 文献库索引按「资料性质」分组（其他取值归入"其他"） */
@@ -311,7 +319,9 @@ function renderIndex(slug, cards) {
   return parts.join('\n') + '\n'
 }
 
-/** 首页「内容统计」区块（占位符内容，由构建脚本生成） */
+/** 首页「内容统计」区块（占位符内容，由构建脚本生成）
+ *  四层统计（《项目结构总图》）：知识卡总计只计正式知识层；
+ *  用户入口节点、社区观察记录、内部治理记录单独统计，不混入知识卡总数。 */
 function renderStatsSection(cards, publishable) {
   const count = (list) => {
     const m = {}
@@ -323,6 +333,16 @@ function renderStatsSection(cards, publishable) {
       .map((slug) =>
         `\n<div class="wd-stat-item">\n<div class="wd-stat-num">${m[slug]}</div>\n<div class="wd-stat-label">${TYPE_LABELS[slug]}</div>\n</div>`)
       .join('')
+  // 四层分组计数
+  const layerCount = (list) => {
+    const m = {}
+    for (const [layer, { slugs }] of Object.entries(LAYER_GROUPS)) {
+      m[layer] = list.filter((c) => slugs.includes(c.slug)).length
+    }
+    return m
+  }
+  const layerAll = layerCount(cards)
+  const layerPub = layerCount(publishable)
   const all = count(cards)
   const pub = count(publishable)
   const pubDetail = {}
@@ -331,22 +351,36 @@ function renderStatsSection(cards, publishable) {
     pubDetail[s] = (pubDetail[s] || 0) + 1
   }
   const total = Object.values(pub).reduce((a, b) => a + b, 0)
-  const totalAll = Object.values(all).reduce((a, b) => a + b, 0)
-  const pending = totalAll - total
+  // 知识卡总计 = 正式知识层
+  const totalAll = layerAll.knowledge
+  const pending = totalAll - layerPub.knowledge
+  // 非知识层单独统计
+  const layerSummary = ['entry', 'observation', 'governance']
+    .filter((k) => layerAll[k] > 0)
+    .map((k) => `${LAYER_GROUPS[k].label} ${layerAll[k]}`)
+    .join('，')
   return [
-    '<!-- 紧凑数字栏：对普通访问者只显示三个总数，详细分类折叠 -->',
+    '<!-- 紧凑数字栏：知识卡总计只计正式知识层，非知识层单独统计 -->',
     '<div class="wd-stat-compact">',
-    `<div class="wd-stat-item"><div class="wd-stat-num">${totalAll}</div><div class="wd-stat-label">知识卡总计</div></div>`,
+    `<div class="wd-stat-item"><div class="wd-stat-num">${totalAll}</div><div class="wd-stat-label">正式知识卡</div></div>`,
     `<div class="wd-stat-item"><div class="wd-stat-num">${total}</div><div class="wd-stat-label">已公开</div></div>`,
     `<div class="wd-stat-item"><div class="wd-stat-num">${pending}</div><div class="wd-stat-label">整理中（未公开）</div></div>`,
     '</div>',
+    layerSummary ? `<p class="wd-stat-note">非知识层：${layerSummary}（用户入口／社区观察／治理记录不计入知识卡总数）</p>` : '',
     '',
     '<details class="wd-stat-detail">',
-    '<summary>按类型查看（知识卡 ' + totalAll + ' 张，构建时自动统计）</summary>',
+    '<summary>按类型查看（正式知识卡 ' + totalAll + ' 张，构建时自动统计）</summary>',
     '',
-    '### 仓库已建立内容',
+    '### 正式知识层（知识卡）',
     '',
     '<div class="wd-stat">' + statItems(all) + '\n</div>',
+    '',
+    '### 非知识层（单独统计，不计入知识卡总数）',
+    '',
+    ...Object.entries(LAYER_GROUPS)
+      .filter(([layer]) => layer !== 'knowledge' && layerAll[layer] > 0)
+      .map(([layer, { label }]) =>
+        `#### ${label}\n\n<div class="wd-stat">${statItems(count(cards.filter((c) => LAYER_GROUPS[layer].slugs.includes(c.slug))))}\n</div>`),
     '',
     '### 网站已公开内容',
     '',

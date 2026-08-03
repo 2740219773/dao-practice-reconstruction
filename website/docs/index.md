@@ -243,17 +243,18 @@ layout: home
 
 <!-- GEN:BEGIN 内容统计 -->
 
-<!-- 紧凑数字栏：对普通访问者只显示三个总数，详细分类折叠 -->
+<!-- 紧凑数字栏：知识卡总计只计正式知识层，非知识层单独统计 -->
 <div class="wd-stat-compact">
-<div class="wd-stat-item"><div class="wd-stat-num">69</div><div class="wd-stat-label">知识卡总计</div></div>
+<div class="wd-stat-item"><div class="wd-stat-num">63</div><div class="wd-stat-label">正式知识卡</div></div>
 <div class="wd-stat-item"><div class="wd-stat-num">5</div><div class="wd-stat-label">已公开</div></div>
-<div class="wd-stat-item"><div class="wd-stat-num">64</div><div class="wd-stat-label">整理中（未公开）</div></div>
+<div class="wd-stat-item"><div class="wd-stat-num">58</div><div class="wd-stat-label">整理中（未公开）</div></div>
 </div>
+<p class="wd-stat-note">非知识层：内部治理记录 6（用户入口／社区观察／治理记录不计入知识卡总数）</p>
 
 <details class="wd-stat-detail">
-<summary>按类型查看（知识卡 69 张，构建时自动统计）</summary>
+<summary>按类型查看（正式知识卡 63 张，构建时自动统计）</summary>
 
-### 仓库已建立内容
+### 正式知识层（知识卡）
 
 <div class="wd-stat">
 <div class="wd-stat-item">
@@ -289,12 +290,23 @@ layout: home
 <div class="wd-stat-label">风险资料卡</div>
 </div>
 <div class="wd-stat-item">
+<div class="wd-stat-num">1</div>
+<div class="wd-stat-label">当代传播资料卡</div>
+</div>
+<div class="wd-stat-item">
 <div class="wd-stat-num">6</div>
 <div class="wd-stat-label">决策卡</div>
 </div>
+</div>
+
+### 非知识层（单独统计，不计入知识卡总数）
+
+#### 内部治理记录
+
+<div class="wd-stat">
 <div class="wd-stat-item">
-<div class="wd-stat-num">1</div>
-<div class="wd-stat-label">当代传播资料卡</div>
+<div class="wd-stat-num">6</div>
+<div class="wd-stat-label">决策卡</div>
 </div>
 </div>
 
