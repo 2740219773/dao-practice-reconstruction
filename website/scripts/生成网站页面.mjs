@@ -21,12 +21,14 @@ import { validateAllCards, PUBLISHABLE, ALLOWLISTS } from './校验公开字段.
 const DOCS_DIR = path.join(REPO_ROOT, 'website', 'docs')
 
 /** 统计显示顺序与名称（与 读取知识卡.mjs 的 CARD_DIRS 对应） */
-const STAT_ORDER = ['library', 'originals', 'concepts', 'claims', 'hypotheses', 'disputes', 'research', 'risks', 'decisions', 'contemporary', 'daoyin', 'medical-observations']
+const STAT_ORDER = ['library', 'originals', 'concepts', 'claims', 'hypotheses', 'disputes', 'research', 'risks', 'decisions', 'contemporary', 'daoyin', 'medical-observations', 'questions', 'discriminations', 'community-observations', 'ai-reviews']
 const TYPE_LABELS = {
   library: '文献卡', originals: '原文卡', concepts: '概念卡', claims: '主张卡',
   hypotheses: '假说卡', disputes: '争议卡', research: '现代研究卡',
   risks: '风险资料卡', decisions: '决策卡', contemporary: '当代传播资料卡',
-  daoyin: '导引术资料卡', 'medical-observations': '医学观察资料卡'
+  daoyin: '导引术资料卡', 'medical-observations': '医学观察资料卡',
+  questions: '问题卡', discriminations: '辨析卡',
+  'community-observations': '社区观察卡', 'ai-reviews': 'AI审校记录卡'
 }
 
 /** 文献库索引按「资料性质」分组（其他取值归入"其他"） */

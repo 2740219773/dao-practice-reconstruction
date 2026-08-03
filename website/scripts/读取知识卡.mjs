@@ -24,7 +24,11 @@ export const CARD_DIRS = [
   { dir: '10-项目决策', slug: 'decisions', label: '决策库', keyField: '决策类型' },
   { dir: '14-当代传播资料卡', slug: 'contemporary', label: '当代传播资料库', keyField: '资料类型' },
   { dir: '16-导引术资料卡', slug: 'daoyin', label: '导引术资料库', keyField: '名称' },
-  { dir: '17-医学观察资料卡', slug: 'medical-observations', label: '医学观察资料库', keyField: '资料名称' }
+  { dir: '17-医学观察资料卡', slug: 'medical-observations', label: '医学观察资料库', keyField: '资料名称' },
+  { dir: '18-问题地图', slug: 'questions', label: '问题库', keyField: '问题分类' },
+  { dir: '19-概念辨析', slug: 'discriminations', label: '概念辨析库', keyField: '概念甲' },
+  { dir: '20-社区观察', slug: 'community-observations', label: '社区观察库', keyField: '来源平台' },
+  { dir: '21-人工智能审校', slug: 'ai-reviews', label: 'AI审校库', keyField: '内容名称' }
 ]
 
 /** 知识卡目录中的非卡片文件（如目录 README），扫描时排除 */
@@ -57,7 +61,7 @@ export async function readAllCards() {
         body: content.trim(),
         slugOf: fileNameToSlug(file)
       })
-      const PREFIX_OK = ['文献-', '原文-', '概念-', '主张-', '假说-', '争议-', '现代研究-', '风险资料-', '决策-', '传播资料-', '导引术-', '医学观察-']
+      const PREFIX_OK = ['文献-', '原文-', '概念-', '主张-', '假说-', '争议-', '现代研究-', '风险资料-', '决策-', '传播资料-', '导引术-', '医学观察-', '问题-', '辨析卡-', '观察记录-', '审校记录-']
       if (!PREFIX_OK.some((p) => id.startsWith(p))) {
         console.warn(`  [警告] ${relPath}：编号「${id}」与所在目录 ${dir} 不符，仍按目录类型处理`)
       }

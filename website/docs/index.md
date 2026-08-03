@@ -245,13 +245,13 @@ layout: home
 
 <!-- 紧凑数字栏：对普通访问者只显示三个总数，详细分类折叠 -->
 <div class="wd-stat-compact">
-<div class="wd-stat-item"><div class="wd-stat-num">68</div><div class="wd-stat-label">知识卡总计</div></div>
+<div class="wd-stat-item"><div class="wd-stat-num">69</div><div class="wd-stat-label">知识卡总计</div></div>
 <div class="wd-stat-item"><div class="wd-stat-num">5</div><div class="wd-stat-label">已公开</div></div>
-<div class="wd-stat-item"><div class="wd-stat-num">63</div><div class="wd-stat-label">整理中（未公开）</div></div>
+<div class="wd-stat-item"><div class="wd-stat-num">64</div><div class="wd-stat-label">整理中（未公开）</div></div>
 </div>
 
 <details class="wd-stat-detail">
-<summary>按类型查看（知识卡 68 张，构建时自动统计）</summary>
+<summary>按类型查看（知识卡 69 张，构建时自动统计）</summary>
 
 ### 仓库已建立内容
 
@@ -289,7 +289,7 @@ layout: home
 <div class="wd-stat-label">风险资料卡</div>
 </div>
 <div class="wd-stat-item">
-<div class="wd-stat-num">5</div>
+<div class="wd-stat-num">6</div>
 <div class="wd-stat-label">决策卡</div>
 </div>
 <div class="wd-stat-item">
