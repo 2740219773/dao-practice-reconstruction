@@ -249,7 +249,7 @@ layout: home
 <div class="wd-stat-item"><div class="wd-stat-num">5</div><div class="wd-stat-label">公开页面总数</div></div>
 <div class="wd-stat-item"><div class="wd-stat-num">58</div><div class="wd-stat-label">整理中（未公开）</div></div>
 </div>
-<p class="wd-stat-note">非知识层：内部治理记录 7（用户入口／社区观察／治理记录不计入知识卡总数）</p>
+<p class="wd-stat-note">非知识层：内部治理记录 6（用户入口／社区观察／治理记录不计入知识卡总数）</p>
 
 <details class="wd-stat-detail">
 <summary>按类型查看（正式知识卡 63 张，构建时自动统计）</summary>
@@ -297,10 +297,6 @@ layout: home
 <div class="wd-stat-num">6</div>
 <div class="wd-stat-label">决策卡</div>
 </div>
-<div class="wd-stat-item">
-<div class="wd-stat-num">1</div>
-<div class="wd-stat-label">AI审校记录卡</div>
-</div>
 </div>
 
 ### 非知识层（单独统计，不计入知识卡总数）
@@ -311,10 +307,6 @@ layout: home
 <div class="wd-stat-item">
 <div class="wd-stat-num">6</div>
 <div class="wd-stat-label">决策卡</div>
-</div>
-<div class="wd-stat-item">
-<div class="wd-stat-num">1</div>
-<div class="wd-stat-label">AI审校记录卡</div>
 </div>
 </div>
 
