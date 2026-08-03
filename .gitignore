@@ -3,3 +3,28 @@
 private/
 .obsidian/
 .workbuddy/
+
+# 网站构建产物（生成详情页）不提交；website/docs/*/index.md 索引页与手工文件（config/theme/topics 等）保留提交
+# 约定：运行 website/scripts/生成网站页面.mjs 后，仅提交 index.md 与手工维护文件，不提交自动生成的详情页
+website/docs/library/*
+website/docs/originals/*
+website/docs/concepts/*
+website/docs/claims/*
+website/docs/disputes/*
+website/docs/research/*
+website/docs/risks/*
+website/docs/contemporary/*
+website/docs/topics/*
+website/docs/safety/*
+website/docs/project/*
+!website/docs/library/index.md
+!website/docs/originals/index.md
+!website/docs/concepts/index.md
+!website/docs/claims/index.md
+!website/docs/disputes/index.md
+!website/docs/research/index.md
+!website/docs/risks/index.md
+!website/docs/contemporary/index.md
+!website/docs/topics/index.md
+!website/docs/safety/index.md
+!website/docs/project/**/index.md
