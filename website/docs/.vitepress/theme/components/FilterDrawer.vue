@@ -7,24 +7,31 @@ import { computed, ref } from 'vue'
 
 export interface FilterOptions {
   type: { key: string; label: string; count?: number }[]
-  evidence: string[]
-  risk: string[]
+  topic: FilterChoice[]
+  concept: FilterChoice[]
+  source: FilterChoice[]
+  evidence: FilterChoice[]
+  risk: FilterChoice[]
+  date: FilterChoice[]
 }
+
+export interface FilterChoice { key: string; label: string }
 
 const props = withDefaults(defineProps<{
   options: FilterOptions
   mobileOnly?: boolean
 }>(), { mobileOnly: false })
 
-const model = defineModel<{ type: string[]; evidence: string[]; risk: string[] }>({ default: () => ({ type: [], evidence: [], risk: [] }) })
+type FilterModel = { type: string[]; topic: string[]; concept: string[]; source: string[]; evidence: string[]; risk: string[]; date: string[] }
+const model = defineModel<FilterModel>({ default: () => ({ type: [], topic: [], concept: [], source: [], evidence: [], risk: [], date: [] }) })
 
 const drawerOpen = ref(false)
 
 const activeCount = computed(
-  () => model.value.type.length + model.value.evidence.length + model.value.risk.length
+  () => Object.values(model.value).reduce((count, values) => count + values.length, 0)
 )
 
-function toggle(listKey: 'type' | 'evidence' | 'risk', value: string) {
+function toggle(listKey: keyof FilterModel, value: string) {
   const list = model.value[listKey]
   model.value = {
     ...model.value,
@@ -33,22 +40,28 @@ function toggle(listKey: 'type' | 'evidence' | 'risk', value: string) {
 }
 
 function clearAll() {
-  model.value = { type: [], evidence: [], risk: [] }
+  model.value = { type: [], topic: [], concept: [], source: [], evidence: [], risk: [], date: [] }
 }
 
 /** 主体（chips 组） */
 function chipGroups() {
-  const groups: { key: 'type' | 'evidence' | 'risk'; label: string; items: string[] | { key: string; label: string; count?: number }[] }[] = [
+  const groups: { key: keyof FilterModel; label: string; items: FilterChoice[] }[] = [
     { key: 'type', label: '资料性质', items: props.options.type },
+    { key: 'topic', label: '专题', items: props.options.topic },
+    { key: 'concept', label: '概念', items: props.options.concept },
+    { key: 'source', label: '典籍与来源', items: props.options.source },
     { key: 'evidence', label: '证据状态', items: props.options.evidence },
-    { key: 'risk', label: '风险等级', items: props.options.risk }
+    { key: 'risk', label: '风险等级', items: props.options.risk },
+    { key: 'date', label: '发布时间', items: props.options.date }
   ]
   return groups
 }
 
-function chipText(g: { key: 'type' | 'evidence' | 'risk'; items: any[] }, v: any): string {
-  if (g.key === 'type') return v.label
-  return v
+const primaryGroups = computed(() => chipGroups().filter((group) => ['type', 'topic', 'source', 'risk'].includes(group.key)))
+const moreGroups = computed(() => chipGroups().filter((group) => ['concept', 'evidence', 'date'].includes(group.key)))
+
+function isSelected(group: keyof FilterModel, value: string) {
+  return model.value[group].includes(value)
 }
 </script>
 
@@ -70,12 +83,13 @@ function chipText(g: { key: 'type' | 'evidence' | 'risk'; items: any[] }, v: any
           <label>{{ g.label }}</label>
           <div class="wdz-filter__chips">
             <button
-              v-for="v in g.items" :key="String(typeof v === 'object' ? v.key : v)"
+              v-for="v in g.items" :key="v.key"
               type="button"
               class="wdz-filter__chip"
-              :class="{ 'is-active': (model[g.key] as string[]).includes(typeof v === 'object' ? v.key : v) }"
-              @click="toggle(g.key, typeof v === 'object' ? v.key : v)"
-            >{{ chipText(g, v) }}</button>
+              :aria-pressed="isSelected(g.key, v.key)"
+              :class="{ 'is-active': isSelected(g.key, v.key) }"
+              @click="toggle(g.key, v.key)"
+            >{{ v.label }}</button>
           </div>
         </div>
         <button class="wdz-btn wdz-btn--primary" type="button" style="margin-top: 8px;" @click="drawerOpen = false">完成</button>
@@ -85,18 +99,30 @@ function chipText(g: { key: 'type' | 'evidence' | 'risk'; items: any[] }, v: any
 
   <!-- 桌面：左侧栏 -->
   <div v-else class="wdz-filter">
-    <div v-for="g in chipGroups()" :key="g.key" class="wdz-filter__group">
+    <div v-for="g in primaryGroups" :key="g.key" class="wdz-filter__group">
       <label>{{ g.label }}</label>
       <div class="wdz-filter__chips">
         <button
-          v-for="v in g.items" :key="String(typeof v === 'object' ? v.key : v)"
+          v-for="v in g.items" :key="v.key"
           type="button"
           class="wdz-filter__chip"
-          :class="{ 'is-active': (model[g.key] as string[]).includes(typeof v === 'object' ? v.key : v) }"
-          @click="toggle(g.key, typeof v === 'object' ? v.key : v)"
-        >{{ chipText(g, v) }}</button>
+          :aria-pressed="isSelected(g.key, v.key)"
+          :class="{ 'is-active': isSelected(g.key, v.key) }"
+          @click="toggle(g.key, v.key)"
+        >{{ v.label }}</button>
       </div>
     </div>
+    <details class="wdz-filter__more">
+      <summary>更多条件</summary>
+      <div v-for="g in moreGroups" :key="g.key" class="wdz-filter__group">
+        <label>{{ g.label }}</label>
+        <div class="wdz-filter__chips">
+          <button v-for="v in g.items" :key="v.key" type="button" class="wdz-filter__chip"
+            :aria-pressed="isSelected(g.key, v.key)" :class="{ 'is-active': isSelected(g.key, v.key) }"
+            @click="toggle(g.key, v.key)">{{ v.label }}</button>
+        </div>
+      </div>
+    </details>
     <button v-if="activeCount" class="wdz-filter__clear" type="button" @click="clearAll">清除全部筛选</button>
   </div>
 </template>

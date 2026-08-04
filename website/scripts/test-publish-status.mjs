@@ -12,15 +12,14 @@
  * 运行：npm test
  */
 import { spawnSync } from 'node:child_process'
-import { existsSync, writeFileSync, rmSync, readFileSync } from 'node:fs'
+import { existsSync, writeFileSync, rmSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 
 const WEBSITE_ROOT = fileURLToPath(new URL('..', import.meta.url)) // website/
 const REPO_ROOT = fileURLToPath(new URL('../..', import.meta.url))
 const CARD_FILE = path.join(REPO_ROOT, '03-原文卡', '原文-9999-回归测试临时卡.md')
-const DETAIL_PAGE = path.join(WEBSITE_ROOT, 'docs', 'originals', '原文-9999-回归测试临时卡.md')
-const INDEX_PAGE = path.join(WEBSITE_ROOT, 'docs', 'originals', 'index.md')
+const DETAIL_PAGE = path.join(WEBSITE_ROOT, 'docs', 'knowledge', '原文-9999-回归测试临时卡.md')
 const CARD_LINK = '原文-9999-回归测试临时卡'
 
 /** 运行生成器，返回 { ok, output }；ok=false 表示构建失败（exit 非 0） */
@@ -49,6 +48,7 @@ function writeTempCard(status, omitChapter = null) {
     '网站发布状态: ' + status,
     '公开摘要: 回归测试专用临时卡，测试后即删除，不构成任何内容。',
     '公开注意事项: 回归测试专用临时卡，测试后即删除，不构成任何练习指导。',
+    '最后修改日期: 2026-08-04',
     '---'
   ].join('\n')
   writeFileSync(CARD_FILE, yaml + '\n\n' + body, 'utf8')
@@ -71,7 +71,7 @@ writeTempCard('可公开草稿')
   const r = runGenerator()
   check('A1 生成器退出码 0', r.ok, r.output.slice(-500))
   check('A2 详情页已生成', existsSync(DETAIL_PAGE), DETAIL_PAGE)
-  check('A3 索引页含该卡链接', existsSync(INDEX_PAGE) && readFileSync(INDEX_PAGE, 'utf8').includes(CARD_LINK), '索引页缺链接')
+  check('A3 生成输出指向统一知识索引', r.output.includes(`/knowledge/${CARD_LINK}.md`), '未输出统一知识详情路径')
 }
 
 // —— 场景 B：已撤回 → 详情页删除 + 索引消失 ——
@@ -81,8 +81,7 @@ writeTempCard('已撤回')
   const r = runGenerator()
   check('B1 生成器退出码 0', r.ok, r.output.slice(-500))
   check('B2 旧详情页已删除', !existsSync(DETAIL_PAGE), '详情页残留：' + DETAIL_PAGE)
-  const idx = existsSync(INDEX_PAGE) ? readFileSync(INDEX_PAGE, 'utf8') : ''
-  check('B3 索引不再含该卡', !idx.includes(CARD_LINK), '索引仍含该卡链接')
+  check('B3 撤回卡不再输出统一详情路径', !r.output.includes(`/knowledge/${CARD_LINK}.md`), '生成输出仍含该卡链接')
 }
 
 // —— 场景 C：可公开卡缺必需章节 → 构建失败 + 明确报告 ——

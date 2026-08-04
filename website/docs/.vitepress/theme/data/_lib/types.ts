@@ -40,6 +40,10 @@ export interface KnowledgeItem {
   meta: Record<string, string>  // 完整元信息（折叠展示）
   relPath: string
   lastModified: string     // YYYY-MM-DD
+  sortDate: string         // YYYY-MM-DD，空值排在末尾
+  topics: string[]         // 关联专题名称
+  concepts: string[]       // 关联概念编号
+  sources: string[]        // 典籍/来源名称或编号
   bodyPreview: string      // 正文章节摘要（搜索/索引用）
   related: {
     concepts: string[]; originals: string[]; claims: string[];
@@ -53,6 +57,7 @@ export interface Topic {
   name: string             // 静
   module: string
   stage: string
+  summary: string          // 面向首部的纯文本短摘要
   coreQuestions: { id: string; question: string }[]
   coreIds: {
     原文: string[]; 概念: string[]; 主张: string[]; 争议: string[];

@@ -48,6 +48,15 @@ function parseList(v: unknown): string[] {
   return []
 }
 
+function toPlainSummary(markdown: string): string {
+  return markdown
+    .replace(/\*\*|__|`/g, '')
+    .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 150)
+}
+
 export interface TopicsData {
   topics: Topic[]
   byId: Record<string, Topic>
@@ -85,6 +94,7 @@ export async function loadTopicsData(): Promise<TopicsData> {
       name,
       module: String(raw['模块'] || ''),
       stage: String(raw['当前阶段'] || ''),
+      summary: toPlainSummary(narrative.what || ''),
       coreQuestions: Array.isArray(raw['核心问题'])
         ? raw['核心问题'].map((q: any) => ({ id: String(q.id || ''), question: String(q.question || '') }))
         : [],

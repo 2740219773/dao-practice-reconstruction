@@ -4,7 +4,7 @@
  * 校验失败抛出错误，由调用方（data loader）在构建期终止。
  */
 import { z } from 'zod'
-import { splitChapters } from './读取知识卡.ts'
+import { displayValue, splitChapters } from './读取知识卡.ts'
 import type { RawCard } from './types.ts'
 
 export const PUBLISH_STATUSES = ['不公开', '内部预览', '可公开草稿', '正式公开', '已撤回'] as const
@@ -107,6 +107,10 @@ function checkPublicFields(parsed: { data: Record<string, any> }): string[] {
     }
     if (!notice || notice.trim() === '' || notice.trim() === '待补录') {
       errors.push(`「${status}」状态下必须填写「公开注意事项」`)
+    }
+    const modified = parsed.data['最后修改日期']
+    if (!modified || !/^\d{4}-\d{2}-\d{2}$/.test(displayValue(modified))) {
+      errors.push(`「${status}」状态下必须填写有效的「最后修改日期」（YYYY-MM-DD）`)
     }
   }
   return errors

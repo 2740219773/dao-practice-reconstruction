@@ -7,6 +7,7 @@ import { defineLoader } from 'vitepress'
 import { readAllCards, displayValue } from './_lib/读取知识卡.ts'
 import { validateAllCards } from './_lib/校验公开字段.ts'
 import { TYPE_LABELS } from './_lib/常量.ts'
+import { loadTopicsData } from './topics.data.ts'
 import type { KnowledgeItem, KnowledgeType, RawCard } from './_lib/types.ts'
 
 /** 类型显示标签（供 KnowledgeLayout 等组件复用） */
@@ -90,6 +91,28 @@ function parseRelated(v: unknown): string[] {
     .map((s) => s.match(/^((文献|原文|概念|主张|假说|争议|现代研究|风险资料)-\d+)/)?.[1] ?? s)
 }
 
+function parseValues(v: unknown): string[] {
+  if (!v) return []
+  if (Array.isArray(v)) return v.map((x) => String(x).trim()).filter(Boolean)
+  return String(v).split(/[,，、]/).map((x) => x.trim()).filter(Boolean)
+}
+
+function topicNamesFor(id: string, topics: Awaited<ReturnType<typeof loadTopicsData>>): string[] {
+  return topics.all
+    .filter((topic) => Object.values(topic.coreIds).some((ids) => ids.includes(id)))
+    .map((topic) => topic.name)
+}
+
+function sourceValues(card: RawCard, y: Record<string, any>): string[] {
+  const values = [
+    ...parseValues(y['所属文献']),
+    ...parseValues(y['所属文献编号']),
+    ...parseValues(y['来源']),
+    ...parseValues(y['关联原文'])
+  ]
+  return [...new Set(values)]
+}
+
 /** 文献资料性质 → 知识层级 */
 const LEVEL_MAP: Record<string, string> = {
   '原始文献': 'L1',
@@ -98,7 +121,7 @@ const LEVEL_MAP: Record<string, string> = {
   '现代学术研究': 'L4'
 }
 
-function toItem(card: RawCard): KnowledgeItem {
+function toItem(card: RawCard, topics: Awaited<ReturnType<typeof loadTopicsData>>): KnowledgeItem {
   const y = card.yaml
   const type = card.slug as KnowledgeType
   const status = (y['网站发布状态'] || '内部预览') as KnowledgeItem['status']
@@ -130,6 +153,9 @@ function toItem(card: RawCard): KnowledgeItem {
   // 概念卡的 关联原文 → originals
   if (y['关联原文']) related.originals = parseRelated(y['关联原文'])
 
+  const lastModified = y['最后修改日期'] ? displayValue(y['最后修改日期']) : ''
+  const concepts = parseRelated(y['关联概念'])
+
   return {
     id: y['编号'],
     type,
@@ -144,7 +170,11 @@ function toItem(card: RawCard): KnowledgeItem {
     tags,
     meta,
     relPath: card.relPath,
-    lastModified: y['最后修改日期'] ? displayValue(y['最后修改日期']) : '',
+    lastModified,
+    sortDate: /^\d{4}-\d{2}-\d{2}$/.test(lastModified) ? lastModified : '',
+    topics: topicNamesFor(String(y['编号'] || ''), topics),
+    concepts,
+    sources: sourceValues(card, y),
     bodyPreview: card.body.slice(0, 260),
     related
   }
@@ -170,12 +200,13 @@ export { data }
 /** 核心加载逻辑（供本 loader 与 search-index.data.ts 复用） */
 export async function loadKnowledgeData(): Promise<KnowledgeData> {
   const cards = await readAllCards()
+  const topics = await loadTopicsData()
   // 校验失败抛错 → 终止构建（含章节白名单与风险字段检查）
   const publishable = validateAllCards(cards)
 
   const items = publishable
     .filter((c) => c.layer === 'knowledge')
-    .map(toItem)
+    .map((card) => toItem(card, topics))
 
   const byType: Record<string, KnowledgeItem[]> = {}
   for (const item of items) {

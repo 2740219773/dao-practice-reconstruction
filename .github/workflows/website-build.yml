@@ -27,16 +27,15 @@ jobs:
       - name: 验证构建产物
         run: |
           test -f docs/.vitepress/dist/index.html
-          test -f docs/.vitepress/dist/project/index.html
+          test -f docs/.vitepress/dist/knowledge/index.html
+          test -f docs/.vitepress/dist/question-map/index.html
+          test -f docs/.vitepress/dist/topics/jing.html
+          test -f docs/.vitepress/dist/method/index.html
           test -f docs/.vitepress/dist/safety/index.html
-          # 三个知识库索引页（自动生成）
-          test -f docs/.vitepress/dist/library/index.html
-          test -f docs/.vitepress/dist/originals/index.html
-          test -f docs/.vitepress/dist/concepts/index.html
-          # 三张样板详情页（自动生成，cleanUrls 无 .html 后缀）
-          test -f docs/.vitepress/dist/library/文献-0001-道德经.html
-          test -f docs/.vitepress/dist/originals/原文-0001-道德经第十六章.html
-          test -f docs/.vitepress/dist/concepts/概念-0001-静.html
+          # 统一知识详情页（自动生成，cleanUrls 无 .html 后缀）
+          test -f docs/.vitepress/dist/knowledge/文献-0001-道德经.html
+          test -f docs/.vitepress/dist/knowledge/原文-0001-道德经第十六章.html
+          test -f docs/.vitepress/dist/knowledge/概念-0001-静.html
       - name: 上传构建产物
         uses: actions/upload-artifact@v4
         with:

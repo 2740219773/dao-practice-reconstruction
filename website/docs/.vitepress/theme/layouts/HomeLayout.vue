@@ -46,6 +46,14 @@ const recentUpdates = computed(() =>
     <!-- 第一屏：品牌与起点 -->
     <InkHero />
 
+    <section class="wdz-home-principles" aria-label="研究原则">
+      <div class="wdz-container wdz-home-principles__inner">
+        <div><b>文</b><span><strong>原文为根</strong>回到语境与版本，不先设结论。</span></div>
+        <div><b>辨</b><span><strong>多方辨析</strong>区分原文、传承与项目判断。</span></div>
+        <div><b>界</b><span><strong>边界清晰</strong>公开争议、不能确认与风险。</span></div>
+      </div>
+    </section>
+
     <!-- 第二屏：你想了解什么 -->
     <section class="wdz-section wdz-container">
       <div class="wdz-section__head">
