@@ -1,0 +1,123 @@
+/* ============================================================
+ * 问道志 · 排版 typography.css（方案 9.2 / 12.2）
+ * ============================================================ */
+
+body {
+  font-family: var(--wdz-font-sans);
+  font-size: 16px;
+  line-height: 1.85;
+  color: var(--wdz-ink);
+  background-color: var(--wdz-paper);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* 品牌与页头标题：宋体，有书卷感但字重不过黑 */
+h1, h2, h3, h4, .wdz-title-serif {
+  font-family: var(--wdz-font-serif);
+  color: var(--wdz-ink);
+  line-height: 1.4;
+}
+
+/* ---------- 正文排版容器（ArticleLayout / 各类 Content） ---------- */
+.wdz-prose {
+  font-size: 16px;
+  line-height: 1.9;
+  max-width: var(--wdz-prose);
+  color: var(--wdz-ink);
+}
+.wdz-prose h1 { font-size: 2rem; margin: 0 0 1.2rem; letter-spacing: 0.02em; }
+.wdz-prose h2 {
+  font-size: 1.45rem;
+  margin: 3rem 0 1.2rem;
+  padding-top: 1.4rem;
+  border-top: 1px solid var(--wdz-line);
+  letter-spacing: 0.03em;
+}
+.wdz-prose h2:first-of-type { border-top: none; }
+.wdz-prose h3 { font-size: 1.2rem; margin: 2rem 0 0.9rem; }
+.wdz-prose h4 { font-size: 1.05rem; margin: 1.6rem 0 0.7rem; }
+.wdz-prose p { margin: 0.9rem 0; }
+.wdz-prose strong { font-weight: 650; }
+.wdz-prose em { font-style: normal; color: var(--wdz-vermilion); } /* 项目强调用朱砂 */
+
+/* 原文引用：宋体，与现代解释形成差异 */
+.wdz-prose blockquote {
+  margin: 1.4rem 0;
+  padding: 0.7rem 1.2rem;
+  border-left: 3px solid var(--wdz-moss);
+  background: var(--wdz-surface);
+  font-family: var(--wdz-font-serif);
+  color: var(--wdz-ink-2);
+  font-size: 0.97em;
+}
+
+.wdz-prose ul, .wdz-prose ol { margin: 0.9rem 0; padding-left: 1.5rem; }
+.wdz-prose li { margin: 0.35rem 0; }
+.wdz-prose a { color: var(--wdz-vermilion); text-decoration: none; border-bottom: 1px solid transparent; }
+.wdz-prose a:hover { border-bottom-color: var(--wdz-vermilion); }
+
+/* 表格 */
+.wdz-prose table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.4rem 0;
+  font-size: 0.92em;
+}
+.wdz-prose th {
+  background: var(--wdz-surface);
+  font-weight: 600;
+  text-align: left;
+  border-bottom: 1px solid var(--wdz-line-strong);
+}
+.wdz-prose th, .wdz-prose td { padding: 0.55rem 0.8rem; border-bottom: 1px solid var(--wdz-line); }
+.wdz-prose tr:last-child td { border-bottom: none; }
+
+/* 代码与元数据：等宽 */
+.wdz-prose code {
+  font-family: var(--wdz-font-mono);
+  font-size: 0.86em;
+  background: var(--wdz-surface);
+  border: 1px solid var(--wdz-line);
+  border-radius: 3px;
+  padding: 0.1em 0.4em;
+  color: var(--wdz-vermilion-3);
+}
+.wdz-prose pre {
+  background: var(--wdz-ink);
+  color: var(--wdz-paper);
+  border-radius: var(--wdz-radius);
+  padding: 1rem 1.2rem;
+  overflow-x: auto;
+}
+.wdz-prose pre code { background: transparent; border: none; color: inherit; padding: 0; }
+
+/* 分隔线 */
+.wdz-prose hr {
+  border: none;
+  border-top: 1px solid var(--wdz-line);
+  margin: 2.5rem 0;
+}
+
+/* 图片：克制圆角与阴影 */
+.wdz-prose img { max-width: 100%; border-radius: var(--wdz-radius); }
+
+/* 折叠细节（折叠元信息） */
+.wdz-prose details {
+  margin: 1.2rem 0;
+  border: 1px solid var(--wdz-line);
+  border-radius: var(--wdz-radius);
+  background: var(--wdz-surface);
+}
+.wdz-prose details summary {
+  cursor: pointer;
+  padding: 0.7rem 1rem;
+  font-weight: 600;
+  color: var(--wdz-ink-2);
+  user-select: none;
+}
+.wdz-prose details[open] summary { border-bottom: 1px solid var(--wdz-line); }
+.wdz-prose details .details-content { padding: 0.8rem 1rem 1rem; }
+
+/* 编号与元信息通用 */
+.wdz-mono { font-family: var(--wdz-font-mono); font-size: 0.88em; }

@@ -1,0 +1,100 @@
+/* ============================================================
+ * 问道志 · 水墨装饰 ink-theme.css（方案 9.4 / 9.5）
+ * 淡墨山形背景、朱砂方印、墨点层级、留白虚线
+ * 使用边界：首页/专题首部可用意境，正文保持高对比可读。
+ * ============================================================ */
+
+/* ---------- 淡墨山形（inline SVG 背景，透明度低于 20%） ---------- */
+.wdz-ink-bg {
+  position: relative;
+  isolation: isolate;
+}
+.wdz-ink-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.14;
+  pointer-events: none;
+  background-repeat: no-repeat;
+  background-position: right top;
+  background-size: 46% auto;
+  /* 抽象墨山：层叠弧线 + 远山 + 孤舟点 */
+  background-image:
+    radial-gradient(ellipse at 78% 22%, rgba(32, 35, 31, 0.28) 0%, transparent 46%),
+    radial-gradient(ellipse at 68% 12%, rgba(32, 35, 31, 0.16) 0%, transparent 40%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 520 300'%3E%3Cpath d='M0 240 C 90 190, 150 230, 230 205 C 300 185, 330 140, 400 120 C 445 106, 480 120, 520 110 L 520 300 L 0 300 Z' fill='%2320231f' opacity='0.55'/%3E%3Cpath d='M60 265 C 140 235, 200 258, 260 244 C 330 228, 380 205, 450 195' fill='none' stroke='%2320231f' stroke-width='2' opacity='0.4'/%3E%3Cpath d='M395 135 C 398 128, 402 128, 405 135 C 402 141, 398 141, 395 135 Z' fill='%2320231f' opacity='0.7'/%3E%3Ccircle cx='330' cy='150' r='2.5' fill='%2320231f' opacity='0.5'/%3E%3Ccircle cx='345' cy='172' r='1.5' fill='%2320231f' opacity='0.35'/%3E%3C/svg%3E");
+}
+
+/* 首页 hero 专用：更淡 */
+.wdz-hero .wdz-ink-bg::before, .wdz-hero::after {
+  content: '';
+  position: absolute;
+  right: -4%;
+  bottom: -2%;
+  width: 52%;
+  height: 82%;
+  z-index: 0;
+  opacity: 0.13;
+  pointer-events: none;
+  background-repeat: no-repeat;
+  background-position: right bottom;
+  background-size: contain;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 560 380'%3E%3Cpath d='M0 320 C 100 260, 190 300, 280 270 C 360 244, 410 190, 490 160 C 530 144, 550 152, 560 148 L 560 380 L 0 380 Z' fill='%2320231f' opacity='0.5'/%3E%3Cpath d='M120 340 C 210 305, 300 330, 380 305 C 440 286, 500 265, 560 255' fill='none' stroke='%2320231f' stroke-width='2' opacity='0.35'/%3E%3Ccircle cx='430' cy='185' r='3' fill='%2320231f' opacity='0.45'/%3E%3C/svg%3E");
+}
+
+/* 专题首部：右下角淡墨 */
+.wdz-topic-hero { position: relative; overflow: hidden; }
+.wdz-topic-hero::after {
+  content: '';
+  position: absolute;
+  right: -2%;
+  bottom: -30%;
+  width: 40%;
+  height: 120%;
+  opacity: 0.08;
+  pointer-events: none;
+  background-repeat: no-repeat;
+  background-position: right bottom;
+  background-size: contain;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 420 300'%3E%3Cpath d='M0 250 C 80 205, 150 240, 230 215 C 300 192, 340 150, 420 130 L 420 300 L 0 300 Z' fill='%2320231f' opacity='0.5'/%3E%3C/svg%3E");
+}
+
+/* ---------- 墨点层级（证据强弱 / 核对程度） ---------- */
+.wdz-dots { display: inline-flex; gap: 4px; vertical-align: middle; }
+.wdz-dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--wdz-ink-3); }
+.wdz-dots i.on { background: var(--wdz-ink); }
+.wdz-dots i.on-strong { background: var(--wdz-vermilion); }
+
+/* ---------- 留白虚线（待确认 / 开放问题 / 假说） ---------- */
+.wdz-dashed-box {
+  border: 1px dashed var(--wdz-line-strong);
+  border-radius: var(--wdz-radius-lg);
+  padding: 1rem 1.2rem;
+  background: transparent;
+}
+
+/* ---------- 朱砂方印品牌（首页 hero 竖排印） ---------- */
+.wdz-brand-seal {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  padding: 8px 4px;
+  background: var(--wdz-vermilion);
+  color: #f6efe4;
+  border-radius: 4px;
+  font-family: var(--wdz-font-serif);
+  font-size: 0.95rem;
+  letter-spacing: 0.3em;
+  writing-mode: vertical-rl;
+  box-shadow: inset 0 0 0 1px rgba(246, 239, 228, 0.35);
+  user-select: none;
+}
+
+/* 禁止的装饰（方案 9.5）：不使用云雾动画/仙鹤飞行/卷轴金纹。
+   如需低性能模式，隐藏全部水墨背景 */
+@media (prefers-reduced-motion: reduce), (max-width: 768px) {
+  .wdz-ink-bg::before { background-image: none; }
+}

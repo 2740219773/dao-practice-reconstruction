@@ -1,0 +1,86 @@
+/* ============================================================
+ * 问道志 · 设计令牌 tokens.css
+ * 《问道志网站重构完整设计方案》第九章 视觉系统
+ * 一纸、一墨、一印、一条路 —— 现代研究型水墨风
+ * ============================================================ */
+
+:root {
+  /* ---------- 色彩（方案 9.1） ---------- */
+  --wdz-paper: #f3efe5;          /* 宣纸白：全站背景与主要留白 */
+  --wdz-surface: #faf7f0;        /* 纸面浅色：卡片、浮层、正文容器 */
+  --wdz-ink: #20231f;            /* 玄墨黑：标题与核心正文 */
+  --wdz-ink-2: #5b625d;          /* 淡墨灰：说明、元信息、辅助文字 */
+  --wdz-ink-3: #8a918b;          /* 淡墨灰更浅：占位与禁用 */
+  --wdz-vermilion: #963629;      /* 朱砂红：当前状态、关键结论、主按钮、风险强调 */
+  --wdz-vermilion-2: #a84a3c;    /* 朱砂浅：悬停、次级强调 */
+  --wdz-vermilion-3: #7a2a1f;    /* 朱砂深：小字号/描边需加深场景 */
+  --wdz-vermilion-soft: rgba(150, 54, 41, 0.09); /* 朱砂柔：徽章底、警示底 */
+  --wdz-moss: #56685b;           /* 青苔灰绿：传统解释、文脉节点、低风险状态 */
+  --wdz-moss-soft: rgba(86, 104, 91, 0.10);
+  --wdz-slate: #596c78;          /* 冷墨蓝灰：现代研究与数据类内容 */
+  --wdz-slate-soft: rgba(89, 108, 120, 0.10);
+  --wdz-ochre: #8a4b3d;          /* 赭色：高风险提示，谨慎少用 */
+  --wdz-ochre-soft: rgba(138, 75, 61, 0.10);
+  --wdz-line: rgba(32, 35, 31, 0.14);      /* 纸灰细线：边框、分隔 */
+  --wdz-line-strong: rgba(32, 35, 31, 0.24); /* 强调边框 */
+
+  /* ---------- 字体（方案 9.2） ---------- */
+  --wdz-font-serif: 'Source Han Serif SC', 'Noto Serif SC', 'Songti SC', 'SimSun', serif;
+  --wdz-font-sans: 'Source Han Sans SC', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --wdz-font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+  --wdz-font-brand: 'KaiTi', 'STKaiti', 'Kaiti SC', serif; /* 书法：仅题签与标志 */
+
+  /* ---------- 间距（8px 基准，方案 9.3） ---------- */
+  --wdz-space-1: 8px;
+  --wdz-space-2: 16px;
+  --wdz-space-3: 24px;
+  --wdz-space-4: 32px;
+  --wdz-space-5: 48px;
+  --wdz-space-6: 64px;
+  --wdz-space-7: 96px;
+
+  /* ---------- 圆角（0~6px，方案 9.3） ---------- */
+  --wdz-radius-sm: 0px;
+  --wdz-radius: 4px;
+  --wdz-radius-lg: 6px;
+
+  /* ---------- 阴影（极轻或不用，方案 9.3） ---------- */
+  --wdz-shadow: 0 1px 2px rgba(32, 35, 31, 0.05);
+  --wdz-shadow-lg: 0 6px 24px rgba(32, 35, 31, 0.10);
+
+  /* ---------- 栅格（方案 9.3） ---------- */
+  --wdz-container: 1240px;       /* 桌面内容最大宽度 1200-1240 */
+  --wdz-prose: 780px;            /* 文章正文宽度 720-780 */
+  --wdz-nav-height: 64px;
+
+  /* ---------- 断点 ---------- */
+  --wdz-bp-mobile: 768px;
+
+  /* ---------- 动效（方案十一，克制） ---------- */
+  --wdz-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --wdz-dur: 200ms;
+
+  /* ============ 兼容映射：旧 --wd-* → 新 --wdz-* ============
+   * 旧 style.css 与历史手写页面继续可用，但取新色值。 */
+  --wd-ink: var(--wdz-ink);
+  --wd-ink-2: var(--wdz-ink-2);
+  --wd-ink-3: var(--wdz-ink-3);
+  --wd-paper: var(--wdz-paper);
+  --wd-paper-2: #ece6d8;
+  --wd-paper-3: var(--wdz-surface);
+  --wd-vermilion: var(--wdz-vermilion);
+  --wd-vermilion-2: var(--wdz-vermilion-2);
+  --wd-vermilion-3: var(--wdz-vermilion-3);
+  --wd-vermilion-soft: var(--wdz-vermilion-soft);
+  --wd-line: var(--wdz-line);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

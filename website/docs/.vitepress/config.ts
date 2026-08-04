@@ -1,12 +1,11 @@
 import { defineConfig } from 'vitepress'
 import container from 'markdown-it-container'
 
-/** 注册知识区块容器（对应 style.css 的 .block-*） */
+/** 注册知识区块容器（对应 components.css 的 .block-*） */
 function blockContainer(md, name) {
   md.use(container, name, {
     render(tokens, idx) {
       if (tokens[idx].nesting === 1) {
-        // 注意：模板字符串中 \s 会退化为 s，必须用 new RegExp 构造
         const strip = new RegExp(`^${name}\\s*`, 'i')
         return `<div class="block block-${name}"><p class="block-title">${tokens[idx].info.trim().replace(strip, '') || ''}</p>`
       }
@@ -24,106 +23,22 @@ function markdownConfig(md) {
 export default defineConfig({
   lang: 'zh-CN',
   title: '问道志',
-  description: '传统道家修炼知识重构与研究计划——研究工作台公开预览版。整理文献、原文、概念、争议与现代研究，证据与风险并重。',
-  // 部署路径（网站建设计划 V0.1 五.1）：
-  // Cloudflare Pages 根地址或独立域名使用 '/'（默认）；
-  // 部署到 GitHub Pages 仓库子路径时改为 '/dao-practice-reconstruction/'
+  description: '传统道家知识的来源整理、概念辨析与现代重构——不急于相信，也不急于否定。',
+  // 部署路径：Cloudflare Pages 根地址使用 '/'（默认）
   base: '/',
   cleanUrls: true,
   lastUpdated: true,
-  // 自定义配色仅覆盖暖白浅色主题，未提供 .dark 变量；
-  // 关闭外观切换防止明暗混搭（深色主题由未来 WEB-003 工作包单独建立）
   appearance: false,
   markdown: {
     config: markdownConfig
   },
   head: [
     ['link', { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' }],
-    // 正式公开前阻止搜索引擎收录（网站建设计划 V0.1 六.小项）；正式上线时移除本行并补充 sitemap
+    // 正式公开前阻止搜索引擎收录；正式上线时移除本行并补充 sitemap
     ['meta', { name: 'robots', content: 'noindex,nofollow' }]
   ],
+  // 自定义主题：导航/页尾由 theme/Layout.vue 渲染；local search 由 SearchModal + search-index.data 承担
   themeConfig: {
-    search: {
-      provider: 'local',
-      options: {
-        translations: {
-          button: { buttonText: '搜索', buttonAriaLabel: '搜索' },
-          modal: {
-            noResultsText: '未找到相关结果',
-            resetButtonTitle: '清除查询',
-            footer: { selectText: '选择', navigateText: '切换', closeText: '关闭' }
-          }
-        }
-      }
-    },
-    nav: [
-      { text: '首页', link: '/' },
-      {
-        text: '项目',
-        items: [
-          { text: '项目说明', link: '/project/' },
-          { text: '研究方法', link: '/project/method/' },
-          { text: '当前进度', link: '/project/progress/' }
-        ]
-      },
-      {
-        text: '知识库',
-        items: [
-          { text: '文献库', link: '/library/' },
-          { text: '原文库', link: '/originals/' },
-          { text: '概念库', link: '/concepts/' },
-          { text: '主张库', link: '/claims/' },
-          { text: '现代研究库', link: '/research/' },
-          { text: '风险资料库', link: '/risks/' }
-        ]
-      },
-      {
-        text: '研究议题',
-        items: [
-          { text: '"静"专题', link: '/topics/' },
-          { text: '争议与开放问题', link: '/disputes/' },
-          { text: '当代传播观察', link: '/contemporary/' }
-        ]
-      },
-      { text: '安全边界', link: '/safety/' }
-    ],
-    sidebar: [
-      {
-        text: '关于本项目',
-        items: [
-          { text: '项目说明', link: '/project/' },
-          { text: '研究方法', link: '/project/method/' },
-          { text: '当前进度', link: '/project/progress/' }
-        ]
-      },
-      {
-        text: '内容库',
-        items: [
-          { text: '文献库', link: '/library/' },
-          { text: '原文库', link: '/originals/' },
-          { text: '概念库', link: '/concepts/' },
-          { text: '主张库', link: '/claims/' },
-          { text: '现代研究库', link: '/research/' },
-          { text: '风险资料库', link: '/risks/' },
-          { text: '"静"专题', link: '/topics/' },
-          { text: '争议与开放问题', link: '/disputes/' },
-          { text: '当代传播观察', link: '/contemporary/' }
-        ]
-      },
-      {
-        text: '安全',
-        items: [
-          { text: '安全边界', link: '/safety/' }
-        ]
-      }
-    ],
-    socialLinks: [
-      { icon: 'github', link: 'https://github.com/2740219773/dao-practice-reconstruction' }
-    ],
-    footer: {
-      message: '研究工作台公开预览版 · 内容持续整理中 · 不构成练习指导或医疗建议',
-      copyright: '问道志 · 知识库见 GitHub 仓库'
-    },
     docFooter: {
       prev: '上一页',
       next: '下一页'

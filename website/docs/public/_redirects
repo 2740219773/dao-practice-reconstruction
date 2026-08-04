@@ -1,0 +1,10 @@
+/library/*       /knowledge/:splat  301
+/originals/*     /knowledge/:splat  301
+/concepts/*      /knowledge/:splat  301
+/claims/*        /knowledge/:splat  301
+/disputes/*      /knowledge/:splat  301
+/research/*      /knowledge/:splat  301
+/risks/*         /knowledge/:splat  301
+/contemporary/*  /knowledge/        301
+/topics/         /topics/jing       301
+/project/method/* /method/          301

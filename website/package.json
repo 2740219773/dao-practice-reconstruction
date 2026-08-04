@@ -1,6 +1,6 @@
 {
   "name": "wendaozhi-website",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "engines": {
@@ -14,6 +14,7 @@
     "test": "node scripts/test-publish-status.mjs"
   },
   "dependencies": {
+    "minisearch": "^7.2.0",
     "vitepress": "^1.6.4"
   },
   "devDependencies": {

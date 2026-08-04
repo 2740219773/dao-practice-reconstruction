@@ -1,0 +1,197 @@
+/* ============================================================
+ * 问道志 · 布局 layout.css（方案 9.3 / 12.1）
+ * 栅格、容器宽度、顶部导航、页尾、章节间距
+ * ============================================================ */
+
+/* ---------- 全局结构 ---------- */
+.wdz-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.wdz-main {
+  flex: 1;
+  width: 100%;
+}
+
+/* 内容容器 */
+.wdz-container {
+  max-width: var(--wdz-container);
+  margin: 0 auto;
+  padding: 0 var(--wdz-space-3);
+}
+.wdz-container--narrow { max-width: var(--wdz-prose); }
+
+/* ---------- 顶部导航 ---------- */
+.wdz-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(243, 239, 229, 0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--wdz-line);
+}
+.wdz-nav__inner {
+  max-width: var(--wdz-container);
+  margin: 0 auto;
+  height: var(--wdz-nav-height);
+  padding: 0 var(--wdz-space-3);
+  display: flex;
+  align-items: center;
+  gap: var(--wdz-space-2);
+}
+.wdz-nav__brand {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  text-decoration: none;
+  color: var(--wdz-ink);
+  font-family: var(--wdz-font-serif);
+  font-size: 1.25rem;
+  letter-spacing: 0.18em;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.wdz-nav__brand small {
+  font-family: var(--wdz-font-sans);
+  font-size: 0.72rem;
+  color: var(--wdz-ink-2);
+  letter-spacing: 0.05em;
+  font-weight: 400;
+}
+.wdz-nav__links {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: var(--wdz-space-2);
+}
+.wdz-nav__link {
+  display: block;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.95rem;
+  color: var(--wdz-ink-2);
+  text-decoration: none;
+  border-radius: var(--wdz-radius);
+  transition: color var(--wdz-dur) var(--wdz-ease), background var(--wdz-dur) var(--wdz-ease);
+}
+.wdz-nav__link:hover { color: var(--wdz-ink); background: var(--wdz-surface); }
+.wdz-nav__link.is-active { color: var(--wdz-vermilion); font-weight: 600; }
+
+.wdz-nav__actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.wdz-nav__search-btn {
+  width: 38px; height: 38px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--wdz-line);
+  border-radius: var(--wdz-radius);
+  background: var(--wdz-surface);
+  color: var(--wdz-ink-2);
+  cursor: pointer;
+  transition: border-color var(--wdz-dur), color var(--wdz-dur);
+}
+.wdz-nav__search-btn:hover { border-color: var(--wdz-vermilion); color: var(--wdz-vermilion); }
+
+/* 汉堡按钮（≤768px 显示） */
+.wdz-nav__hamburger {
+  display: none;
+  width: 38px; height: 38px;
+  border: 1px solid var(--wdz-line);
+  border-radius: var(--wdz-radius);
+  background: var(--wdz-surface);
+  color: var(--wdz-ink);
+  cursor: pointer;
+  align-items: center; justify-content: center;
+  margin-left: auto;
+}
+.wdz-nav__hamburger svg { width: 20px; height: 20px; }
+
+/* 移动端下拉菜单 */
+.wdz-nav__mobile {
+  display: none;
+  border-top: 1px solid var(--wdz-line);
+  background: var(--wdz-surface);
+  padding: 0.5rem 1rem 1rem;
+}
+.wdz-nav__mobile a {
+  display: block;
+  padding: 0.7rem 0.5rem;
+  color: var(--wdz-ink-2);
+  text-decoration: none;
+  border-bottom: 1px solid var(--wdz-line);
+  font-size: 1rem;
+}
+.wdz-nav__mobile a:last-child { border-bottom: none; }
+.wdz-nav__mobile a.is-active { color: var(--wdz-vermilion); font-weight: 600; }
+
+/* ---------- 页尾 ---------- */
+.wdz-footer {
+  border-top: 1px solid var(--wdz-line);
+  margin-top: var(--wdz-space-6);
+  background: var(--wdz-surface);
+}
+.wdz-footer__inner {
+  max-width: var(--wdz-container);
+  margin: 0 auto;
+  padding: var(--wdz-space-4) var(--wdz-space-3) var(--wdz-space-5);
+}
+.wdz-footer__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--wdz-space-4);
+}
+.wdz-footer__brand { font-family: var(--wdz-font-serif); font-size: 1.1rem; letter-spacing: 0.14em; color: var(--wdz-ink); }
+.wdz-footer__desc { margin-top: 0.6rem; font-size: 0.86rem; color: var(--wdz-ink-2); line-height: 1.7; }
+.wdz-footer__col h4 { font-size: 0.9rem; font-weight: 600; color: var(--wdz-ink); margin-bottom: 0.7rem; }
+.wdz-footer__col a {
+  display: block;
+  padding: 0.25rem 0;
+  font-size: 0.88rem;
+  color: var(--wdz-ink-2);
+  text-decoration: none;
+}
+.wdz-footer__col a:hover { color: var(--wdz-vermilion); }
+.wdz-footer__bottom {
+  margin-top: var(--wdz-space-4);
+  padding-top: var(--wdz-space-3);
+  border-top: 1px solid var(--wdz-line);
+  font-size: 0.82rem;
+  color: var(--wdz-ink-3);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ---------- 章节留白与题签 ---------- */
+.wdz-section { padding: var(--wdz-space-5) 0; }
+.wdz-section--tight { padding: var(--wdz-space-3) 0; }
+.wdz-section__head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: var(--wdz-space-3);
+}
+.wdz-section__tag {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--wdz-vermilion);
+  letter-spacing: 0.22em;
+  white-space: nowrap;
+}
+.wdz-section__title {
+  font-family: var(--wdz-font-serif);
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--wdz-ink);
+}
+.wdz-section__sub { color: var(--wdz-ink-2); font-size: 0.92rem; }
+
+/* ---------- 响应式 ---------- */
+@media (max-width: 768px) {
+  .wdz-nav__links, .wdz-nav__search-btn { display: none; }
+  .wdz-nav__hamburger { display: inline-flex; }
+  .wdz-nav__mobile.is-open { display: block; }
+  .wdz-container { padding: 0 var(--wdz-space-2); }
+  .wdz-section { padding: var(--wdz-space-3) 0; }
+  .wdz-footer__grid { grid-template-columns: 1fr 1fr; gap: var(--wdz-space-3); }
+  .wdz-section__title { font-size: 1.35rem; }
+}
