@@ -61,7 +61,7 @@ function statusLabel(status: string) {
             <h3>{{ topic.title }}</h3>
             <p>{{ topic.summary }}</p>
             <p class="wdz-topic-card__note">原文 → 概念 → 争议 → 现代研究 → 风险边界</p>
-            <a v-if="topic.detailVisible" class="wdz-topic-card__action" :href="`${topic.url}/`">查看专题 →</a>
+            <a v-if="topic.detailVisible" class="wdz-topic-card__action" :href="topic.url">查看专题 →</a>
           </div>
         </article>
       </div>

@@ -17,9 +17,9 @@ export interface RouteNode {
 /** 「静」专题文脉路线（方案 7.4） */
 const nodes: RouteNode[] = [
   { id: 'ddj', label: '道德经', desc: '致虚极，守静笃', state: 'verified', url: '/knowledge/原文-0001-道德经第十六章' },
-  { id: 'zz', label: '庄子', desc: '心斋 · 坐忘', state: 'verified', url: '/knowledge/原文-0006-庄子大宗师坐忘' },
-  { id: 'gz', label: '管子·内业', desc: '心静气理', state: 'verified', url: '/knowledge/原文-0009-管子内业心静气理' },
-  { id: 'zw', label: '坐忘论', desc: '收心 · 泰定', state: 'verified', url: '/knowledge/原文-0016-坐忘论收心篇' },
+  { id: 'zz', label: '庄子', desc: '心斋 · 坐忘', state: 'partial' },
+  { id: 'gz', label: '管子·内业', desc: '心静气理', state: 'partial' },
+  { id: 'zw', label: '坐忘论', desc: '收心 · 泰定', state: 'partial' },
   { id: 'modern', label: '近现代解释', desc: '静坐 · 气功传播', state: 'partial' },
   { id: 'research', label: '现代研究', desc: '正念 · 冥想对照', state: 'partial' },
   { id: 'spread', label: '当代传播', desc: '常见说法与误读', state: 'pending' }
