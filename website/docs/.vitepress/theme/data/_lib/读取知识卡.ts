@@ -99,7 +99,13 @@ export function displayValue(v: unknown): string {
     const p = (n: number) => String(n).padStart(2, '0')
     return `${v.getFullYear()}-${p(v.getMonth() + 1)}-${p(v.getDate())}`
   }
-  return String(v ?? '').replace(/\n/g, ' ')
+  let text = String(v ?? '')
+  // 部分旧卡片把带引号的 YAML 字符串再次转义，展示层应还原为普通引号。
+  text = text.replace(/\\(["'])/g, '$1')
+  if (text.length >= 2 && text.startsWith('"') && text.endsWith('"')) {
+    text = text.slice(1, -1)
+  }
+  return text.replace(/\n/g, ' ')
 }
 
 /** 按「## 中文序号标题」切分专题文档（结论摘要/安全边界等） */

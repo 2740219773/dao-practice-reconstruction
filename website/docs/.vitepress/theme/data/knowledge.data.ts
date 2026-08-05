@@ -157,13 +157,13 @@ function toItem(card: RawCard, topics: Awaited<ReturnType<typeof loadTopicsData>
   const concepts = parseRelated(y['关联概念'])
 
   return {
-    id: y['编号'],
+    id: displayValue(y['编号']),
     type,
     slug: card.slugOf,
-    title: y['标题'] || card.slugOf,
+    title: displayValue(y['标题'] || card.slugOf),
     url: `/knowledge/${card.slugOf}`,
-    summary: y['公开摘要'] || '',
-    notice: y['公开注意事项'] || '',
+    summary: displayValue(y['公开摘要']),
+    notice: displayValue(y['公开注意事项']),
     status,
     evidenceLevel: y['文献可靠等级'] ? displayValue(y['文献可靠等级']) : undefined,
     riskLevel: risk ? displayValue(risk) : undefined,

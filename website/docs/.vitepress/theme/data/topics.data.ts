@@ -6,7 +6,7 @@ import { defineLoader } from 'vitepress'
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import yaml from 'js-yaml'
-import { REPO_ROOT, splitSections } from './_lib/读取知识卡.ts'
+import { REPO_ROOT, displayValue, splitSections } from './_lib/读取知识卡.ts'
 import type { Topic } from './_lib/types.ts'
 
 const PUBLIC_STATUSES = new Set(['已完成', '研究中', '待开始', '暂不公开'])
@@ -41,7 +41,7 @@ function boolValue(value: unknown): boolean {
 }
 
 function plainText(value: unknown, limit = 180): string {
-  return String(value || '')
+  return displayValue(value)
     .replace(/\*\*|__|`/g, '')
     .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1')
     .replace(/\s+/g, ' ')
@@ -80,7 +80,7 @@ function topicFromDirectory(entryName: string, manifest: Record<string, any>, pu
     homepageVisible: boolValue(publicData['首页展示']),
     homepageStatus: plainText(publicData['首页状态文字']),
     coreQuestions: Array.isArray(manifest['核心问题'])
-      ? manifest['核心问题'].map((q: any) => ({ id: String(q.id || ''), question: String(q.question || '') })) : [],
+      ? manifest['核心问题'].map((q: any) => ({ id: displayValue(q.id), question: displayValue(q.question) })) : [],
     coreIds,
     narrative: {
       what: narrative.what || '', notWhat: narrative.notWhat || '', confirm: narrative.confirm || '',

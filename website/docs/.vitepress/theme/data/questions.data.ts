@@ -50,7 +50,7 @@ export async function loadQuestionsData(): Promise<QuestionsData> {
   for (const card of publishable.filter((c) => c.slug === 'questions')) {
     const y = card.yaml
     const id = String(y['编号'] || '')
-    const title = String(y['问题'] || '').replace(/^"|"$/g, '')
+    const title = displayValue(y['问题'])
     const group = String(y['问题分类'] || '其他')
 
     // 反方材料：辨析卡中概念乙与本体相关者（简化为全部可公开辨析卡中与静相关的）
@@ -68,7 +68,7 @@ export async function loadQuestionsData(): Promise<QuestionsData> {
       id,
       title,
       group,
-      briefAnswer: String(y['简要回答'] || y['公开摘要'] || '').replace(/^"|"$/g, ''),
+      briefAnswer: displayValue(y['简要回答'] || y['公开摘要']),
       background: extractBodyInfo(card, ['问题与背景']),
       supports,
       opposes,

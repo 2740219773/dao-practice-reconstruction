@@ -7,4 +7,5 @@
 /risks/*         /knowledge/:splat  301
 /contemporary/*  /knowledge/        301
 /topics          /topics/            301
+/knowledge       /knowledge/         301
 /project/method/* /method/          301
