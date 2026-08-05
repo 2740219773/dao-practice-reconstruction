@@ -11,7 +11,8 @@ docs/disputes/
 docs/research/
 docs/risks/
 docs/contemporary/
-# 统一知识索引详情页（重构版 V0.2）：/knowledge/{slug}.md 由脚本生成，不入库
-docs/knowledge/
+# 统一知识索引详情页（重构版 V0.2）：/knowledge/{slug}.md 由脚本生成；索引页必须入库
+docs/knowledge/*
+!docs/knowledge/index.md
 docs/.vitepress/theme/data/*.mjs
 docs/.vitepress/**/*.timestamp-*.mjs
