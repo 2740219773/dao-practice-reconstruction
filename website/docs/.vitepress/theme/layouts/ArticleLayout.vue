@@ -10,6 +10,7 @@ import { data as knowledgeData } from '../data/knowledge.data.ts'
 import EvidenceBadge from '../components/EvidenceBadge.vue'
 import SafetyNotice from '../components/SafetyNotice.vue'
 import RelatedReading from '../components/RelatedReading.vue'
+import { data as buildInfo } from '../data/build-info.data.ts'
 
 const { frontmatter } = useData()
 const route = useRoute()
@@ -113,6 +114,10 @@ const riskLevel = computed<'info' | 'caution' | 'danger' | null>(() => {
     <template v-else>
       <h1 v-if="frontmatter.title">{{ frontmatter.title }}</h1>
       <Content />
+      <aside v-if="route.path === '/updates/' || route.path === '/updates'" class="wdz-build-info" aria-label="当前站点版本">
+        <span>当前站点版本：{{ buildInfo.commit }}</span>
+        <span v-if="buildInfo.buildTime">构建时间：{{ buildInfo.buildTime }}</span>
+      </aside>
     </template>
 
     <!-- 知识卡详情底部：关联阅读 -->

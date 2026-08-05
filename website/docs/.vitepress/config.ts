@@ -1,5 +1,13 @@
 import { defineConfig } from 'vitepress'
 import container from 'markdown-it-container'
+import { existsSync, readFileSync } from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const buildInfoFile = path.join(fileURLToPath(new URL('.', import.meta.url)), '..', 'public', 'build-info.json')
+const buildSha = existsSync(buildInfoFile)
+  ? JSON.parse(readFileSync(buildInfoFile, 'utf8')).commit || 'unknown'
+  : 'unknown'
 
 /** 注册知识区块容器（对应 components.css 的 .block-*） */
 function blockContainer(md, name) {
@@ -34,6 +42,7 @@ export default defineConfig({
   },
   head: [
     ['link', { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' }],
+    ['meta', { name: 'wdz-build-sha', content: buildSha }],
     // 正式公开前阻止搜索引擎收录；正式上线时移除本行并补充 sitemap
     ['meta', { name: 'robots', content: 'noindex,nofollow' }]
   ],

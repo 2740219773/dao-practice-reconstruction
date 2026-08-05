@@ -36,6 +36,15 @@ jobs:
           test -f docs/.vitepress/dist/knowledge/文献-0001-道德经.html
           test -f docs/.vitepress/dist/knowledge/原文-0001-道德经第十六章.html
           test -f docs/.vitepress/dist/knowledge/概念-0001-静.html
+          test -f docs/.vitepress/dist/build-info.json
+      - name: 线上冒烟测试
+        if: ${{ vars.WDZ_SMOKE_BASE_URL != '' }}
+        env:
+          WDZ_SMOKE_BASE_URL: ${{ vars.WDZ_SMOKE_BASE_URL }}
+        run: npm run smoke
+      - name: 线上冒烟测试未配置
+        if: ${{ vars.WDZ_SMOKE_BASE_URL == '' }}
+        run: echo "未配置 WDZ_SMOKE_BASE_URL，跳过线上冒烟测试。"
       - name: 上传构建产物
         uses: actions/upload-artifact@v4
         with:

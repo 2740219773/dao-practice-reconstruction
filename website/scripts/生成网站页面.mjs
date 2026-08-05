@@ -13,6 +13,7 @@
  * 数据校验主职责在 theme/data/_lib（data loader 构建期执行）；本脚本同样调用
  * validateAllCards，校验失败即终止，保证生成物与展示数据一致。
  */
+import { execFileSync } from 'node:child_process'
 import { mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { readAllCards, REPO_ROOT, splitChapters } from '../docs/.vitepress/theme/data/_lib/读取知识卡.ts'
@@ -20,6 +21,29 @@ import { validateAllCards, ALLOWLISTS } from '../docs/.vitepress/theme/data/_lib
 
 /** 输出目录：website/docs */
 const DOCS_DIR = path.join(REPO_ROOT, 'website', 'docs')
+
+function buildSha() {
+  const fromEnv = process.env.CF_PAGES_COMMIT_SHA || process.env.GITHUB_SHA
+  if (fromEnv) return fromEnv.slice(0, 8)
+  try {
+    return execFileSync('git', ['rev-parse', '--short=8', 'HEAD'], {
+      cwd: REPO_ROOT,
+      encoding: 'utf8'
+    }).trim() || 'unknown'
+  } catch {
+    return 'unknown'
+  }
+}
+
+function writeBuildInfo() {
+  const publicDir = path.join(DOCS_DIR, 'public')
+  mkdirSync(publicDir, { recursive: true })
+  writeFileSync(path.join(publicDir, 'build-info.json'), `${JSON.stringify({
+    commit: buildSha(),
+    buildTime: new Date().toISOString(),
+    environment: process.env.WDZ_BUILD_ENV || 'preview'
+  }, null, 2)}\n`, 'utf8')
+}
 
 /** 各类型详情页章节 → 区块容器名 */
 const CHAPTER_BLOCKS = {
@@ -71,6 +95,7 @@ function renderDetail(card) {
 }
 
 async function main() {
+  writeBuildInfo()
   console.log('[生成] 步骤 1/3：扫描知识卡…')
   const cards = await readAllCards()
   console.log(`[生成] 扫描到 ${cards.length} 张卡`)

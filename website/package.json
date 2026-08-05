@@ -11,7 +11,8 @@
     "build": "node scripts/生成网站页面.mjs && vitepress build docs",
     "preview": "vitepress preview docs",
     "generate": "node scripts/生成网站页面.mjs",
-    "test": "node scripts/test-publish-status.mjs"
+    "test": "node scripts/test-publish-status.mjs",
+    "smoke": "node scripts/smoke-production.mjs"
   },
   "dependencies": {
     "minisearch": "^7.2.0",

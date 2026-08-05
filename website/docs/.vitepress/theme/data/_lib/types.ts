@@ -54,10 +54,26 @@ export interface KnowledgeItem {
 /** 专题（topics.data.ts 输出） */
 export interface Topic {
   id: string               // TOPIC-001
+  slug: string             // jing
   name: string             // 静
   module: string
+  kind: 'concept' | 'daoyin' | 'medical-observation'
   stage: string
+  publicStatus: '已完成' | '研究中' | '待开始' | '暂不公开'
+  listed: boolean
+  detailVisible: boolean
+  searchVisible: boolean
+  order: number
+  title: string
   summary: string          // 面向首部的纯文本短摘要
+  scopeSummary: string
+  statusSummary: string
+  boundarySummary: string
+  conclusionRange: string
+  verificationSummary: string
+  safetyHighlight: string
+  homepageVisible: boolean
+  homepageStatus: string
   coreQuestions: { id: string; question: string }[]
   coreIds: {
     原文: string[]; 概念: string[]; 主张: string[]; 争议: string[];

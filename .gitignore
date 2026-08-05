@@ -27,4 +27,5 @@ website/docs/project/*
 !website/docs/contemporary/index.md
 !website/docs/topics/index.md
 !website/docs/safety/index.md
+website/docs/public/build-info.json
 !website/docs/project/**/index.md

@@ -34,7 +34,7 @@ export default defineLoader({
       })
     }
 
-    for (const t of topics.all) {
+    for (const t of topics.searchableTopics) {
       entries.push({
         id: t.id,
         title: `专题：${t.name}`,

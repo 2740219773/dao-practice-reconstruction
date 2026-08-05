@@ -396,6 +396,34 @@ body {
 .wdz-filter-drawer__close { width: 36px; height: 36px; border: 1px solid var(--wdz-line); background: transparent; color: var(--wdz-ink); font-size: 1.4rem; cursor: pointer; }
 .wdz-filter-drawer__done { margin-top: 8px; }
 
+/* 专题总入口 */
+.wdz-topics-page { padding-top: 72px; padding-bottom: 88px; }
+.wdz-topics-hero { max-width: 680px; padding: 24px 0 72px; border-bottom: 1px solid var(--wdz-line); }
+.wdz-topics-hero__eyebrow { margin: 0 0 20px; color: var(--wdz-vermilion); font-size: 0.8rem; letter-spacing: 0.1em; }
+.wdz-topics-hero h1 { margin: 0 0 20px; font-family: var(--wdz-font-serif); font-size: clamp(2.6rem, 5vw, 4.2rem); font-weight: 500; }
+.wdz-topics-hero p:not(.wdz-topics-hero__eyebrow) { margin: 8px 0 0; color: var(--wdz-ink-2); font-size: 1.05rem; line-height: 1.9; }
+.wdz-topics-section { padding-top: 64px; }
+.wdz-topics-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.wdz-topic-card { display: grid; grid-template-columns: 84px minmax(0, 1fr); min-width: 0; border: 1px solid var(--wdz-line); background: var(--wdz-surface); }
+.wdz-topic-card--current { border-left: 3px solid var(--wdz-vermilion); }
+.wdz-topic-card__mark { display: grid; place-items: center; min-height: 220px; border-right: 1px solid var(--wdz-line); color: var(--wdz-vermilion); font-family: var(--wdz-font-serif); font-size: 3.5rem; }
+.wdz-topic-card__body { min-width: 0; padding: 24px; }
+.wdz-topic-card__status { margin: 0 0 10px; color: var(--wdz-vermilion); font-size: 0.78rem; }
+.wdz-topic-card h3 { margin: 0 0 12px; font-family: var(--wdz-font-serif); font-size: 1.35rem; font-weight: 500; }
+.wdz-topic-card__body > p:not(.wdz-topic-card__status):not(.wdz-topic-card__note) { margin: 0; color: var(--wdz-ink-2); line-height: 1.8; }
+.wdz-topic-card__note { margin: 16px 0 0; color: var(--wdz-ink-3); font-size: 0.82rem; line-height: 1.7; }
+.wdz-topic-card__action { display: inline-block; margin-top: 20px; color: var(--wdz-vermilion); font-size: 0.86rem; font-weight: 600; text-decoration: none; }
+.wdz-topics-roadmap { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-block: 1px solid var(--wdz-line); }
+.wdz-topic-roadmap-item { display: flex; flex-direction: column; gap: 8px; min-width: 0; padding: 22px 24px; color: var(--wdz-ink-3); font-size: 0.82rem; }
+.wdz-topic-roadmap-item + .wdz-topic-roadmap-item { border-left: 1px solid var(--wdz-line); }
+.wdz-topic-roadmap-item__name { color: var(--wdz-ink-2); font-family: var(--wdz-font-serif); font-size: 1.55rem; }
+.wdz-topics-modules { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.wdz-topics-module { min-width: 0; padding: 24px; border-top: 2px solid var(--wdz-line-strong); background: rgba(236, 230, 216, 0.32); }
+.wdz-topics-module h3 { margin: 0 0 12px; font-family: var(--wdz-font-serif); font-size: 1.05rem; font-weight: 500; }
+.wdz-topics-module p { margin: 0; color: var(--wdz-ink-2); font-size: 0.88rem; line-height: 1.75; }
+.wdz-topics-module .wdz-topic-card__action { margin-top: 16px; color: var(--wdz-ink-3); font-weight: 400; }
+.wdz-build-info { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--wdz-line); color: var(--wdz-ink-3); font-size: 0.76rem; }
+
 /* 所有窄屏覆盖集中在文件末尾，避免桌面规则再次覆盖。 */
 @media (max-width: 1024px) {
   .wdz-topic-layout { grid-template-columns: 150px minmax(0, 1fr); }
@@ -471,6 +499,17 @@ body {
   .wdz-knowledge-card__meta { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 10px 18px; padding: 10px 14px; border-top: 1px solid var(--wdz-line); border-left: 0; }
   .wdz-knowledge-card__meta div { margin: 0; }
   .wdz-knowledge-questions__list { grid-template-columns: 1fr; }
+
+  .wdz-topics-page { padding-top: 40px; padding-bottom: 64px; }
+  .wdz-topics-hero { padding: 16px 0 48px; }
+  .wdz-topics-hero h1 { font-size: 2.6rem; }
+  .wdz-topics-section { padding-top: 48px; }
+  .wdz-topics-grid,
+  .wdz-topics-modules { grid-template-columns: 1fr; }
+  .wdz-topic-card__mark { min-height: 160px; }
+  .wdz-topics-roadmap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .wdz-topic-roadmap-item:nth-child(3) { border-left: 0; border-top: 1px solid var(--wdz-line); }
+  .wdz-topic-roadmap-item:nth-child(4) { border-top: 1px solid var(--wdz-line); }
 }
 
 @media (max-width: 480px) {

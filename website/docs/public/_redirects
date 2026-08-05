@@ -6,5 +6,5 @@
 /research/*      /knowledge/:splat  301
 /risks/*         /knowledge/:splat  301
 /contemporary/*  /knowledge/        301
-/topics/         /topics/jing       301
+/topics          /topics/            301
 /project/method/* /method/          301

@@ -6,7 +6,8 @@
 import { computed, ref, watch } from 'vue'
 import { useData, useRoute } from 'vitepress'
 import HomeLayout from './layouts/HomeLayout.vue'
-import TopicLayout from './layouts/TopicLayout.vue'
+import TopicsLayout from './layouts/TopicsLayout.vue'
+import ConceptTopicLayout from './layouts/ConceptTopicLayout.vue'
 import QuestionLayout from './layouts/QuestionLayout.vue'
 import KnowledgeLayout from './layouts/KnowledgeLayout.vue'
 import ArticleLayout from './layouts/ArticleLayout.vue'
@@ -19,14 +20,15 @@ const route = useRoute()
 const navLinks = [
   { text: '问道', link: '/' },
   { text: '问题地图', link: '/question-map/' },
-  { text: '专题研究', link: '/topics/jing' },
+  { text: '专题研究', link: '/topics/' },
   { text: '典籍与概念', link: '/knowledge/' },
   { text: '研究方法', link: '/method/' }
 ]
 
 const layoutMap: Record<string, any> = {
   home: HomeLayout,
-  topic: TopicLayout,
+  topic: ConceptTopicLayout,
+  topics: TopicsLayout,
   question: QuestionLayout,
   knowledge: KnowledgeLayout
 }
@@ -121,6 +123,7 @@ function onKeydown(e: KeyboardEvent) {
           <div class="wdz-footer__col">
             <h4>阅读</h4>
             <a href="/question-map/">问题地图</a>
+            <a href="/topics/">全部专题</a>
             <a href="/topics/jing">「静」专题</a>
             <a href="/knowledge/">典籍与概念</a>
             <a href="/method/">研究方法</a>
