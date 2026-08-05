@@ -9,7 +9,6 @@
  * ⑥ 最近更新 → 数据驱动
  */
 import { computed } from 'vue'
-import { useData } from 'vitepress'
 import { data as knowledgeData } from '../data/knowledge.data.ts'
 import { data as questionsData } from '../data/questions.data.ts'
 import { HOMEPAGE_QUESTION_IDS } from '../data/_lib/常量.ts'
@@ -17,8 +16,6 @@ import InkHero from '../components/InkHero.vue'
 import QuestionEntry from '../components/QuestionEntry.vue'
 import TopicRoute from '../components/TopicRoute.vue'
 import ConceptMap from '../components/ConceptMap.vue'
-
-const { frontmatter } = useData()
 
 /** 第二屏：3 个高价值问题 */
 const heroQuestions = computed(() =>
@@ -61,7 +58,7 @@ const recentUpdates = computed(() =>
         <h2 class="wdz-section__title">你想了解什么</h2>
       </div>
       <p class="wdz-section__sub">从问题开始，而不是从分类开始。三个代表性问题，通往完整的问题地图。</p>
-      <QuestionEntry :questions="heroQuestions" style="margin-top: 24px;" />
+      <QuestionEntry :questions="heroQuestions" class="wdz-home__questions" />
     </section>
 
     <!-- 第三屏：当前研究·静的文脉路线 -->
@@ -71,7 +68,7 @@ const recentUpdates = computed(() =>
         <h2 class="wdz-section__title">当前研究 ·「静」的文脉路线</h2>
       </div>
       <TopicRoute />
-      <p class="wdz-section__sub" style="margin-top: 8px;">阅读顺序，不代表单纯继承；每一站都可回到原文查证。</p>
+      <p class="wdz-section__sub wdz-home__route-note">阅读顺序，不代表单纯继承；每一站都可回到原文查证。</p>
     </section>
 
     <!-- 第四屏：六个核心概念 -->
@@ -81,7 +78,7 @@ const recentUpdates = computed(() =>
         <h2 class="wdz-section__title">六个核心概念</h2>
       </div>
       <p class="wdz-section__sub">关系线表示研究关联，不代表固定理论。</p>
-      <ConceptMap :concepts="concepts" style="margin-top: 24px;" />
+      <ConceptMap :concepts="concepts" class="wdz-home__concepts" />
     </section>
 
     <!-- 第五屏：我们如何形成判断 -->
@@ -97,8 +94,8 @@ const recentUpdates = computed(() =>
         <div class="wdz-step"><div class="wdz-step__num">4</div><div class="wdz-step__title">对照研究</div><div class="wdz-step__desc">与现代研究对照，但不互相替代</div></div>
         <div class="wdz-step"><div class="wdz-step__num">5</div><div class="wdz-step__title">标记边界</div><div class="wdz-step__desc">不能确认的与有风险的，明确标注</div></div>
       </div>
-      <p style="margin-top: 16px; font-size: 0.9rem; color: var(--wdz-ink-2);">
-        完整七层工作流见 <a href="/method/" style="color: var(--wdz-vermilion);">研究方法</a>。
+      <p class="wdz-home__method-note">
+        完整七层工作流见 <a href="/method/">研究方法</a>。
       </p>
     </section>
 

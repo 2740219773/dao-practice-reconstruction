@@ -19,7 +19,7 @@ const cards = computed(() =>
 </script>
 
 <template>
-  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+  <div class="wdz-question-entry">
     <a v-for="c in cards" :key="c.url" class="wdz-question-card" :href="c.url">
       <span class="wdz-question-card__go">进入探索 →</span>
       <div class="wdz-question-card__title">{{ c.title }}</div>
@@ -28,9 +28,3 @@ const cards = computed(() =>
     </a>
   </div>
 </template>
-
-<style scoped>
-@media (max-width: 768px) {
-  div { grid-template-columns: 1fr !important; }
-}
-</style>

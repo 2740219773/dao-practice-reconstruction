@@ -68,15 +68,15 @@ function isSelected(group: keyof FilterModel, value: string) {
 <template>
   <!-- 移动端：抽屉触发器 + 浮层 -->
   <template v-if="mobileOnly">
-    <button class="wdz-filter-drawer__toggle" type="button" @click="drawerOpen = true">
+    <button class="wdz-filter-drawer__toggle" type="button" :aria-expanded="drawerOpen" aria-controls="knowledge-filter-sheet" @click="drawerOpen = true">
       <span>筛选条件{{ activeCount ? `（${activeCount}）` : '' }}</span>
       <span>▾</span>
     </button>
     <div class="wdz-filter-drawer__mask" :class="{ 'is-open': drawerOpen }" @click="drawerOpen = false" />
-    <div class="wdz-filter-drawer__sheet" :class="{ 'is-open': drawerOpen }" role="dialog" aria-label="筛选">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+    <div id="knowledge-filter-sheet" class="wdz-filter-drawer__sheet" :class="{ 'is-open': drawerOpen }" role="dialog" aria-modal="true" aria-label="筛选" @keydown.esc="drawerOpen = false">
+      <div class="wdz-filter-drawer__head">
         <b>筛选条件</b>
-        <button class="wdz-filter__clear" type="button" @click="clearAll">清除全部</button>
+        <div><button class="wdz-filter__clear" type="button" @click="clearAll">清除全部</button><button class="wdz-filter-drawer__close" type="button" aria-label="关闭筛选" @click="drawerOpen = false">×</button></div>
       </div>
       <div class="wdz-filter">
         <div v-for="g in chipGroups()" :key="g.key" class="wdz-filter__group">
@@ -92,7 +92,7 @@ function isSelected(group: keyof FilterModel, value: string) {
             >{{ v.label }}</button>
           </div>
         </div>
-        <button class="wdz-btn wdz-btn--primary" type="button" style="margin-top: 8px;" @click="drawerOpen = false">完成</button>
+        <button class="wdz-btn wdz-btn--primary wdz-filter-drawer__done" type="button" @click="drawerOpen = false">完成</button>
       </div>
     </div>
   </template>

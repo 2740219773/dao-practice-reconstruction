@@ -9,6 +9,7 @@ import './styles/typography.css'
 import './styles/layout.css'
 import './styles/components.css'
 import './styles/ink-theme.css'
+import './styles/fidelity.css'
 
 export default {
   Layout,

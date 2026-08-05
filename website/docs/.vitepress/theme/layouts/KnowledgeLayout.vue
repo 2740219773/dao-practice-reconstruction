@@ -4,14 +4,11 @@
  * 左侧筛选（专题/资料性质/典籍/证据状态/风险等级），右侧按类型分组结果。
  */
 import { computed, onMounted, ref, watch } from 'vue'
-import { useData } from 'vitepress'
 import { data as knowledgeData } from '../data/knowledge.data.ts'
 import { data as questionsData } from '../data/questions.data.ts'
 import { TYPE_LABELS } from '../data/_lib/常量.ts'
 import KnowledgeCard from '../components/KnowledgeCard.vue'
 import FilterDrawer, { type FilterChoice } from '../components/FilterDrawer.vue'
-
-const { frontmatter } = useData()
 
 type Filters = { type: string[]; topic: string[]; concept: string[]; source: string[]; evidence: string[]; risk: string[]; date: string[] }
 const emptyFilters = (): Filters => ({ type: [], topic: [], concept: [], source: [], evidence: [], risk: [], date: [] })
@@ -54,7 +51,8 @@ watch([filters, keyword, sort], () => writeFiltersToUrl(filters.value), { deep: 
 
 const itemById = computed(() => new Map(knowledgeData.items.map((item) => [item.id, item])))
 function labelForReference(value: string) {
-  return itemById.value.get(value)?.title || value
+  const referenceId = value.match(/^(?:文献|原文|概念|主张|假说|争议|现代研究|风险资料)-\d+/)?.[0]
+  return itemById.value.get(referenceId || value)?.title || value.replace(/^\S+-\d+[（(]?/, '').replace(/[）)]$/, '') || value
 }
 function choices(values: string[]): FilterChoice[] {
   return unique(values).map((key) => ({ key, label: labelForReference(key) }))
@@ -128,24 +126,31 @@ function clearAll() { filters.value = emptyFilters(); keyword.value = ''; sort.v
 </script>
 
 <template>
-  <div class="wdz-container" style="padding-top: 48px; padding-bottom: 64px;">
+  <div class="wdz-container wdz-knowledge-page">
     <!-- 页头 -->
-    <div class="wdz-topic-hero">
-      <div class="wdz-topic-glyph">典</div>
-      <h1 class="wdz-topic-title">典籍与概念</h1>
-      <p class="wdz-topic-sub">
+    <header class="wdz-knowledge-hero">
+      <p class="wdz-knowledge-hero__eyebrow">统一知识索引</p>
+      <h1>典籍与概念</h1>
+      <p>
         统一检索全部已公开知识：典籍原文、概念辨析、主张、争议、现代研究与风险资料。
-        内部资料类型已转化为筛选条件，正文与证据结构保留。
       </p>
-      <div class="wdz-topic-badges">
-        <span class="wdz-badge wdz-badge--ink"><span class="wdz-badge__dot" />共 {{ knowledgeData.items.length }} 项正式知识</span>
-        <span class="wdz-badge wdz-badge--plain">{{ knowledgeData.stats.knowledgePub }} 已公开 · {{ knowledgeData.stats.pending }} 整理中</span>
-      </div>
+      <label class="wdz-knowledge-hero__search">
+        <span class="sr-only">在知识索引中搜索</span>
+        <span aria-hidden="true">⌕</span>
+        <input v-model="keyword" type="search" placeholder="搜索“静、心斋、坐忘、呼吸、风险……”" />
+      </label>
+      <div class="wdz-knowledge-hero__meta">{{ knowledgeData.items.length }} 项已公开知识</div>
+    </header>
+
+    <div class="wdz-knowledge-context" aria-label="索引建议">
+      <div><span>当前专题</span><b>「静」：来源、解释、争议与边界</b><small>从核心原文出发，梳理多重含义、常见误解与安全边界。</small></div>
+      <div><span>建议入口</span><a href="/question-map/">静是否等于没有念头？</a><small>用问题串联原文、解释、反方材料与暂定结论。</small></div>
     </div>
 
-    <div class="wdz-knowledge-layout" style="margin-top: 32px;">
+    <div class="wdz-knowledge-layout">
       <!-- 左筛选（桌面） -->
       <aside class="wdz-knowledge-aside">
+        <h2>筛选条件</h2>
         <FilterDrawer v-model="filters" :options="filterOptions" />
       </aside>
 
@@ -155,26 +160,19 @@ function clearAll() { filters.value = emptyFilters(); keyword.value = ''; sort.v
       </div>
 
       <!-- 右侧结果 -->
-      <div>
-        <div class="wdz-knowledge-context" aria-label="索引建议">
-          <div><span>当前专题</span><b>「静」：原文、解释、争议与边界</b></div>
-          <div><span>建议入口</span><a href="/question-map/">从一个问题开始</a></div>
-        </div>
+      <div class="wdz-knowledge-results">
         <div class="wdz-knowledge-result-head">
-          <span class="wdz-knowledge-count">知识索引 <b>{{ filtered.length }}</b> 项</span>
+          <h2>知识索引 <small>共 {{ filtered.length }} 项</small></h2>
           <button v-if="hasActiveFilters" class="wdz-filter__clear" type="button" @click="clearAll">
             清除筛选
           </button>
-        </div>
-        <div class="wdz-knowledge-tools">
-          <label class="wdz-knowledge-search"><span class="sr-only">在知识索引中搜索</span><input v-model="keyword" type="search" placeholder="在当前知识索引中搜索" /></label>
           <label class="wdz-knowledge-sort">排序<select v-model="sort"><option value="recent">最近更新</option><option value="type">资料性质</option></select></label>
         </div>
 
         <div v-for="g in groups" :key="g.type">
           <h3 class="wdz-knowledge-group__title">{{ g.label }}（{{ g.items.length }}）</h3>
           <div v-for="it in g.items" :key="it.id">
-            <KnowledgeCard :item="it" :glyph="glyph(it.type)" :glyph-class="glyphClass(it.type)" />
+            <KnowledgeCard :item="it" :glyph="glyph(it.type)" :glyph-class="glyphClass(it.type)" :type-label="g.label" :source-label="labelForReference(it.sources[0] || '')" />
           </div>
         </div>
         <div v-if="filtered.length === 0" class="wdz-search__empty" role="status"><p>没有符合当前条件的条目。</p><button class="wdz-filter__clear" type="button" @click="clearAll">清除筛选并查看全部</button></div>
@@ -182,14 +180,15 @@ function clearAll() { filters.value = emptyFilters(); keyword.value = ''; sort.v
     </div>
 
     <!-- 底部：也可以从问题开始 -->
-    <div style="margin-top: 56px; border-top: 1px solid var(--wdz-line); padding-top: 32px;">
-      <h2 class="wdz-section__title" style="font-size: 1.25rem;">也可以从问题开始</h2>
-      <div class="wdz-qgroup__list" style="margin-top: 16px;">
+    <section class="wdz-knowledge-questions">
+      <h2 class="wdz-section__title">也可以从问题开始</h2>
+      <p>不了解知识卡分类时，问题地图是更自然的入口。</p>
+      <div class="wdz-knowledge-questions__list">
         <a v-for="q in bottomQuestions" :key="q.id" :href="q.url" class="wdz-question-card">
           <div class="wdz-question-card__title">{{ q.title }}</div>
-          <div class="wdz-question-card__desc">{{ q.briefAnswer }}</div>
+          <span aria-hidden="true">→</span>
         </a>
       </div>
-    </div>
+    </section>
   </div>
 </template>

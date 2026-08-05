@@ -10,6 +10,8 @@ const props = defineProps<{
   item: KnowledgeItem
   glyph?: string
   glyphClass?: string
+  typeLabel?: string
+  sourceLabel?: string
 }>()
 
 const g = computed(() => props.glyph || '知')
@@ -21,13 +23,17 @@ const gc = computed(() => props.glyphClass || '')
     <div class="wdz-knowledge-card__glyph" :class="gc" aria-hidden="true">{{ g }}</div>
     <div class="wdz-knowledge-card__body">
       <a class="wdz-knowledge-card__title" :href="item.url">{{ item.title }}</a>
-      <span class="wdz-mono" style="color: var(--wdz-ink-3); margin-left: 8px; font-size: 0.78rem;">{{ item.id }}</span>
       <p class="wdz-knowledge-card__summary">{{ item.summary }}</p>
       <div class="wdz-knowledge-card__tags">
-        <span class="wdz-badge wdz-badge--plain">{{ item.status }}</span>
-        <span v-if="item.evidenceLevel" class="wdz-badge wdz-badge--moss">证据：{{ item.evidenceLevel }}</span>
-        <span v-if="item.riskLevel" class="wdz-badge wdz-badge--ochre">风险：{{ item.riskLevel }}</span>
+        <span v-if="item.topics[0]">专题：{{ item.topics[0] }}</span>
+        <span v-if="sourceLabel || item.sources[0]">来源：{{ sourceLabel || item.sources[0] }}</span>
       </div>
     </div>
+    <dl class="wdz-knowledge-card__meta">
+      <div><dt>资料</dt><dd>{{ typeLabel || item.type }}</dd></div>
+      <div><dt>状态</dt><dd>{{ item.status }}</dd></div>
+      <div v-if="item.evidenceLevel"><dt>证据</dt><dd>{{ item.evidenceLevel }}</dd></div>
+      <div v-if="item.riskLevel"><dt>风险</dt><dd>{{ item.riskLevel }}</dd></div>
+    </dl>
   </article>
 </template>
