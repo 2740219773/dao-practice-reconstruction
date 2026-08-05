@@ -26,6 +26,7 @@ website/docs/project/*
 !website/docs/risks/index.md
 !website/docs/contemporary/index.md
 !website/docs/topics/index.md
+!website/docs/topics/jing.md
 !website/docs/safety/index.md
 website/docs/public/build-info.json
 !website/docs/project/**/index.md

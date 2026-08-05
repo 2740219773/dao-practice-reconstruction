@@ -45,7 +45,7 @@ const related = computed(() => ({
 </script>
 
 <template>
-  <div class="wdz-container" style="padding-top: 40px; padding-bottom: 64px;">
+  <div class="wdz-container wdz-question-page" style="padding-top: 40px; padding-bottom: 64px;">
     <template v-if="q">
       <!-- 问题首部 -->
       <div class="wdz-topic-hero">

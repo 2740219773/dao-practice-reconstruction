@@ -65,7 +65,14 @@ const riskLevel = computed<'info' | 'caution' | 'danger' | null>(() => {
 </script>
 
 <template>
-  <div class="wdz-container wdz-container--narrow wdz-prose wdz-article" style="padding-top: 48px; padding-bottom: 64px;">
+  <div
+    class="wdz-container wdz-container--narrow wdz-prose wdz-article"
+    :class="{
+      'wdz-method-page': route.path === '/method/' || route.path === '/method',
+      'wdz-safety-page': route.path === '/safety/' || route.path === '/safety'
+    }"
+    style="padding-top: 48px; padding-bottom: 64px;"
+  >
     <!-- 知识卡详情：头部证据组件 -->
     <template v-if="isDetail && current">
       <div class="wdz-original-title">
