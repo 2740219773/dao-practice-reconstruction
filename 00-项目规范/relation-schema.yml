@@ -1,0 +1,34 @@
+# 问道志知识关系结构规范
+
+# 基础关系
+relation:
+  from: 起始节点
+  to: 目标节点
+  type: 关系类型
+  description: 关系说明
+
+# 关系类型
+# source_of       来源于
+# belongs_to      属于
+# influences      影响
+# references      引用
+# related_to      关联
+# studied_by      被研究
+# disputed_by     存在争议
+# evolved_from    演变来源
+
+relation_type:
+  - source_of
+  - belongs_to
+  - influences
+  - references
+  - related_to
+  - studied_by
+  - disputed_by
+  - evolved_from
+
+# 使用原则
+# 1. 关系需要有明确方向
+# 2. 关系不代表绝对因果
+# 3. 历史关系和现代研究关系需要区分
+# 4. 争议关系需要保留多种观点
