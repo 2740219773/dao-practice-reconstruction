@@ -1,0 +1,135 @@
+# 机器可读关系数据。字段名保留英文仅用于程序解析；说明、范围与备注保持中文。
+version: "1.0"
+status: review
+relation_semantics:
+  related_to:
+    symmetric: true
+    description: 一般语义关联，不表示历史先后、因果、师承或实践步骤。
+
+relations:
+  - id: relation.core.001
+    source: concept.dao
+    target: concept.xu
+    relation: related_to
+    scope: 《道德经》及老庄虚静语境
+    evidence: A
+    verification: provisional
+    source_refs:
+      - source.daodejing.16
+
+  - id: relation.core.002
+    source: concept.dao
+    target: concept.jing
+    relation: related_to
+    scope: 《道德经》守静、观复语境
+    evidence: A
+    verification: provisional
+    source_refs:
+      - source.daodejing.16
+
+  - id: relation.core.003
+    source: concept.xu
+    target: concept.jing
+    relation: related_to
+    scope: 《道德经》第十六章及后世虚静语境
+    evidence: A
+    verification: verified
+    source_refs:
+      - source.daodejing.16
+      - source.topic002.xu
+      - source.topic001.jing
+
+  - id: relation.core.004
+    source: concept.xu
+    target: concept.xin
+    relation: related_to
+    scope: 《庄子》心斋、虚心语境
+    evidence: A
+    verification: verified
+    source_refs:
+      - source.zhuangzi.xinzhai
+      - source.topic002.xu
+
+  - id: relation.core.005
+    source: concept.jing
+    target: concept.xin
+    relation: related_to
+    scope: 心静、收心及心性安定语境
+    evidence: A
+    verification: partial
+    source_refs:
+      - source.neiye.jing
+      - source.zuowanglun.shouxin
+
+  - id: relation.core.006
+    source: concept.jing
+    target: concept.qi
+    relation: related_to
+    scope: 《管子·内业》“心静气理”等精气语境
+    evidence: A
+    verification: partial
+    source_refs:
+      - source.neiye.jing
+
+  - id: relation.core.007
+    source: concept.xin
+    target: concept.qi
+    relation: related_to
+    scope: “心使气”“心静气理”等语境
+    evidence: A
+    verification: provisional
+    source_refs:
+      - source.daodejing.55
+      - source.neiye.jing
+
+  - id: relation.core.008
+    source: concept.xin
+    target: concept.shen
+    relation: related_to
+    scope: 心全形全、心主身等身心关系语境
+    evidence: A
+    verification: provisional
+    source_refs:
+      - source.neiye.xingshen
+      - source.zuowanglun.shen
+
+  - id: relation.core.009
+    source: concept.qi
+    target: concept.shen
+    relation: related_to
+    scope: 四体、血气与身体状态语境
+    evidence: A
+    verification: provisional
+    source_refs:
+      - source.neiye.xueqi
+
+  - id: relation.core.010
+    source: concept.qi
+    target: concept.xi
+    relation: related_to
+    scope: 仅限呼吸义和气息关联语境
+    evidence: B
+    verification: provisional
+    source_refs:
+      - source.zhuangzi.xiyizhong
+
+  - id: relation.core.011
+    source: concept.jing
+    target: concept.xi
+    relation: related_to
+    scope: 仅限《坐忘论》“息乱”之止息义，与呼吸义分开
+    evidence: A
+    verification: partial
+    source_refs:
+      - source.zuowanglun.xiluan
+
+  - id: relation.core.012
+    source: concept.xi
+    target: concept.shen
+    relation: related_to
+    scope: 呼吸与身体的后续研究关系
+    evidence: C
+    verification: provisional
+    source_refs:
+      - source.legacy.xi
+      - source.legacy.shen
