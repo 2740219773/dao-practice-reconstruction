@@ -1,0 +1,87 @@
+# 问道志知识图谱 V3
+# 本文件是图谱构建清单，不重复维护节点正文。
+# 字段名保留英文仅用于程序解析。
+
+version: "3.0"
+status: review
+mode: manifest
+
+principles:
+  - Markdown 知识卡是节点内容主来源，不在本文件复制正文。
+  - 关系数据由独立关系文件维护。
+  - 来源 ID 由统一注册表管理。
+  - 知识导航、历史发展、师承和实践步骤必须分开。
+  - 旧 V2 在迁移期保留兼容，但不再作为新增关系的主来源。
+
+node_sources:
+  core_concepts:
+    path: 23-核心概念网络
+    expected_ids:
+      - concept.dao
+      - concept.qi
+      - concept.jing
+      - concept.xu
+      - concept.xin
+      - concept.xi
+      - concept.shen
+  classics:
+    path: 24-经典节点
+  persons:
+    path: 25-人物节点
+  schools:
+    path: 26-流派节点
+  methods:
+    path: 27-方法节点
+  stages:
+    path: 28-修行阶段
+  routes:
+    path: 29-修行路线图
+  research:
+    paths:
+      - 11-专题研究
+      - 32-争议辨析层
+
+relation_sources:
+  - path: 31-知识图谱整合/核心概念关系-v1.yml
+    scope: 七个核心概念第一版规范关系
+    status: review
+
+source_registry:
+  path: 31-知识图谱整合/来源标识注册表-v1.yml
+  status: review
+
+schemas:
+  knowledge_card: 31-知识图谱整合/知识卡数据模型.md
+  relation_rules: 31-知识图谱整合/节点关系规范.md
+  source_rules: 00-项目规范/知识图谱来源字段规范.md
+  writing_template: 00-项目规范/知识卡模板.md
+
+legacy_compatibility:
+  knowledge_map_v2:
+    path: 00-项目规范/knowledge-map-v2.yml
+    status: legacy
+    policy: 只用于迁移期兼容，不再新增未经新版关系规范审校的边。
+  legacy_concept_cards:
+    path: 04-概念卡
+    status: evidence_source
+    policy: 暂作为详细研究与原文编号入口，完成来源迁移前不删除。
+
+build_targets:
+  nodes:
+    planned_output: data/nodes.json
+    status: planned
+  relations:
+    planned_output: data/relations.json
+    status: planned
+  graph:
+    planned_output: data/graph.json
+    status: planned
+
+quality_gates:
+  - 所有节点 ID 必须唯一。
+  - 所有关系 target/source 必须指向已知节点或明确的待建节点。
+  - source_refs 必须能在来源注册表或节点来源中解析。
+  - verified 判断不得引用未核对来源作为唯一依据。
+  - related_to 作为对称关系只维护一条规范边。
+  - develops 与 influences 必须有历史证据，不得由知识导航箭头自动生成。
+  - 方法关系不得自动解释为实践步骤。
