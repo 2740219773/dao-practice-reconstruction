@@ -1,0 +1,18 @@
+module: DAOYIN-001-八段锦
+
+related_systems:
+  - name: 身体实践体系
+    nodes:
+      - 导引
+      - 吐纳
+      - 服气
+
+related_concepts:
+  - 身
+  - 息
+  - 气
+
+related_research:
+  - 身心训练研究
+
+note: 关联用于知识导航，不代表传统功效主张已经得到现代验证。
