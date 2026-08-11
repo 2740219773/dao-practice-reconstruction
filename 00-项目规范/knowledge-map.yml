@@ -1,0 +1,79 @@
+# 问道志知识图谱基础索引
+
+version: 1.0
+
+nodes:
+  - id: jing
+    name: 静
+    type: concept
+    module: TOPIC
+
+  - id: qingjing
+    name: 清静思想
+    type: practice_system
+    module: 修性体系
+
+  - id: zuowang
+    name: 坐忘
+    type: practice_system
+    module: 修性体系
+
+  - id: xinzhai
+    name: 心斋
+    type: practice_system
+    module: 修性体系
+
+  - id: neidan
+    name: 内丹体系
+    type: practice_system
+    module: 修命体系
+
+  - id: zhuj i
+    name: 筑基
+    type: method
+    module: 修命体系
+
+  - id: jingqishen
+    name: 精气神
+    type: concept
+    module: 修命体系
+
+  - id: daoyin
+    name: 导引
+    type: method
+    module: 身体实践体系
+
+  - id: tuna
+    name: 吐纳
+    type: method
+    module: 身体实践体系
+
+  - id: medobs
+    name: 内证观察
+    type: research_module
+    module: MEDOBS
+
+edges:
+  - from: jing
+    to: qingjing
+    relation: related_to
+
+  - from: qingjing
+    to: TOPIC-001
+    relation: studied_by
+
+  - from: neidan
+    to: zhuj i
+    relation: contains
+
+  - from: jingqishen
+    to: neidan
+    relation: foundation_of
+
+  - from: daoyin
+    to: medobs
+    relation: observed_by
+
+  - from: tuna
+    to: daoyin
+    relation: related_to
