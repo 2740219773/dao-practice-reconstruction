@@ -1,0 +1,19 @@
+module: MEDOBS-001-内证观察笔记
+
+related_systems:
+  - name: 身体实践体系
+    nodes:
+      - 身体实践
+      - 呼吸训练
+      - 静坐观察
+
+related_concepts:
+  - 精气神
+  - 气论
+  - 身心关系
+
+related_research:
+  - 气论现代研究
+  - 身心训练研究
+
+note: 主观体验记录需要与传统解释和现代研究保持区分。
