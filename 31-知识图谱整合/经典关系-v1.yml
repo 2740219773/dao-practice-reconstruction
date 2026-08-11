@@ -1,0 +1,192 @@
+# 第一批经典节点规范关系。
+# 字段名保留英文仅用于程序解析；关系含义以《节点关系规范》为准。
+version: "1.0"
+status: review
+source_registry: 31-知识图谱整合/来源标识注册表-v1.yml
+
+relations:
+  # 《道德经》与核心概念
+  - id: relation.classic.001
+    source: classic.daodejing
+    target: concept.dao
+    relation: related_to
+    scope: 第一、二十五、四十二章等直接论“道”的语境
+    evidence: A
+    verification: provisional
+    source_refs: [source.daodejing.1, source.daodejing.25, source.daodejing.42]
+
+  - id: relation.classic.002
+    source: classic.daodejing
+    target: concept.xu
+    relation: related_to
+    scope: 第十六章“致虚极”语境
+    evidence: A
+    verification: provisional
+    source_refs: [source.daodejing.16]
+
+  - id: relation.classic.003
+    source: classic.daodejing
+    target: concept.jing
+    relation: related_to
+    scope: 第十六章“守静笃”与观复语境
+    evidence: A
+    verification: verified
+    source_refs: [source.daodejing.16, source.project.topic001.jing]
+
+  - id: relation.classic.004
+    source: classic.daodejing
+    target: concept.qi
+    relation: related_to
+    scope: 第十章“专气”与第五十五章“心使气”语境
+    evidence: A
+    verification: provisional
+    source_refs: [source.daodejing.10, source.daodejing.55]
+
+  # 《庄子》与核心概念
+  - id: relation.classic.005
+    source: classic.zhuangzi
+    target: concept.dao
+    relation: related_to
+    scope: 《大宗师》《知北游》等直接论“道”的相关段落
+    evidence: A
+    verification: provisional
+    source_refs: [source.zhuangzi.dazongshi.dao, source.zhuangzi.zhibeiyou.dao]
+
+  - id: relation.classic.006
+    source: classic.zhuangzi
+    target: concept.xu
+    relation: related_to
+    scope: 《人间世》心斋“唯道集虚”语境
+    evidence: A
+    verification: verified
+    source_refs: [source.zhuangzi.renjianshi.xinzhai, source.project.topic002.xu]
+
+  - id: relation.classic.007
+    source: classic.zhuangzi
+    target: concept.xin
+    relation: related_to
+    scope: 《人间世》心斋语境
+    evidence: A
+    verification: provisional
+    source_refs: [source.zhuangzi.renjianshi.xinzhai]
+
+  - id: relation.classic.008
+    source: classic.zhuangzi
+    target: concept.jing
+    relation: related_to
+    scope: 心斋、坐忘与后续虚静研究的原始关联语境
+    evidence: A
+    verification: partial
+    source_refs: [source.zhuangzi.renjianshi.xinzhai, source.zhuangzi.dazongshi.zuowang]
+
+  - id: relation.classic.009
+    source: classic.zhuangzi
+    target: concept.xi
+    relation: related_to
+    scope: 《大宗师》“真人之息以踵，众人之息以喉”呼吸义
+    evidence: A
+    verification: provisional
+    source_refs: [source.zhuangzi.dazongshi.xiyizhong]
+
+  - id: relation.classic.010
+    source: classic.zhuangzi
+    target: concept.shen
+    relation: related_to
+    scope: 《大宗师》坐忘中的形体、自我与认知语境
+    evidence: A
+    verification: provisional
+    source_refs: [source.zhuangzi.dazongshi.zuowang]
+
+  # 《周易》及其后世接受
+  - id: relation.classic.011
+    source: classic.zhouyi
+    target: classic.cantongqi
+    relation: related_to
+    scope: 《参同契》借用卦象、变化、时间周期与易学宇宙论框架
+    evidence: B
+    verification: verified
+    source_refs: [source.research.oup.yijing.redmond_hon, source.research.pregadio.cantongqi]
+
+  # 《黄帝内经》
+  - id: relation.classic.012
+    source: classic.huangdineijing
+    target: concept.qi
+    relation: related_to
+    scope: 传统医学气论与生命理论语境
+    evidence: A
+    verification: provisional
+    source_refs: [source.huangdineijing.general]
+
+  - id: relation.classic.013
+    source: classic.huangdineijing
+    target: concept.shen
+    relation: related_to
+    scope: 医学形体、身体与生命整体语境；待拆分具体篇章
+    evidence: B
+    verification: provisional
+    source_refs: [source.huangdineijing.general, source.research.unschuld.huangdineijing]
+
+  # 《参同契》与炼丹、内丹接受史
+  - id: relation.classic.014
+    source: classic.cantongqi
+    target: method.waidan
+    relation: related_to
+    scope: 中国炼丹史与外在炼制语言背景；不表示《参同契》只是单纯外丹手册
+    evidence: B
+    verification: verified
+    source_refs: [source.research.pregadio.cantongqi]
+
+  - id: relation.classic.015
+    source: classic.cantongqi
+    target: method.neidan
+    relation: related_to
+    scope: 唐宋以后内丹传统对《参同契》的接受、注释与重新解释
+    evidence: B
+    verification: verified
+    source_refs: [source.research.pregadio.cantongqi]
+
+  - id: relation.classic.016
+    source: classic.cantongqi
+    target: classic.wuzhenpian
+    relation: influences
+    scope: 《悟真篇》大量概念、意象和术语受到《参同契》影响
+    evidence: B
+    verification: verified
+    source_refs: [source.research.pregadio.cantongqi, source.research.pregadio.wuzhenpian]
+
+  - id: relation.classic.017
+    source: classic.cantongqi
+    target: concept.qi
+    relation: related_to
+    scope: 炼丹与宇宙生命论中的气相关语境；具体章句待细分
+    evidence: B
+    verification: provisional
+    source_refs: [source.cantongqi.general, source.research.pregadio.cantongqi]
+
+  # 《悟真篇》
+  - id: relation.classic.018
+    source: classic.wuzhenpian
+    target: method.neidan
+    relation: related_to
+    scope: 北宋内丹理论与金丹修炼语境
+    evidence: B
+    verification: verified
+    source_refs: [source.wuzhenpian.general, source.research.pregadio.wuzhenpian]
+
+  - id: relation.classic.019
+    source: person.zhangboduan
+    target: classic.wuzhenpian
+    relation: authored
+    scope: 《悟真篇》核心文本作者关系
+    evidence: B
+    verification: verified
+    source_refs: [source.research.pregadio.wuzhenpian]
+
+  - id: relation.classic.020
+    source: classic.wuzhenpian
+    target: concept.qi
+    relation: related_to
+    scope: 宋代内丹精气神与炼养语境；具体诗篇待细分
+    evidence: C
+    verification: provisional
+    source_refs: [source.wuzhenpian.general]
