@@ -1,0 +1,74 @@
+version: 1
+note: "字段名保留英文用于程序读取；内容与说明使用中文。"
+
+examples:
+  concept:
+    id: concept.qi
+    type: concept
+    name: 气
+    summary: 传统思想中描述天地变化、生命运行与修炼实践的重要概念
+    status: review
+    period: 先秦至后世发展
+    systems:
+      - 传统生命观
+      - 导引养生
+      - 内丹体系
+    tags:
+      - 核心概念
+      - 生命观
+    relations:
+      - target: method.daoyin
+        relation: related_to
+        scope: 导引养生
+        evidence: C
+        source_refs:
+          - source.huangdineijing.qi
+      - target: method.neidan
+        relation: related_to
+        scope: 内丹传统
+        evidence: C
+        source_refs:
+          - source.wuzhenpian.qi
+    sources:
+      - id: source.huangdineijing.qi
+        type: classic
+        name: 黄帝内经
+        reference: 待细化章节
+        evidence: A
+      - id: source.wuzhenpian.qi
+        type: classic
+        name: 悟真篇
+        reference: 待细化篇章
+        evidence: A
+    claims:
+      - text: 气在不同传统中的含义并不完全一致，不宜用单一现代概念直接等同。
+        evidence: B
+        source_refs: []
+        status: provisional
+
+  relation:
+    id: relation.wuzhenpian_neidan
+    type: research
+    name: 悟真篇与内丹体系关系
+    status: review
+    relation_card:
+      source: classic.wuzhenpian
+      target: method.neidan
+      relation: develops
+      scope: 宋代以后内丹传统
+      evidence: B
+      source_refs:
+        - source.wuzhenpian.text
+      disputed: false
+    sources:
+      - id: source.wuzhenpian.text
+        type: classic
+        name: 悟真篇
+        reference: 全书及相关注本
+        evidence: A
+
+rules:
+  - "任何节点 id 必须全库唯一。"
+  - "重要关系必须记录 source_refs 与 evidence。"
+  - "传统解释、现代研究和个人经验不得混为同一类证据。"
+  - "reference 尚未核实时允许写待细化，但 status 不得标记为 published。"
