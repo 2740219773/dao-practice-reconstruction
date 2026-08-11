@@ -7,6 +7,11 @@ nodes:
     type: concept
     description: 道家思想中的核心概念
 
+  - id: concept.xu
+    name: 虚
+    type: concept
+    description: 与虚静、清静、修养思想相关的核心概念
+
   - id: concept.jing
     name: 静
     type: concept
@@ -17,15 +22,40 @@ nodes:
     type: concept
     description: 传统生命观中的重要概念
 
+  - id: concept.xin
+    name: 心
+    type: concept
+    description: 道家修性体系中的重要概念
+
+  - id: concept.xi
+    name: 息
+    type: concept
+    description: 与呼吸调节、吐纳实践相关的概念
+
+  - id: concept.shen
+    name: 身
+    type: concept
+    description: 与身体实践、生命观和养生体系相关的概念
+
   - id: system.neidan
     name: 内丹体系
     type: system
     description: 道家修命体系的重要组成部分
 
+  - id: system.qingjing
+    name: 清静体系
+    type: system
+    description: 道家修性体系中的重要方向
+
   - id: method.daoyin
     name: 导引
     type: method
     description: 传统身体实践方法
+
+  - id: method.tuna
+    name: 吐纳
+    type: method
+    description: 传统呼吸调节方法
 
   - id: research.medobs
     name: 内证观察
@@ -33,8 +63,32 @@ nodes:
     description: 对身体实践过程的观察研究
 
 relations:
+  - from: concept.dao
+    to: concept.jing
+    type: influences
+
+  - from: concept.xu
+    to: concept.jing
+    type: related_to
+
   - from: concept.jing
     to: system.qingjing
+    type: related_to
+
+  - from: concept.qi
+    to: system.neidan
+    type: related_to
+
+  - from: concept.qi
+    to: method.daoyin
+    type: related_to
+
+  - from: concept.xi
+    to: method.tuna
+    type: belongs_to
+
+  - from: concept.shen
+    to: method.daoyin
     type: related_to
 
   - from: system.neidan
