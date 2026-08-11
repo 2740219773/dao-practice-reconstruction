@@ -1,0 +1,18 @@
+module: TOPIC-001-静
+
+related_systems:
+  - name: 修性体系
+    nodes:
+      - 清静思想
+      - 坐忘
+      - 心斋
+
+related_concepts:
+  - 静
+  - 虚
+  - 心
+
+related_research:
+  - 现代思想研究
+
+note: 关联用于知识导航，不代表因果证明。
