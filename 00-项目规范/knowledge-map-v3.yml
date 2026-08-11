@@ -2,7 +2,7 @@
 # 本文件是图谱构建清单，不重复维护节点正文。
 # 字段名保留英文仅用于程序解析。
 
-version: "3.1"
+version: "3.2"
 status: review
 mode: manifest
 
@@ -26,6 +26,13 @@ node_sources:
       - concept.shen
   classics:
     path: 24-经典节点
+    expected_ids:
+      - classic.daodejing
+      - classic.zhuangzi
+      - classic.zhouyi
+      - classic.huangdineijing
+      - classic.cantongqi
+      - classic.wuzhenpian
   persons:
     path: 25-人物节点
   schools:
@@ -63,6 +70,9 @@ planned_nodes:
 relation_sources:
   - path: 31-知识图谱整合/核心概念关系-v1.yml
     scope: 七个核心概念第一版规范关系
+    status: review
+  - path: 31-知识图谱整合/经典关系-v1.yml
+    scope: 六部第一批经典与核心概念、方法、人物之间的规范关系
     status: review
 
 source_registry:
@@ -105,3 +115,4 @@ quality_gates:
   - develops 与 influences 必须有历史证据，不得由知识导航箭头自动生成。
   - 方法关系不得自动解释为实践步骤。
   - planned_nodes 不得被网站或 AI 当作已有正文节点展示。
+  - 经典作者、成书年代和文本分层必须优先使用学术研究来源，不能只依据传统归属字段。
