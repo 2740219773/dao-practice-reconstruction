@@ -1,0 +1,145 @@
+# 来源主 ID 与迁移期别名注册表。
+# 字段名保留英文仅用于程序解析。
+version: "1.0"
+status: review
+
+sources:
+  - canonical_id: source.daodejing.16
+    type: classic
+    name: 道德经
+    reference: 第十六章
+    aliases: []
+
+  - canonical_id: source.daodejing.10
+    type: classic
+    name: 道德经
+    reference: 第十章
+    aliases: []
+
+  - canonical_id: source.daodejing.55
+    type: classic
+    name: 道德经
+    reference: 第五十五章
+    aliases: []
+
+  - canonical_id: source.zhuangzi.renjianshi.xinzhai
+    type: classic
+    name: 庄子
+    reference: 人间世·心斋相关段落
+    aliases:
+      - source.zhuangzi.xinzhai
+      - source.zhuangzi.renjianshi
+
+  - canonical_id: source.zhuangzi.dazongshi.zuowang
+    type: classic
+    name: 庄子
+    reference: 大宗师·坐忘相关段落
+    aliases:
+      - source.zhuangzi.dazongshi
+      - source.zhuangzi.zuowang
+    notes: source.zhuangzi.dazongshi 若用于整篇而非坐忘段落，后续应拆成单独全篇占位来源。
+
+  - canonical_id: source.zhuangzi.dazongshi.xiyizhong
+    type: classic
+    name: 庄子
+    reference: 大宗师“真人之息以踵，众人之息以喉”相关段落
+    aliases:
+      - source.zhuangzi.xiyizhong
+
+  - canonical_id: source.neiye.xinjingqili
+    type: classic
+    name: 管子·内业
+    reference: “心静气理，道乃可止”相关段落
+    aliases:
+      - source.neiye.jing
+      - source.neiye.xinjing
+
+  - canonical_id: source.neiye.xinxing
+    type: classic
+    name: 管子·内业
+    reference: “心全于中，形全于外”相关段落
+    aliases:
+      - source.neiye.xingshen
+
+  - canonical_id: source.neiye.xueqijing
+    type: classic
+    name: 管子·内业
+    reference: “四体既正，血气既静”相关段落
+    aliases:
+      - source.neiye.xueqi
+
+  - canonical_id: source.zuowanglun.shouxin
+    type: classic
+    name: 坐忘论
+    reference: 收心篇
+    aliases:
+      - source.zuowanglun.xiluan
+    notes: “息乱而不灭照”位于收心篇，旧 ID 作为句段别名保留。
+
+  - canonical_id: source.zuowanglun.taiding
+    type: classic
+    name: 坐忘论
+    reference: 泰定篇
+    aliases: []
+
+  - canonical_id: source.project.topic001.jing
+    type: project
+    name: TOPIC-001 静专题证据总账
+    reference: 11-专题研究/TOPIC-001-静/证据总账.md
+    aliases:
+      - source.topic001.jing
+
+  - canonical_id: source.project.topic002.xu
+    type: project
+    name: TOPIC-002 虚专题证据总账
+    reference: 11-专题研究/TOPIC-002-虚/证据总账.md
+    aliases:
+      - source.topic002.xu
+
+  - canonical_id: source.project.legacy.concept0001
+    type: project
+    name: 旧版静概念卡
+    reference: 04-概念卡/概念-0001-静.md
+    aliases:
+      - source.legacy.jing
+
+  - canonical_id: source.project.legacy.concept0002
+    type: project
+    name: 旧版虚概念卡
+    reference: 04-概念卡/概念-0002-虚.md
+    aliases:
+      - source.legacy.xu
+
+  - canonical_id: source.project.legacy.concept0003
+    type: project
+    name: 旧版心概念卡
+    reference: 04-概念卡/概念-0003-心.md
+    aliases:
+      - source.legacy.xin
+
+  - canonical_id: source.project.legacy.concept0004
+    type: project
+    name: 旧版气概念卡
+    reference: 04-概念卡/概念-0004-气.md
+    aliases:
+      - source.legacy.qi
+
+  - canonical_id: source.project.legacy.concept0005
+    type: project
+    name: 旧版息概念卡
+    reference: 04-概念卡/概念-0005-息.md
+    aliases:
+      - source.legacy.xi
+
+  - canonical_id: source.project.legacy.concept0006
+    type: project
+    name: 旧版身概念卡
+    reference: 04-概念卡/概念-0006-身.md
+    aliases:
+      - source.legacy.shen
+
+migration_rules:
+  - 新增节点、关系和来源一律使用 canonical_id。
+  - aliases 仅用于兼容已有文件，不得继续作为新数据主 ID。
+  - 同一别名若未来发现实际指向不同句段，必须拆分并记录迁移说明。
+  - general 全书占位来源后续应逐步替换为具体篇章或句段。
