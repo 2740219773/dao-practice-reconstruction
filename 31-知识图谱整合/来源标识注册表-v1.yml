@@ -1,13 +1,20 @@
 # 来源主 ID 与迁移期别名注册表。
 # 字段名保留英文仅用于程序解析。
-version: "1.0"
+version: "1.1"
 status: review
 
 sources:
-  - canonical_id: source.daodejing.16
+  # 《道德经》
+  - canonical_id: source.daodejing.general
     type: classic
     name: 道德经
-    reference: 第十六章
+    reference: 全书占位来源；具体判断应优先细分到章
+    aliases: []
+
+  - canonical_id: source.daodejing.1
+    type: classic
+    name: 道德经
+    reference: 第一章
     aliases: []
 
   - canonical_id: source.daodejing.10
@@ -16,10 +23,35 @@ sources:
     reference: 第十章
     aliases: []
 
+  - canonical_id: source.daodejing.16
+    type: classic
+    name: 道德经
+    reference: 第十六章
+    aliases: []
+
+  - canonical_id: source.daodejing.25
+    type: classic
+    name: 道德经
+    reference: 第二十五章
+    aliases: []
+
+  - canonical_id: source.daodejing.42
+    type: classic
+    name: 道德经
+    reference: 第四十二章
+    aliases: []
+
   - canonical_id: source.daodejing.55
     type: classic
     name: 道德经
     reference: 第五十五章
+    aliases: []
+
+  # 《庄子》
+  - canonical_id: source.zhuangzi.general
+    type: classic
+    name: 庄子
+    reference: 今本《庄子》全书占位来源；具体判断应优先细分到篇与段落
     aliases: []
 
   - canonical_id: source.zhuangzi.renjianshi.xinzhai
@@ -37,7 +69,13 @@ sources:
     aliases:
       - source.zhuangzi.dazongshi
       - source.zhuangzi.zuowang
-    notes: source.zhuangzi.dazongshi 若用于整篇而非坐忘段落，后续应拆成单独全篇占位来源。
+    notes: 旧 source.zhuangzi.dazongshi 曾被混用于整篇；新增数据不得继续使用该别名。
+
+  - canonical_id: source.zhuangzi.dazongshi.dao
+    type: classic
+    name: 庄子
+    reference: 大宗师中直接论“道”的相关段落
+    aliases: []
 
   - canonical_id: source.zhuangzi.dazongshi.xiyizhong
     type: classic
@@ -45,6 +83,20 @@ sources:
     reference: 大宗师“真人之息以踵，众人之息以喉”相关段落
     aliases:
       - source.zhuangzi.xiyizhong
+
+  - canonical_id: source.zhuangzi.zhibeiyou.dao
+    type: classic
+    name: 庄子
+    reference: 知北游中直接论“道”的相关段落
+    aliases:
+      - source.zhuangzi.zhibeiyou
+
+  # 《管子·内业》
+  - canonical_id: source.neiye.jingqi
+    type: classic
+    name: 管子·内业
+    reference: 精气、气之精等相关段落
+    aliases: []
 
   - canonical_id: source.neiye.xinjingqili
     type: classic
@@ -68,13 +120,20 @@ sources:
     aliases:
       - source.neiye.xueqi
 
+  # 《坐忘论》
   - canonical_id: source.zuowanglun.shouxin
     type: classic
     name: 坐忘论
     reference: 收心篇
     aliases:
       - source.zuowanglun.xiluan
-    notes: “息乱而不灭照”位于收心篇，旧 ID 作为句段别名保留。
+    notes: “息乱而不灭照”位于收心篇，旧句段 ID 作为别名保留。
+
+  - canonical_id: source.zuowanglun.duanyuan
+    type: classic
+    name: 坐忘论
+    reference: 断缘篇
+    aliases: []
 
   - canonical_id: source.zuowanglun.taiding
     type: classic
@@ -82,6 +141,32 @@ sources:
     reference: 泰定篇
     aliases: []
 
+  # 第一批经典节点的全书占位来源
+  - canonical_id: source.zhouyi.general
+    type: classic
+    name: 周易
+    reference: 《周易》经文及其传世文本结构的全书占位来源
+    aliases: []
+
+  - canonical_id: source.huangdineijing.general
+    type: classic
+    name: 黄帝内经
+    reference: 《素问》《灵枢》传世体系全书占位来源
+    aliases: []
+
+  - canonical_id: source.cantongqi.general
+    type: classic
+    name: 周易参同契
+    reference: 传世《周易参同契》全书占位来源
+    aliases: []
+
+  - canonical_id: source.wuzhenpian.general
+    type: classic
+    name: 悟真篇
+    reference: 《悟真篇》传世文本全书占位来源
+    aliases: []
+
+  # 项目专题与旧卡
   - canonical_id: source.project.topic001.jing
     type: project
     name: TOPIC-001 静专题证据总账
@@ -138,8 +223,46 @@ sources:
     aliases:
       - source.legacy.shen
 
+  # 学术研究来源：用于作者、成书、文本分层和接受史，不替代经典原文
+  - canonical_id: source.research.sep.daoism
+    type: historical
+    name: Stanford Encyclopedia of Philosophy - Daoism
+    reference: 关于《道德经》《庄子》作者、成书与文本形成史的综述
+    aliases: []
+
+  - canonical_id: source.research.sep.zhuangzi
+    type: historical
+    name: Stanford Encyclopedia of Philosophy - Zhuangzi
+    reference: 关于今本《庄子》多作者、多层文本结构的研究综述
+    aliases: []
+
+  - canonical_id: source.research.oup.yijing.redmond_hon
+    type: historical
+    name: Teaching the I Ching (Book of Changes)
+    reference: Geoffrey Redmond、Tze-ki Hon，Oxford University Press，2014；用于《周易》早期文本、十翼与经典形成问题
+    aliases: []
+
+  - canonical_id: source.research.unschuld.huangdineijing
+    type: historical
+    name: Huang Di Nei Jing Su Wen: Nature, Knowledge, Imagery in an Ancient Chinese Medical Text
+    reference: Paul U. Unschuld，University of California Press，2003；用于《素问》文本史与成书问题
+    aliases: []
+
+  - canonical_id: source.research.pregadio.cantongqi
+    type: historical
+    name: The Seal of the Unity of the Three
+    reference: Fabrizio Pregadio，2011；用于《参同契》作者、成书、文本结构与丹道接受史
+    aliases: []
+
+  - canonical_id: source.research.pregadio.wuzhenpian
+    type: historical
+    name: Awakening to Reality: The Regulated Verses of the Wuzhen pian
+    reference: Fabrizio Pregadio，2009；用于《悟真篇》作者、年代、内丹定位及与《参同契》的关系
+    aliases: []
+
 migration_rules:
   - 新增节点、关系和来源一律使用 canonical_id。
   - aliases 仅用于兼容已有文件，不得继续作为新数据主 ID。
   - 同一别名若未来发现实际指向不同句段，必须拆分并记录迁移说明。
   - general 全书占位来源后续应逐步替换为具体篇章或句段。
+  - 学术研究来源用于文本史、作者归属、历史关系与研究争议，不能代替经典原文证明经典自身主张。
