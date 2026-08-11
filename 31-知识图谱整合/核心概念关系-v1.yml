@@ -1,6 +1,7 @@
 # 机器可读关系数据。字段名保留英文仅用于程序解析；说明、范围与备注保持中文。
 version: "1.0"
 status: review
+source_registry: 31-知识图谱整合/来源标识注册表-v1.yml
 relation_semantics:
   related_to:
     symmetric: true
@@ -36,8 +37,8 @@ relations:
     verification: verified
     source_refs:
       - source.daodejing.16
-      - source.topic002.xu
-      - source.topic001.jing
+      - source.project.topic002.xu
+      - source.project.topic001.jing
 
   - id: relation.core.004
     source: concept.xu
@@ -47,8 +48,8 @@ relations:
     evidence: A
     verification: verified
     source_refs:
-      - source.zhuangzi.xinzhai
-      - source.topic002.xu
+      - source.zhuangzi.renjianshi.xinzhai
+      - source.project.topic002.xu
 
   - id: relation.core.005
     source: concept.jing
@@ -58,7 +59,7 @@ relations:
     evidence: A
     verification: partial
     source_refs:
-      - source.neiye.jing
+      - source.neiye.xinjingqili
       - source.zuowanglun.shouxin
 
   - id: relation.core.006
@@ -69,7 +70,7 @@ relations:
     evidence: A
     verification: partial
     source_refs:
-      - source.neiye.jing
+      - source.neiye.xinjingqili
 
   - id: relation.core.007
     source: concept.xin
@@ -80,7 +81,7 @@ relations:
     verification: provisional
     source_refs:
       - source.daodejing.55
-      - source.neiye.jing
+      - source.neiye.xinjingqili
 
   - id: relation.core.008
     source: concept.xin
@@ -90,8 +91,8 @@ relations:
     evidence: A
     verification: provisional
     source_refs:
-      - source.neiye.xingshen
-      - source.zuowanglun.shen
+      - source.neiye.xinxing
+      - source.zuowanglun.shouxin
 
   - id: relation.core.009
     source: concept.qi
@@ -101,7 +102,7 @@ relations:
     evidence: A
     verification: provisional
     source_refs:
-      - source.neiye.xueqi
+      - source.neiye.xueqijing
 
   - id: relation.core.010
     source: concept.qi
@@ -111,7 +112,7 @@ relations:
     evidence: B
     verification: provisional
     source_refs:
-      - source.zhuangzi.xiyizhong
+      - source.zhuangzi.dazongshi.xiyizhong
 
   - id: relation.core.011
     source: concept.jing
@@ -121,7 +122,7 @@ relations:
     evidence: A
     verification: partial
     source_refs:
-      - source.zuowanglun.xiluan
+      - source.zuowanglun.shouxin
 
   - id: relation.core.012
     source: concept.xi
@@ -131,5 +132,5 @@ relations:
     evidence: C
     verification: provisional
     source_refs:
-      - source.legacy.xi
-      - source.legacy.shen
+      - source.project.legacy.concept0005
+      - source.project.legacy.concept0006
