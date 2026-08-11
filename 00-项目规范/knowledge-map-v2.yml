@@ -1,0 +1,46 @@
+# 问道志知识图谱 V2
+# 用于描述核心知识节点与关系
+
+nodes:
+  - id: concept.dao
+    name: 道
+    type: concept
+    description: 道家思想中的核心概念
+
+  - id: concept.jing
+    name: 静
+    type: concept
+    description: 与清静、修性、内观相关的核心概念
+
+  - id: concept.qi
+    name: 气
+    type: concept
+    description: 传统生命观中的重要概念
+
+  - id: system.neidan
+    name: 内丹体系
+    type: system
+    description: 道家修命体系的重要组成部分
+
+  - id: method.daoyin
+    name: 导引
+    type: method
+    description: 传统身体实践方法
+
+  - id: research.medobs
+    name: 内证观察
+    type: research
+    description: 对身体实践过程的观察研究
+
+relations:
+  - from: concept.jing
+    to: system.qingjing
+    type: related_to
+
+  - from: system.neidan
+    to: method.daoyin
+    type: related_to
+
+  - from: method.daoyin
+    to: research.medobs
+    type: studied_by
