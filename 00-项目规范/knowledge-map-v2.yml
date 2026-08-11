@@ -1,5 +1,10 @@
 # 问道志知识图谱 V2
-# 用于描述核心知识节点与关系
+# 状态：legacy（迁移期兼容）
+# 新版统一入口：00-项目规范/knowledge-map-v3.yml
+#
+# 注意：本文件保留用于历史兼容，不再作为新增节点与关系的主来源。
+# 其中部分关系采用早期简化表达，例如 influences、belongs_to 等，
+# 已不完全符合新版《节点关系规范》。后续构建程序应优先读取 V3 清单。
 
 nodes:
   - id: concept.dao
@@ -30,12 +35,12 @@ nodes:
   - id: concept.xi
     name: 息
     type: concept
-    description: 与呼吸调节、吐纳实践相关的概念
+    description: 传统文献中的多义概念，包含呼吸、生息与止息等语境
 
   - id: concept.shen
     name: 身
     type: concept
-    description: 与身体实践、生命观和养生体系相关的概念
+    description: 与形体、自身、身心关系和身体实践研究相关的概念
 
   - id: system.neidan
     name: 内丹体系
@@ -55,7 +60,7 @@ nodes:
   - id: method.tuna
     name: 吐纳
     type: method
-    description: 传统呼吸调节方法
+    description: 传统呼吸相关实践方法
 
   - id: research.medobs
     name: 内证观察
