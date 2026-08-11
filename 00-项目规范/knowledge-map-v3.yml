@@ -2,7 +2,7 @@
 # 本文件是图谱构建清单，不重复维护节点正文。
 # 字段名保留英文仅用于程序解析。
 
-version: "3.0"
+version: "3.1"
 status: review
 mode: manifest
 
@@ -41,6 +41,25 @@ node_sources:
       - 11-专题研究
       - 32-争议辨析层
 
+# 已被新版知识卡引用，但当前尚无正式节点文件的对象。
+# 构建器应将其标记为 planned，而不是误判为丢失或自动创建空节点。
+planned_nodes:
+  - id: school.xianqin_daojia
+    name: 先秦道家
+    type: school
+    status: planned
+    reason: 已被“道”等节点引用，后续流派/思想传统分类审计时正式建立。
+  - id: method.xinzhai
+    name: 心斋
+    type: method
+    status: planned
+    reason: 已被“虚、心”等节点引用，需从《庄子·人间世》原文与旧专题材料建立方法卡。
+  - id: method.zuowang
+    name: 坐忘
+    type: method
+    status: planned
+    reason: 已被“虚、心”等节点引用，需区分《庄子》坐忘概念与后世《坐忘论》体系后建立。
+
 relation_sources:
   - path: 31-知识图谱整合/核心概念关系-v1.yml
     scope: 七个核心概念第一版规范关系
@@ -78,10 +97,11 @@ build_targets:
     status: planned
 
 quality_gates:
-  - 所有节点 ID 必须唯一。
-  - 所有关系 target/source 必须指向已知节点或明确的待建节点。
+  - 所有正式节点 ID 必须唯一。
+  - 所有关系 target/source 必须指向正式节点或 planned_nodes 中明确登记的待建节点。
   - source_refs 必须能在来源注册表或节点来源中解析。
   - verified 判断不得引用未核对来源作为唯一依据。
   - related_to 作为对称关系只维护一条规范边。
   - develops 与 influences 必须有历史证据，不得由知识导航箭头自动生成。
   - 方法关系不得自动解释为实践步骤。
+  - planned_nodes 不得被网站或 AI 当作已有正文节点展示。
