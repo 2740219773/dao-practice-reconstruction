@@ -1,0 +1,35 @@
+# 问道志知识节点结构规范
+
+# 节点基础字段
+node:
+  id: 唯一标识
+  name: 节点名称
+  type: 节点类型
+  description: 简要说明
+
+# 节点类型
+# classic       经典
+# concept       概念
+# person        人物
+# school        流派
+# system        体系
+# method        方法
+# topic         专题
+# research      现代研究
+# issue         争议问题
+
+type: classic | concept | person | school | system | method | topic | research | issue
+
+# 扩展字段
+metadata:
+  source: 来源资料
+  period: 时间范围
+  related_nodes: 关联节点
+  evidence_level: 证据等级
+  notes: 补充说明
+
+# 使用原则
+# 1. 一个节点只表达一个核心对象
+# 2. 不将传统观点直接等同于现代科学结论
+# 3. 保留来源和不同解释
+# 4. 节点关系通过 relation-schema.yml 管理
