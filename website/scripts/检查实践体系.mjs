@@ -9,11 +9,13 @@ const PRACTICE_DIR = path.join(REPO_ROOT, '33-实践体系', '实践卡')
 const RELATION_FILE = path.join(REPO_ROOT, '33-实践体系', '实践关系-v1.json')
 const COMPONENT_FILE = path.join(WEBSITE_ROOT, 'docs', '.vitepress', 'theme', 'components', 'PracticeJournal.vue')
 const MODEL_FILE = path.join(WEBSITE_ROOT, 'docs', '.vitepress', 'theme', 'practice', 'practice-model.mjs')
+const MIGRATION_FILE = path.join(WEBSITE_ROOT, 'docs', '.vitepress', 'theme', 'practice', 'practice-migrations.mjs')
 const STATS_FILE = path.join(WEBSITE_ROOT, 'docs', '.vitepress', 'theme', 'practice', 'practice-stats.mjs')
 const SAFETY_FILE = path.join(WEBSITE_ROOT, 'docs', '.vitepress', 'theme', 'practice', 'practice-safety.mjs')
 const AI_FILE = path.join(WEBSITE_ROOT, 'docs', '.vitepress', 'theme', 'practice', 'practice-ai.mjs')
 const STAGE_FILE = path.join(WEBSITE_ROOT, 'docs', '.vitepress', 'theme', 'practice', 'practice-stage.mjs')
 const TEST_FILE = path.join(WEBSITE_ROOT, 'tests', 'practice-journal.test.mjs')
+const MIGRATION_TEST_FILE = path.join(WEBSITE_ROOT, 'tests', 'practice-migrations.test.mjs')
 const PRACTICE_PAGE = path.join(WEBSITE_ROOT, 'docs', 'practice', 'index.md')
 const THEME_INDEX = path.join(WEBSITE_ROOT, 'docs', '.vitepress', 'theme', 'index.ts')
 const PACKAGE_FILE = path.join(WEBSITE_ROOT, 'package.json')
@@ -27,7 +29,8 @@ const requiredDocs = [
   '33-实践体系/实践记录数据模型-V1.0.md',
   '33-实践体系/AI实践复盘规范-V1.0.md',
   '33-实践体系/知识与实践关系规范-V1.0.md',
-  '33-实践体系/30天与阶段复盘规范-V1.0.md'
+  '33-实践体系/30天与阶段复盘规范-V1.0.md',
+  '33-实践体系/实践记录Schema迁移规范-V1.0.md'
 ]
 
 const requiredFields = [
@@ -84,11 +87,13 @@ assert(existsSync(RELATION_FILE), '缺少 33-实践体系/实践关系-v1.json')
 assert(existsSync(COMPONENT_FILE), '缺少 PracticeJournal.vue')
 for (const [file, label] of [
   [MODEL_FILE, 'practice-model.mjs'],
+  [MIGRATION_FILE, 'practice-migrations.mjs'],
   [STATS_FILE, 'practice-stats.mjs'],
   [SAFETY_FILE, 'practice-safety.mjs'],
   [AI_FILE, 'practice-ai.mjs'],
   [STAGE_FILE, 'practice-stage.mjs'],
-  [TEST_FILE, 'practice-journal.test.mjs']
+  [TEST_FILE, 'practice-journal.test.mjs'],
+  [MIGRATION_TEST_FILE, 'practice-migrations.test.mjs']
 ]) assert(existsSync(file), `缺少实践模块或测试：${label}`)
 
 const files = existsSync(PRACTICE_DIR)
@@ -164,17 +169,23 @@ for (const relation of relationData.relations || []) {
 
 const component = existsSync(COMPONENT_FILE) ? readFileSync(COMPONENT_FILE, 'utf8') : ''
 const model = existsSync(MODEL_FILE) ? readFileSync(MODEL_FILE, 'utf8') : ''
+const migration = existsSync(MIGRATION_FILE) ? readFileSync(MIGRATION_FILE, 'utf8') : ''
 const stats = existsSync(STATS_FILE) ? readFileSync(STATS_FILE, 'utf8') : ''
 const safety = existsSync(SAFETY_FILE) ? readFileSync(SAFETY_FILE, 'utf8') : ''
 const ai = existsSync(AI_FILE) ? readFileSync(AI_FILE, 'utf8') : ''
 const stage = existsSync(STAGE_FILE) ? readFileSync(STAGE_FILE, 'utf8') : ''
 const tests = existsSync(TEST_FILE) ? readFileSync(TEST_FILE, 'utf8') : ''
+const migrationTests = existsSync(MIGRATION_TEST_FILE) ? readFileSync(MIGRATION_TEST_FILE, 'utf8') : ''
 const packageJson = existsSync(PACKAGE_FILE) ? JSON.parse(readFileSync(PACKAGE_FILE, 'utf8')) : { scripts: {} }
-const clientCode = [component, model, stats, safety, ai, stage].join('\n')
+const clientCode = [component, model, migration, stats, safety, ai, stage].join('\n')
 
 assert(model.includes('wendaozhi.practice.records.v1'), '数据模型缺少版本化本地存储键')
 assert(model.includes('SCHEMA_VERSION'), '数据模型缺少 SCHEMA_VERSION')
 assert(model.includes('mergeImportPayload'), '数据模型缺少导入合并规则')
+assert(model.includes('migrateEnvelope'), 'JSON导入尚未接入schema迁移器')
+assert(migration.includes('PRACTICE_MIGRATIONS'), '迁移模块缺少显式迁移注册表')
+assert(migration.includes('future_version'), '迁移模块缺少未来版本拒绝规则')
+assert(migration.includes('missing_migration'), '迁移模块缺少迁移链断裂保护')
 assert(stats.includes('aggregateRecent'), '统计模块缺少 aggregateRecent')
 assert(stats.includes('overLimitCount'), '统计模块缺少超审查上限统计')
 assert(safety.includes('buildSafetyReview'), '安全模块缺少 buildSafetyReview')
@@ -187,13 +198,18 @@ assert(stage.includes('discuss_diversion'), '阶段模块缺少“讨论分流�
 assert(tests.includes('30天分布区分实际练习'), '实践测试尚未覆盖30天分布')
 assert(tests.includes('不会自动给出分流'), '实践测试尚未覆盖记录不足时禁止自动分流')
 assert(tests.includes('只允许讨论分流'), '实践测试尚未覆盖稳定状态下的非自动解锁规则')
+assert(migrationTests.includes('未来 schema 版本拒绝自动降级'), 'schema测试尚未覆盖未来版本保护')
+assert(migrationTests.includes('缺少逐版本迁移函数'), 'schema测试尚未覆盖迁移链缺失')
+assert(migrationTests.includes('不修改输入对象'), 'schema测试尚未覆盖纯函数迁移要求')
 assert(!/\bfetch\s*\(|XMLHttpRequest|axios\s*\./.test(clientCode), '实践记录第一阶段不得包含自动网络上传代码')
+assert(component.includes('parseAndMigrateStored'), 'PracticeJournal 本地读取尚未接入schema迁移器')
 assert(component.includes('exportPayload') && component.includes('mergeImportPayload'), 'PracticeJournal 应使用统一 JSON 数据模型')
 assert(component.includes('buildSafetyReview'), 'PracticeJournal 应使用独立安全规则')
 assert(component.includes('buildAiPrompt'), 'PracticeJournal 应使用独立 AI 摘要规则')
 assert(component.includes('buildStageReview'), 'PracticeJournal 尚未接入30天阶段复盘')
 assert(component.includes('30天与阶段'), 'PracticeJournal 缺少30天与阶段入口')
 assert(packageJson.scripts?.['test:practice'], 'package.json 缺少 test:practice')
+assert(String(packageJson.scripts?.['test:practice'] || '').includes('practice-*.test.mjs'), 'test:practice 尚未覆盖全部实践测试文件')
 assert(String(packageJson.scripts?.test || '').includes('test:practice'), 'npm test 尚未纳入实践场景回归')
 
 const practicePage = existsSync(PRACTICE_PAGE) ? readFileSync(PRACTICE_PAGE, 'utf8') : ''
@@ -202,5 +218,5 @@ assert(practicePage.includes('<PracticeJournal />'), '实践首页尚未挂载 P
 assert(themeIndex.includes("app.component('PracticeJournal'"), '主题入口尚未全局注册 PracticeJournal')
 
 if (!process.exitCode) {
-  console.log(`[实践体系检查] 通过：${files.length} 张实践卡，${relationData.relations.length} 条实践关系，5 个规则模块与30天阶段回归有效。`)
+  console.log(`[实践体系检查] 通过：${files.length} 张实践卡，${relationData.relations.length} 条实践关系，6 个规则模块、30天阶段复盘与schema迁移保护有效。`)
 }
