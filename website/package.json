@@ -7,10 +7,12 @@
     "node": ">=22"
   },
   "scripts": {
-    "dev": "node scripts/生成网站页面.mjs && vitepress dev docs",
-    "build": "node scripts/生成网站页面.mjs && vitepress build docs",
+    "graph": "node scripts/构建知识图谱.mjs",
+    "graph:check": "node scripts/构建知识图谱.mjs --check",
+    "dev": "npm run graph && node scripts/生成网站页面.mjs && vitepress dev docs",
+    "build": "npm run graph && node scripts/生成网站页面.mjs && vitepress build docs",
     "preview": "vitepress preview docs",
-    "generate": "node scripts/生成网站页面.mjs",
+    "generate": "npm run graph && node scripts/生成网站页面.mjs",
     "test": "node scripts/test-publish-status.mjs",
     "smoke": "node scripts/smoke-production.mjs"
   },
