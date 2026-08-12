@@ -1,0 +1,53 @@
+# 本文件只补充实践层当前需要、但尚未统一进入全局来源注册表的现代来源。
+# 字段名保留英文仅用于程序解析；正文解释保持中文。
+
+sources:
+  - id: source.modern.nccih.meditation_safety
+    type: modern
+    name: Meditation and Mindfulness: Effectiveness and Safety
+    organization: National Center for Complementary and Integrative Health
+    reference: 冥想与正念的效果、安全性和不良体验概览
+    evidence: E
+    verification: verified
+    scope: 可用于支持“冥想并非对所有人都完全无风险、不能替代正规医疗”等一般安全边界；不直接验证问道志具体实践卡，也不验证古代静、心斋或坐忘概念。
+
+  - id: source.modern.farias2020.meditation_adverse_events
+    type: modern
+    name: Adverse events in meditation practices and meditation-based therapies: a systematic review
+    author: Farias M, Maraldi E, Wallenkampf KC, Lucchetti G
+    year: 2020
+    reference: Acta Psychiatrica Scandinavica 142(5):374-393; DOI 10.1111/acps.13225
+    evidence: E
+    verification: verified
+    scope: 系统综述，用于支持实践系统需要主动监测不良体验和功能影响；不同研究方案差异较大，不能据此推断任一具体基础练习的固定风险率。
+
+  - id: source.modern.who2020.physical_activity
+    type: modern
+    name: WHO Guidelines on Physical Activity and Sedentary Behaviour
+    organization: World Health Organization
+    year: 2020
+    reference: 普通身体活动与久坐行为公共卫生指南
+    evidence: E
+    verification: verified
+    scope: 仅作为普通身体活动与活动量管理的一般现代背景，不用于证明传统导引、气、经络或养生理论。
+
+  - id: source.project.safety.v02
+    type: project
+    name: 问道志安全边界 V0.2
+    reference: 00-项目规范/安全边界 V0.2.md
+    evidence: E
+    verification: verified
+    scope: 实践层的上位安全规范；其判断继续追溯至项目已登记的外部安全与伦理来源。
+
+  - id: source.project.practice.design.v02
+    type: project
+    name: 问道志实践系统设计方案 V0.2
+    reference: 33-实践体系/实践系统设计方案-V0.2.md
+    evidence: E
+    verification: verified
+    scope: 项目现代教学设计来源，不是外部历史或科学证据。
+
+notes:
+  - A—E在此继续兼容项目既有字段；字母代表来源类别，不代表A必然比E更强。
+  - 现代来源只能支持其实际研究对象，不能反向证明传统概念。
+  - 后续应将上述现代来源并入全局canonical来源注册表，避免长期形成第二套来源库。
