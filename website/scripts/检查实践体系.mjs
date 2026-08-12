@@ -12,6 +12,7 @@ const MODEL_FILE = path.join(WEBSITE_ROOT, 'docs', '.vitepress', 'theme', 'pract
 const STATS_FILE = path.join(WEBSITE_ROOT, 'docs', '.vitepress', 'theme', 'practice', 'practice-stats.mjs')
 const SAFETY_FILE = path.join(WEBSITE_ROOT, 'docs', '.vitepress', 'theme', 'practice', 'practice-safety.mjs')
 const AI_FILE = path.join(WEBSITE_ROOT, 'docs', '.vitepress', 'theme', 'practice', 'practice-ai.mjs')
+const STAGE_FILE = path.join(WEBSITE_ROOT, 'docs', '.vitepress', 'theme', 'practice', 'practice-stage.mjs')
 const TEST_FILE = path.join(WEBSITE_ROOT, 'tests', 'practice-journal.test.mjs')
 const PRACTICE_PAGE = path.join(WEBSITE_ROOT, 'docs', 'practice', 'index.md')
 const THEME_INDEX = path.join(WEBSITE_ROOT, 'docs', '.vitepress', 'theme', 'index.ts')
@@ -25,7 +26,8 @@ const requiredDocs = [
   '33-实践体系/实践问题与安全分流-V1.0.md',
   '33-实践体系/实践记录数据模型-V1.0.md',
   '33-实践体系/AI实践复盘规范-V1.0.md',
-  '33-实践体系/知识与实践关系规范-V1.0.md'
+  '33-实践体系/知识与实践关系规范-V1.0.md',
+  '33-实践体系/30天与阶段复盘规范-V1.0.md'
 ]
 
 const requiredFields = [
@@ -85,6 +87,7 @@ for (const [file, label] of [
   [STATS_FILE, 'practice-stats.mjs'],
   [SAFETY_FILE, 'practice-safety.mjs'],
   [AI_FILE, 'practice-ai.mjs'],
+  [STAGE_FILE, 'practice-stage.mjs'],
   [TEST_FILE, 'practice-journal.test.mjs']
 ]) assert(existsSync(file), `缺少实践模块或测试：${label}`)
 
@@ -164,8 +167,10 @@ const model = existsSync(MODEL_FILE) ? readFileSync(MODEL_FILE, 'utf8') : ''
 const stats = existsSync(STATS_FILE) ? readFileSync(STATS_FILE, 'utf8') : ''
 const safety = existsSync(SAFETY_FILE) ? readFileSync(SAFETY_FILE, 'utf8') : ''
 const ai = existsSync(AI_FILE) ? readFileSync(AI_FILE, 'utf8') : ''
+const stage = existsSync(STAGE_FILE) ? readFileSync(STAGE_FILE, 'utf8') : ''
+const tests = existsSync(TEST_FILE) ? readFileSync(TEST_FILE, 'utf8') : ''
 const packageJson = existsSync(PACKAGE_FILE) ? JSON.parse(readFileSync(PACKAGE_FILE, 'utf8')) : { scripts: {} }
-const clientCode = [component, model, stats, safety, ai].join('\n')
+const clientCode = [component, model, stats, safety, ai, stage].join('\n')
 
 assert(model.includes('wendaozhi.practice.records.v1'), '数据模型缺少版本化本地存储键')
 assert(model.includes('SCHEMA_VERSION'), '数据模型缺少 SCHEMA_VERSION')
@@ -175,10 +180,19 @@ assert(stats.includes('overLimitCount'), '统计模块缺少超审查上限统�
 assert(safety.includes('buildSafetyReview'), '安全模块缺少 buildSafetyReview')
 assert(safety.includes('reviewDraftSafety'), '安全模块缺少填写期安全核对')
 assert(ai.includes('buildAiPrompt'), 'AI 模块缺少 buildAiPrompt')
+assert(ai.includes('buildStageAiPrompt'), 'AI 模块缺少30天阶段复盘提示词')
+assert(stage.includes('buildStageReview'), '阶段模块缺少 buildStageReview')
+assert(stage.includes('buildThirtyDayDistribution'), '阶段模块缺少30天分布')
+assert(stage.includes('discuss_diversion'), '阶段模块缺少“讨论分流而非自动解锁”判断')
+assert(tests.includes('30天分布区分实际练习'), '实践测试尚未覆盖30天分布')
+assert(tests.includes('不会自动给出分流'), '实践测试尚未覆盖记录不足时禁止自动分流')
+assert(tests.includes('只允许讨论分流'), '实践测试尚未覆盖稳定状态下的非自动解锁规则')
 assert(!/\bfetch\s*\(|XMLHttpRequest|axios\s*\./.test(clientCode), '实践记录第一阶段不得包含自动网络上传代码')
 assert(component.includes('exportPayload') && component.includes('mergeImportPayload'), 'PracticeJournal 应使用统一 JSON 数据模型')
 assert(component.includes('buildSafetyReview'), 'PracticeJournal 应使用独立安全规则')
 assert(component.includes('buildAiPrompt'), 'PracticeJournal 应使用独立 AI 摘要规则')
+assert(component.includes('buildStageReview'), 'PracticeJournal 尚未接入30天阶段复盘')
+assert(component.includes('30天与阶段'), 'PracticeJournal 缺少30天与阶段入口')
 assert(packageJson.scripts?.['test:practice'], 'package.json 缺少 test:practice')
 assert(String(packageJson.scripts?.test || '').includes('test:practice'), 'npm test 尚未纳入实践场景回归')
 
@@ -188,5 +202,5 @@ assert(practicePage.includes('<PracticeJournal />'), '实践首页尚未挂载 P
 assert(themeIndex.includes("app.component('PracticeJournal'"), '主题入口尚未全局注册 PracticeJournal')
 
 if (!process.exitCode) {
-  console.log(`[实践体系检查] 通过：${files.length} 张实践卡，${relationData.relations.length} 条实践关系，4 个独立规则模块与自动场景测试有效。`)
+  console.log(`[实践体系检查] 通过：${files.length} 张实践卡，${relationData.relations.length} 条实践关系，5 个规则模块与30天阶段回归有效。`)
 }
