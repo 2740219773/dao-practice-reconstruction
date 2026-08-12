@@ -1,6 +1,6 @@
 # 来源主 ID 与迁移期别名注册表。
 # 字段名保留英文仅用于程序解析。
-version: "1.1"
+version: "1.2"
 status: review
 
 sources:
@@ -226,14 +226,14 @@ sources:
   # 学术研究来源：用于作者、成书、文本分层和接受史，不替代经典原文
   - canonical_id: source.research.sep.daoism
     type: historical
-    name: Stanford Encyclopedia of Philosophy - Daoism
-    reference: 关于《道德经》《庄子》作者、成书与文本形成史的综述
+    name: Stanford Encyclopedia of Philosophy - Laozi / Daoism
+    reference: 用于老子传统传记、历史身份、《老子》作者与文本形成以及道家/道教分类问题
     aliases: []
 
   - canonical_id: source.research.sep.zhuangzi
     type: historical
     name: Stanford Encyclopedia of Philosophy - Zhuangzi
-    reference: 关于今本《庄子》多作者、多层文本结构的研究综述
+    reference: 关于今本《庄子》多作者、多层文本结构及庄周时代的研究综述
     aliases: []
 
   - canonical_id: source.research.oup.yijing.redmond_hon
@@ -257,7 +257,13 @@ sources:
   - canonical_id: source.research.pregadio.wuzhenpian
     type: historical
     name: Awakening to Reality: The Regulated Verses of the Wuzhen pian
-    reference: Fabrizio Pregadio，2009；用于《悟真篇》作者、年代、内丹定位及与《参同契》的关系
+    reference: Fabrizio Pregadio，2009；用于张伯端、《悟真篇》作者、年代、内丹定位、南宗后世谱系及与《参同契》的关系
+    aliases: []
+
+  - canonical_id: source.research.pregadio.jindan
+    type: historical
+    name: Jindan (Golden Elixir) / Taoist Alchemy studies
+    reference: Fabrizio Pregadio，《Encyclopedia of Taoism》及相关道教炼丹史研究；用于外丹、内丹及二者历史关系
     aliases: []
 
 migration_rules:
