@@ -15,6 +15,7 @@
     "preview": "vitepress preview docs",
     "generate": "npm run graph && node scripts/生成网站页面.mjs",
     "test:practice": "node --test tests/practice-*.test.mjs",
+    "test:e2e:practice": "node scripts/e2e-practice-browser.mjs",
     "test": "node scripts/test-publish-status.mjs && npm run test:practice",
     "smoke": "node scripts/smoke-production.mjs"
   },
