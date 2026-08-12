@@ -5,7 +5,8 @@
  * 1. 扫描并校验旧公开知识卡，生成 /knowledge/*；
  * 2. 读取 V3 data/nodes.json 与节点 source_path，自动生成 /graph/node/*；
  * 3. 扫描 33-实践体系/实践卡，校验并自动生成 /practice/card/*；
- * 4. 网站页面永远是构建产物，仓库 Markdown 仍是正文唯一源。
+ * 4. 将实践关系中的前后依赖、传统背景、不等同与安全约束自动写入实践详情；
+ * 5. 网站页面永远是构建产物，仓库 Markdown 仍是正文唯一源。
  */
 import { execFileSync } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
@@ -16,6 +17,7 @@ import { validateAllCards, ALLOWLISTS } from '../docs/.vitepress/theme/data/_lib
 
 const DOCS_DIR = path.join(REPO_ROOT, 'website', 'docs')
 const PRACTICE_SOURCE_DIR = path.join(REPO_ROOT, '33-实践体系', '实践卡')
+const PRACTICE_RELATION_FILE = path.join(REPO_ROOT, '33-实践体系', '实践关系-v1.json')
 
 function buildSha() {
   const fromEnv = process.env.CF_PAGES_COMMIT_SHA || process.env.GITHUB_SHA
@@ -183,9 +185,71 @@ function validatePracticeCard(file, parsed, seenIds, seenSlugs) {
   }
 }
 
-function renderPracticeCard(card) {
+function loadPracticeRelationContext(cards) {
+  const cardById = new Map(cards.map((card) => [String(card.data.id), card]))
+  let relations = []
+  if (existsSync(PRACTICE_RELATION_FILE)) {
+    const parsed = JSON.parse(readFileSync(PRACTICE_RELATION_FILE, 'utf8'))
+    relations = Array.isArray(parsed.relations) ? parsed.relations : []
+  }
+
+  const nodeById = new Map()
+  const nodeBundlePath = path.join(REPO_ROOT, 'data', 'nodes.json')
+  if (existsSync(nodeBundlePath)) {
+    const bundle = JSON.parse(readFileSync(nodeBundlePath, 'utf8'))
+    for (const node of Array.isArray(bundle.nodes) ? bundle.nodes : []) nodeById.set(String(node.id), node)
+  }
+
+  return { cardById, nodeById, relations }
+}
+
+function practiceEntity(id, context) {
+  const practice = context.cardById.get(String(id))
+  if (practice) return { name: practice.data.name, url: `/practice/card/${practice.data.slug}` }
+
+  const node = context.nodeById.get(String(id))
+  if (node) return { name: node.name, url: `/graph/node/${encodeURIComponent(String(node.id))}` }
+
+  if (String(id).startsWith('policy.')) return { name: '安全边界 V0.2', url: '/safety/' }
+  return { name: String(id), url: '' }
+}
+
+function entityLink(entity) {
+  return entity.url ? `[${entity.name}](${entity.url})` : entity.name
+}
+
+function relationBullet(relation, entity) {
+  const scope = String(relation.scope || '').trim()
+  return `- ${entityLink(entity)}${scope ? `：${scope}` : ''}`
+}
+
+function renderPracticeRelations(card, context) {
+  const id = String(card.data.id)
+  const outgoing = context.relations.filter((relation) => String(relation.source) === id)
+  const incoming = context.relations.filter((relation) => String(relation.target) === id && relation.relation === 'prerequisite_for')
+
+  const groups = [
+    ['前序基础', incoming.map((relation) => relationBullet(relation, practiceEntity(relation.source, context)))],
+    ['下一基础', outgoing.filter((relation) => relation.relation === 'prerequisite_for').map((relation) => relationBullet(relation, practiceEntity(relation.target, context)))],
+    ['传统与知识背景', outgoing.filter((relation) => relation.relation === 'contextualized_by').map((relation) => relationBullet(relation, practiceEntity(relation.target, context)))],
+    ['明确不等同', outgoing.filter((relation) => relation.relation === 'not_equivalent_to').map((relation) => relationBullet(relation, practiceEntity(relation.target, context)))],
+    ['安全约束', outgoing.filter((relation) => relation.relation === 'safety_constrained_by').map((relation) => relationBullet(relation, practiceEntity(relation.target, context)))]
+  ].filter(([, lines]) => lines.length)
+
+  if (!groups.length) return ''
+  const parts = [
+    '## 关联与边界',
+    '',
+    '> 以下关系由 `实践关系-v1.json` 自动生成。前后顺序只表示问道志现代教学依赖；传统背景表示可回看的知识入口，不表示古法传承或等同。'
+  ]
+  for (const [title, lines] of groups) parts.push('', `### ${title}`, '', ...lines)
+  return parts.join('\n')
+}
+
+function renderPracticeCard(card, relationContext) {
   const y = card.data
   const body = card.content.replace(/^\s*#\s+[^\n]+\n+/, '').trim()
+  const relationBlock = renderPracticeRelations(card, relationContext)
   const parts = [
     '---',
     `title: ${JSON.stringify(y.name)}`,
@@ -201,7 +265,8 @@ function renderPracticeCard(card) {
     `> **实践层说明：** 本卡是问道志现代低风险教学单元，风险等级 **${y.risk_level}**，不等同于任何古代功法复原。开始前请阅读 [安全边界](/safety/)。`
   ]
   if (body) parts.push('', body)
-  parts.push('', `::: source 来源与修订\n\n源文件：[${card.relPath}](https://github.com/2740219773/dao-practice-reconstruction/blob/main/${card.relPath.split('/').map(encodeURIComponent).join('/')})。本页由构建器自动生成，仓库 Markdown 是唯一人工维护正文。\n\n返回 [我要实践](/practice/)。\n\n:::`)
+  if (relationBlock) parts.push('', '---', '', relationBlock)
+  parts.push('', `::: source 来源与修订\n\n源文件：[${card.relPath}](https://github.com/2740219773/dao-practice-reconstruction/blob/main/${card.relPath.split('/').map(encodeURIComponent).join('/')})。本页由构建器自动生成，仓库 Markdown 是唯一人工维护正文；“关联与边界”来自实践关系数据。\n\n返回 [我要实践](/practice/)。\n\n:::`)
   return parts.join('\n') + '\n'
 }
 
@@ -222,13 +287,14 @@ function generatePracticePages() {
 
   cards.sort((a, b) => Number(a.data.sequence) - Number(b.data.sequence))
   const expected = Array.from({ length: cards.length }, (_, i) => i + 1)
-  const actual = cards.map((c) => Number(c.data.sequence))
+  const actual = cards.map((card) => Number(card.data.sequence))
   if (JSON.stringify(expected) !== JSON.stringify(actual)) {
     throw new Error(`实践卡 sequence 必须从1连续编号，当前：${actual.join(', ')}`)
   }
 
+  const relationContext = loadPracticeRelationContext(cards)
   for (const card of cards) {
-    writeFileSync(path.join(cardDir, `${card.data.slug}.md`), renderPracticeCard(card), 'utf8')
+    writeFileSync(path.join(cardDir, `${card.data.slug}.md`), renderPracticeCard(card, relationContext), 'utf8')
   }
   return cards.length
 }
@@ -244,7 +310,7 @@ async function main() {
   console.log(`[生成] 可公开 ${publishable.length} 张（可公开草稿/正式公开）`)
 
   console.log('[生成] 步骤 3/5：生成 /knowledge/ 详情页…')
-  const knowledgeCards = publishable.filter((c) => c.layer === 'knowledge')
+  const knowledgeCards = publishable.filter((card) => card.layer === 'knowledge')
   const kDir = path.join(DOCS_DIR, 'knowledge')
   cleanGeneratedMarkdown(kDir, new Set(['index.md']))
   for (const card of knowledgeCards) {
@@ -259,22 +325,22 @@ async function main() {
 
   console.log('[生成] 步骤 5/5：校验并生成 /practice/card/ 详情页…')
   const practiceCount = generatePracticePages()
-  if (practiceCount) console.log(`  ✓ 生成 ${practiceCount} 个基础实践详情页`)
+  if (practiceCount) console.log(`  ✓ 生成 ${practiceCount} 个基础实践详情页（含关系回链）`)
 
   for (const slug of ['library', 'originals', 'concepts', 'claims', 'disputes', 'research', 'risks', 'contemporary']) {
     const dir = path.join(DOCS_DIR, slug)
     let files = []
     try { files = readdirSync(dir) } catch { continue }
-    for (const f of files) {
-      if (f === 'index.md') continue
-      if (f.endsWith('.md')) rmSync(path.join(dir, f), { force: true })
+    for (const file of files) {
+      if (file === 'index.md') continue
+      if (file.endsWith('.md')) rmSync(path.join(dir, file), { force: true })
     }
   }
 
   console.log('[生成] 完成。')
 }
 
-main().catch((err) => {
-  console.error('[生成失败] ' + err.message)
+main().catch((error) => {
+  console.error('[生成失败] ' + error.message)
   process.exit(1)
 })
