@@ -57,22 +57,24 @@ function readJson(file: string) {
   return JSON.parse(readFileSync(file, 'utf8'))
 }
 
+export function loadGraphData(): GraphData {
+  const graphFile = path.join(REPO_ROOT, 'data', 'graph.json')
+  const nodesFile = path.join(REPO_ROOT, 'data', 'nodes.json')
+  const graph = readJson(graphFile) as GraphData
+  const nodeBundle = readJson(nodesFile) as { version: string; nodes: GraphNode[] }
+  const fullById = new Map(nodeBundle.nodes.map((node) => [node.id, node]))
+
+  return {
+    version: graph.version,
+    nodes: graph.nodes.map((node) => ({ ...node, ...(fullById.get(node.id) || {}) })),
+    relations: graph.relations
+  }
+}
+
 export default defineLoader({
   watch: [
     new URL('../../../../../data/graph.json', import.meta.url).pathname,
     new URL('../../../../../data/nodes.json', import.meta.url).pathname
   ],
-  load(): GraphData {
-    const graphFile = path.join(REPO_ROOT, 'data', 'graph.json')
-    const nodesFile = path.join(REPO_ROOT, 'data', 'nodes.json')
-    const graph = readJson(graphFile) as GraphData
-    const nodeBundle = readJson(nodesFile) as { version: string; nodes: GraphNode[] }
-
-    const fullById = new Map(nodeBundle.nodes.map((node) => [node.id, node]))
-    return {
-      version: graph.version,
-      nodes: graph.nodes.map((node) => ({ ...node, ...(fullById.get(node.id) || {}) })),
-      relations: graph.relations
-    }
-  }
+  load: loadGraphData
 })
