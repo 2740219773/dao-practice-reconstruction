@@ -1,0 +1,126 @@
+# 第二批方法节点规范关系。
+# 字段名保留英文仅用于程序解析；关系含义以《节点关系规范》为准。
+version: "1.0"
+status: review
+source_registry: 31-知识图谱整合/来源标识注册表-v1.yml
+
+relations:
+  - id: relation.method2.001
+    source: method.daoyin
+    target: concept.shen
+    relation: related_to
+    scope: 导引以身体、四肢和姿势活动为主要实践对象之一
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.research.kohn.daoyin
+      - source.research.brill.yangsheng
+
+  - id: relation.method2.002
+    source: method.daoyin
+    target: concept.qi
+    relation: related_to
+    scope: 部分导引材料与气、呼吸和养生理论结合；不能把全部导引统一解释成行气术
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.research.brill.selfcare_excavated
+      - source.research.stanleybaker.health
+
+  - id: relation.method2.003
+    source: method.daoyin
+    target: method.tuna
+    relation: related_to
+    scope: 部分历史养生材料将呼吸调节与身体导引结合，二者并非同义
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.research.brill.selfcare_excavated
+
+  - id: relation.method2.004
+    source: method.tuna
+    target: concept.xi
+    relation: related_to
+    scope: 吐纳涉及呼吸意义上的息，但息为多义概念，二者不能等同
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.research.brill.selfcare_excavated
+
+  - id: relation.method2.005
+    source: method.tuna
+    target: concept.qi
+    relation: related_to
+    scope: 传统吐纳常以气和养生理论解释，不等于现代空气交换理论
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.research.stanleybaker.health
+
+  - id: relation.method2.006
+    source: method.tuna
+    target: method.fuqi
+    relation: related_to
+    scope: 两者都可能涉及呼吸与气的摄取，但中古服气具有更具体宗教修养语境
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.research.kohn.daoist_meditation
+
+  - id: relation.method2.007
+    source: method.fuqi
+    target: concept.qi
+    relation: related_to
+    scope: 服气以传统气观念为核心解释框架，不能直接等同现代空气或营养摄入
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.research.kohn.daoist_meditation
+
+  - id: relation.method2.008
+    source: method.fuqi
+    target: method.neidan
+    relation: related_to
+    scope: 服气早于成熟内丹体系；后世内丹吸收更早身体修养传统，但不构成单线起源
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.research.kohn.daoist_meditation
+
+  - id: relation.method2.009
+    source: method.jingzuo
+    target: concept.jing
+    relation: related_to
+    scope: 坐式修养经常与安定、守静等目标相关，但静概念不等于静坐方法
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.research.roth.classical_meditation
+      - source.research.kohn.daoist_meditation
+
+  - id: relation.method2.010
+    source: method.jingzuo
+    target: method.zuowang
+    relation: related_to
+    scope: 静坐是较宽泛坐式实践类别，坐忘是特定经典及后世传统中的修养表达，二者不能等同
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.zhuangzi.dazongshi.zuowang
+      - source.research.kohn.daoist_meditation
+
+  - id: relation.method2.011
+    source: method.jingzuo
+    target: method.neidan
+    relation: related_to
+    scope: 宋元以后部分内丹传统采用坐式修养，但内丹体系不能缩减为静坐
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.research.kohn.daoist_meditation
+
+notes:
+  - 不建立“气 → 息 → 吐纳 → 导引”的固定实践步骤链。
+  - 不建立“静坐 = 坐忘”或“静坐 contains 心斋”。
+  - 服气与辟谷未来需另建关系，且必须保留明确健康安全边界。
+  - related_to 为一般对称关系，只维护一条规范边。
