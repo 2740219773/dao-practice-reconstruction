@@ -3,7 +3,6 @@
  * 栅格、容器宽度、顶部导航、页尾、章节间距
  * ============================================================ */
 
-/* ---------- 全局结构 ---------- */
 .wdz-shell {
   min-height: 100vh;
   display: flex;
@@ -14,7 +13,6 @@
   width: 100%;
 }
 
-/* 内容容器 */
 .wdz-container {
   max-width: var(--wdz-container);
   margin: 0 auto;
@@ -22,12 +20,11 @@
 }
 .wdz-container--narrow { max-width: var(--wdz-prose); }
 
-/* ---------- 顶部导航 ---------- */
 .wdz-nav {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(243, 239, 229, 0.92);
+  background: color-mix(in srgb, var(--wdz-paper) 92%, transparent);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--wdz-line);
 }
@@ -78,19 +75,24 @@
 .wdz-nav__link.is-active { color: var(--wdz-vermilion); font-weight: 600; }
 
 .wdz-nav__actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
-.wdz-nav__search-btn {
-  width: 38px; height: 38px;
-  display: inline-flex; align-items: center; justify-content: center;
+.wdz-nav__search-btn,
+.wdz-nav__theme-btn {
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid var(--wdz-line);
   border-radius: var(--wdz-radius);
   background: var(--wdz-surface);
   color: var(--wdz-ink-2);
   cursor: pointer;
-  transition: border-color var(--wdz-dur), color var(--wdz-dur);
+  transition: border-color var(--wdz-dur), color var(--wdz-dur), background var(--wdz-dur);
 }
-.wdz-nav__search-btn:hover { border-color: var(--wdz-vermilion); color: var(--wdz-vermilion); }
+.wdz-nav__search-btn:hover,
+.wdz-nav__theme-btn:hover { border-color: var(--wdz-vermilion); color: var(--wdz-vermilion); }
+.wdz-nav__theme-btn[aria-pressed='true'] { color: var(--wdz-vermilion); }
 
-/* 汉堡按钮（≤768px 显示） */
 .wdz-nav__hamburger {
   display: none;
   width: 38px; height: 38px;
@@ -104,7 +106,6 @@
 }
 .wdz-nav__hamburger svg { width: 20px; height: 20px; }
 
-/* 移动端下拉菜单 */
 .wdz-nav__mobile {
   display: none;
   border-top: 1px solid var(--wdz-line);
@@ -122,7 +123,6 @@
 .wdz-nav__mobile a:last-child { border-bottom: none; }
 .wdz-nav__mobile a.is-active { color: var(--wdz-vermilion); font-weight: 600; }
 
-/* ---------- 页尾 ---------- */
 .wdz-footer {
   border-top: 1px solid var(--wdz-line);
   margin-top: var(--wdz-space-6);
@@ -161,7 +161,6 @@
   gap: 8px;
 }
 
-/* ---------- 章节留白与题签 ---------- */
 .wdz-section { padding: var(--wdz-space-5) 0; }
 .wdz-section--tight { padding: var(--wdz-space-3) 0; }
 .wdz-section__head {
@@ -185,7 +184,6 @@
 }
 .wdz-section__sub { color: var(--wdz-ink-2); font-size: 0.92rem; }
 
-/* ---------- 响应式 ---------- */
 @media (max-width: 768px) {
   .wdz-nav__links, .wdz-nav__search-btn { display: none; }
   .wdz-nav__hamburger { display: inline-flex; }
