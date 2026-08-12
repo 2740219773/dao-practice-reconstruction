@@ -2,7 +2,7 @@
 # 本文件是图谱构建清单，不重复维护节点正文。
 # 字段名保留英文仅用于程序解析。
 
-version: "3.2"
+version: "3.3"
 status: review
 mode: manifest
 
@@ -12,6 +12,7 @@ principles:
   - 来源 ID 由统一注册表管理。
   - 知识导航、历史发展、师承和实践步骤必须分开。
   - 旧 V2 在迁移期保留兼容，但不再作为新增关系的主来源。
+  - 人物与作品必须区分确定作者关系和传统归属关系。
 
 node_sources:
   core_concepts:
@@ -35,10 +36,19 @@ node_sources:
       - classic.wuzhenpian
   persons:
     path: 25-人物节点
+    expected_ids:
+      - person.laozi
+      - person.zhuangzi
+      - person.zhangboduan
   schools:
     path: 26-流派节点
   methods:
     path: 27-方法节点
+    expected_ids:
+      - method.neidan
+      - method.waidan
+      - method.xinzhai
+      - method.zuowang
   stages:
     path: 28-修行阶段
   routes:
@@ -48,24 +58,20 @@ node_sources:
       - 11-专题研究
       - 32-争议辨析层
 
-# 已被新版知识卡引用，但当前尚无正式节点文件的对象。
+# 已被新版知识卡引用，但当前尚无正式 V3 节点的对象。
+# 这里既可登记“尚无文件”，也可登记“已有旧文件但尚未迁移”的对象。
 # 构建器应将其标记为 planned，而不是误判为丢失或自动创建空节点。
 planned_nodes:
   - id: school.xianqin_daojia
     name: 先秦道家
     type: school
     status: planned
-    reason: 已被“道”等节点引用，后续流派/思想传统分类审计时正式建立。
-  - id: method.xinzhai
-    name: 心斋
-    type: method
+    reason: 已被“道、老子、庄子”等节点引用，后续思想传统/宗教宗派分类审计时正式建立；需说明“道家”作为后起思想史分类的性质。
+  - id: person.gehong
+    name: 葛洪
+    type: person
     status: planned
-    reason: 已被“虚、心”等节点引用，需从《庄子·人间世》原文与旧专题材料建立方法卡。
-  - id: method.zuowang
-    name: 坐忘
-    type: method
-    status: planned
-    reason: 已被“虚、心”等节点引用，需区分《庄子》坐忘概念与后世《坐忘论》体系后建立。
+    reason: 仓库已有旧版人物文件，但尚未按 V3 知识卡模型迁移；外丹节点只保留待审关联。
 
 relation_sources:
   - path: 31-知识图谱整合/核心概念关系-v1.yml
@@ -73,6 +79,9 @@ relation_sources:
     status: review
   - path: 31-知识图谱整合/经典关系-v1.yml
     scope: 六部第一批经典与核心概念、方法、人物之间的规范关系
+    status: review
+  - path: 31-知识图谱整合/人物与方法关系-v1.yml
+    scope: 老子、庄子、张伯端以及内丹、外丹、心斋、坐忘的第一版规范关系
     status: review
 
 source_registry:
@@ -94,6 +103,15 @@ legacy_compatibility:
     path: 04-概念卡
     status: evidence_source
     policy: 暂作为详细研究与原文编号入口，完成来源迁移前不删除。
+  legacy_nodes:
+    paths:
+      - 25-人物节点
+      - 26-流派节点
+      - 27-方法节点
+      - 28-修行阶段
+      - 29-修行路线图
+    status: mixed
+    policy: 只有进入 expected_ids 的节点才视为已完成 V3 迁移；目录中其他旧文件不得自动视为正式 V3 数据。
 
 build_targets:
   nodes:
@@ -111,8 +129,10 @@ quality_gates:
   - 所有关系 target/source 必须指向正式节点或 planned_nodes 中明确登记的待建节点。
   - source_refs 必须能在来源注册表或节点来源中解析。
   - verified 判断不得引用未核对来源作为唯一依据。
-  - related_to 作为对称关系只维护一条规范边。
+  - related_to 与 contrasts_with 作为对称关系只维护一条规范边。
   - develops 与 influences 必须有历史证据，不得由知识导航箭头自动生成。
+  - authored 只用于较稳定作者关系；传统托名或复合文本优先使用 traditional_attribution。
   - 方法关系不得自动解释为实践步骤。
-  - planned_nodes 不得被网站或 AI 当作已有正文节点展示。
+  - planned_nodes 不得被网站或 AI 当作已有正式正文节点展示。
   - 经典作者、成书年代和文本分层必须优先使用学术研究来源，不能只依据传统归属字段。
+  - 涉及外丹等有现实毒理风险的历史方法节点不得输出可复现配方、剂量或服食指导。
