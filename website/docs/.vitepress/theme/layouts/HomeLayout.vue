@@ -4,7 +4,7 @@
  * ① 品牌与起点 → InkHero
  * ② 你想了解什么 → QuestionEntry
  * ③ 当前研究·静的文脉路线 → TopicRoute
- * ④ 六个核心概念 → ConceptMap
+ * ④ 核心概念入口 → ConceptMap + V3 知识图谱
  * ⑤ 我们如何形成判断 → 静态 5 步
  * ⑥ 最近更新 → 数据驱动
  */
@@ -24,7 +24,7 @@ const heroQuestions = computed(() =>
     .filter(Boolean)
 )
 
-/** 第四屏：六个核心概念（概念-0001~0006） */
+/** 第四屏：旧知识索引中已公开的六张概念卡；完整 V3 概念网络从知识图谱进入 */
 const concepts = computed(() =>
   (knowledgeData.byType.concepts || []).slice(0, 6)
 )
@@ -40,7 +40,6 @@ const recentUpdates = computed(() =>
 
 <template>
   <div class="wdz-home">
-    <!-- 第一屏：品牌与起点 -->
     <InkHero />
 
     <section class="wdz-home-principles" aria-label="研究原则">
@@ -51,7 +50,6 @@ const recentUpdates = computed(() =>
       </div>
     </section>
 
-    <!-- 第二屏：你想了解什么 -->
     <section class="wdz-section wdz-container">
       <div class="wdz-section__head">
         <span class="wdz-section__tag">问题</span>
@@ -61,7 +59,6 @@ const recentUpdates = computed(() =>
       <QuestionEntry :questions="heroQuestions" class="wdz-home__questions" />
     </section>
 
-    <!-- 第三屏：当前研究·静的文脉路线 -->
     <section class="wdz-section wdz-container">
       <div class="wdz-section__head">
         <span class="wdz-section__tag">路线</span>
@@ -71,17 +68,18 @@ const recentUpdates = computed(() =>
       <p class="wdz-section__sub wdz-home__route-note">阅读顺序，不代表单纯继承；每一站都可回到原文查证。</p>
     </section>
 
-    <!-- 第四屏：六个核心概念 -->
     <section class="wdz-section wdz-container">
       <div class="wdz-section__head">
         <span class="wdz-section__tag">概念</span>
-        <h2 class="wdz-section__title">六个核心概念</h2>
+        <h2 class="wdz-section__title">核心概念入口</h2>
       </div>
-      <p class="wdz-section__sub">关系线表示研究关联，不代表固定理论。</p>
+      <p class="wdz-section__sub">首页先呈现已经进入公开知识索引的概念卡；完整 V3 网络还连接经典、人物、传统与方法。关系线表示研究关联，不代表固定理论或师承。</p>
       <ConceptMap :concepts="concepts" class="wdz-home__concepts" />
+      <p class="wdz-home__method-note">
+        查看当前完整的 <a href="/graph/">知识图谱 →</a>
+      </p>
     </section>
 
-    <!-- 第五屏：我们如何形成判断 -->
     <section class="wdz-section wdz-container">
       <div class="wdz-section__head">
         <span class="wdz-section__tag">方法</span>
@@ -99,7 +97,6 @@ const recentUpdates = computed(() =>
       </p>
     </section>
 
-    <!-- 第六屏：最近更新 -->
     <section class="wdz-section wdz-container">
       <div class="wdz-section__head">
         <span class="wdz-section__tag">更新</span>
