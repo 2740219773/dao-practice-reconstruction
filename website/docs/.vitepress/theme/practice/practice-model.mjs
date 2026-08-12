@@ -1,3 +1,5 @@
+import { migrateEnvelope, PRACTICE_MIGRATIONS } from './practice-migrations.mjs'
+
 export const STORAGE_KEY = 'wendaozhi.practice.records.v1'
 export const SCHEMA_VERSION = 1
 
@@ -133,18 +135,40 @@ export function exportPayload(records, exportedAt = new Date().toISOString()) {
 }
 
 export function mergeImportPayload(existingRecords, payload) {
-  if (!payload || payload.schemaVersion !== SCHEMA_VERSION || !Array.isArray(payload.records)) {
-    return { ok: false, error: '版本或结构不支持', records: existingRecords, accepted: 0, rejected: 0 }
+  const migrated = migrateEnvelope(payload, {
+    currentVersion: SCHEMA_VERSION,
+    normalizeRecord,
+    migrations: PRACTICE_MIGRATIONS
+  })
+  if (!migrated.ok) {
+    return {
+      ok: false,
+      code: migrated.code,
+      error: migrated.error || '版本或结构不支持',
+      records: existingRecords,
+      accepted: 0,
+      rejected: Array.isArray(payload?.records) ? payload.records.length : 0,
+      migrated: false
+    }
   }
 
-  const valid = payload.records.map(normalizeRecord).filter(Boolean)
-  const rejected = payload.records.length - valid.length
-  if (!valid.length && payload.records.length) {
-    return { ok: false, error: '没有可识别的记录；未知实践 ID 或非法记录不会导入', records: existingRecords, accepted: 0, rejected }
+  const valid = migrated.records
+  const rejected = migrated.rejected || 0
+  if (!valid.length && Array.isArray(payload.records) && payload.records.length) {
+    return { ok: false, code: 'no_valid_records', error: '没有可识别的记录；未知实践 ID 或非法记录不会导入', records: existingRecords, accepted: 0, rejected, migrated: migrated.migrated }
   }
 
   const map = new Map(existingRecords.map((record) => [record.id, record]))
   for (const record of valid) map.set(record.id, record)
   const records = [...map.values()].sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)))
-  return { ok: true, records, accepted: valid.length, rejected }
+  return {
+    ok: true,
+    code: 'ok',
+    records,
+    accepted: valid.length,
+    rejected,
+    migrated: migrated.migrated,
+    sourceVersion: migrated.sourceVersion,
+    targetVersion: migrated.targetVersion
+  }
 }
