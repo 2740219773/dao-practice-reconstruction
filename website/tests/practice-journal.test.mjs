@@ -12,7 +12,8 @@ import {
 } from '../docs/.vitepress/theme/practice/practice-model.mjs'
 import { aggregateRecent, recentRecords } from '../docs/.vitepress/theme/practice/practice-stats.mjs'
 import { buildSafetyReview, reviewDraftSafety } from '../docs/.vitepress/theme/practice/practice-safety.mjs'
-import { buildAiPrompt, buildReviewSummary } from '../docs/.vitepress/theme/practice/practice-ai.mjs'
+import { buildAiPrompt, buildReviewSummary, buildStageAiPrompt, buildStageReviewSummary } from '../docs/.vitepress/theme/practice/practice-ai.mjs'
+import { buildStageReview, buildThirtyDayDistribution } from '../docs/.vitepress/theme/practice/practice-stage.mjs'
 
 const NOW = new Date(2026, 7, 12, 12, 0, 0)
 
@@ -25,13 +26,56 @@ function record(overrides = {}) {
     practiceId: overrides.practiceId || 'practice.basic.natural_breath',
     durationMinutes: overrides.durationMinutes ?? 3,
     startState: overrides.startState || 'acceptable',
+    postureState: overrides.postureState || 'not_observed',
     issues: overrides.issues || [],
     severity: overrides.severity || 'none',
     afterState: overrides.afterState || 'normal',
     breathState: overrides.breathState || 'mostly_natural',
+    attentionState: overrides.attentionState || 'not_practiced',
     note: overrides.note || '',
     ...overrides
   })
+}
+
+function stableThirtyDayHistory() {
+  const rows = []
+  for (let i = 1; i <= 5; i++) {
+    rows.push(record({
+      id: `sit-${i}`,
+      date: `2026-08-0${i}`,
+      practiceId: 'practice.basic.short_sitting',
+      durationMinutes: 5,
+      postureState: 'comfortable',
+      breathState: 'mostly_natural',
+      attentionState: 'returned',
+      afterState: 'normal'
+    }))
+  }
+  for (let i = 6; i <= 9; i++) {
+    rows.push(record({
+      id: `daily-${i}`,
+      date: `2026-08-0${i}`,
+      practiceId: 'practice.basic.daily_awareness',
+      durationMinutes: 2,
+      postureState: 'not_observed',
+      breathState: 'not_observed',
+      attentionState: 'returned',
+      afterState: 'normal'
+    }))
+  }
+  for (let i = 10; i <= 12; i++) {
+    rows.push(record({
+      id: `posture-${i}`,
+      date: `2026-08-${i}`,
+      practiceId: 'practice.basic.posture',
+      durationMinutes: 3,
+      postureState: 'comfortable',
+      breathState: 'not_observed',
+      attentionState: 'not_practiced',
+      afterState: 'normal'
+    }))
+  }
+  return rows
 }
 
 test('正常记录可以通过模型校验', () => {
@@ -179,4 +223,68 @@ test('AI摘要明确保留不练、超时和安全边界，不包含个人长备
   assert.match(prompt, /不诊断疾病/)
   assert.match(prompt, /主动决定不练.*不把它描述为失败/)
   assert.doesNotMatch(prompt, /秘密备注/)
+})
+
+test('30天分布区分实际练习、主动不练与无记录', () => {
+  const distribution = buildThirtyDayDistribution([
+    record({ id: 'practice-day', date: '2026-08-12' }),
+    record({ id: 'skip-day', date: '2026-08-11', startState: 'skipped', durationMinutes: 0 })
+  ], { now: NOW, days: 30 })
+  assert.equal(distribution.length, 30)
+  assert.equal(distribution.at(-1).status, 'practiced')
+  assert.equal(distribution.at(-2).status, 'skipped')
+  assert.equal(distribution.at(-3).status, 'no_record')
+})
+
+test('阶段复盘在记录不足时不会自动给出分流', () => {
+  const review = buildStageReview([
+    record({ id: 'one', practiceId: 'practice.basic.posture', postureState: 'comfortable' }),
+    record({ id: 'two', practiceId: 'practice.basic.natural_breath', breathState: 'mostly_natural' })
+  ], { now: NOW })
+  assert.equal(review.decision.code, 'continue_collect')
+  assert.ok(Object.values(review.capabilities).some((item) => item.code === 'insufficient'))
+})
+
+test('阶段复盘遇到红色事件时暂停阶段判断', () => {
+  const review = buildStageReview([
+    ...stableThirtyDayHistory(),
+    record({ id: 'red-stage', date: '2026-08-12', severity: 'red', issues: ['function_impact'] })
+  ], { now: NOW })
+  assert.equal(review.decision.code, 'pause_for_safety')
+  assert.equal(review.capabilities.body.code, 'paused')
+  assert.match(review.safety.primary, /最近30天存在红色事件/)
+})
+
+test('记录充分且四类基础能力稳定时只允许讨论分流，不自动解锁', () => {
+  const review = buildStageReview(stableThirtyDayHistory(), { now: NOW })
+  assert.equal(review.stats.actualPracticeCount, 12)
+  assert.equal(review.capabilities.body.code, 'stable')
+  assert.equal(review.capabilities.breath.code, 'stable')
+  assert.equal(review.capabilities.attention.code, 'stable')
+  assert.equal(review.capabilities.dailyLife.code, 'stable')
+  assert.equal(review.decision.code, 'discuss_diversion')
+  assert.match(review.decision.reason, /不是自动解锁/)
+})
+
+test('多次超审查上限时阶段复盘优先回到已审查负荷', () => {
+  const rows = stableThirtyDayHistory()
+  rows[0].durationMinutes = 15
+  rows[1].durationMinutes = 15
+  rows[2].durationMinutes = 15
+  const review = buildStageReview(rows, { now: NOW })
+  assert.equal(review.stats.overLimitCount, 3)
+  assert.equal(review.decision.code, 'return_reviewed_load')
+})
+
+test('30天AI阶段摘要不包含原始长备注且明确禁止自动晋级', () => {
+  const rows = stableThirtyDayHistory()
+  rows[0].note = '这是一段不应进入阶段AI摘要的私人长备注'
+  const review = buildStageReview(rows, { now: NOW })
+  const summary = buildStageReviewSummary(review, NOW)
+  const prompt = buildStageAiPrompt(summary)
+  assert.match(summary, /最近30天/)
+  assert.match(summary, /阶段方向：可以讨论下一阶段或分流/)
+  assert.doesNotMatch(summary, /私人长备注/)
+  assert.match(prompt, /不代表自动晋级、解锁/)
+  assert.match(prompt, /记录不足.*不用猜测填补/)
 })
