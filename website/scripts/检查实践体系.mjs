@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import path from 'node:path'
 import matter from 'gray-matter'
+import fg from 'fast-glob'
 
 const WEBSITE_ROOT = process.cwd()
 const REPO_ROOT = path.resolve(WEBSITE_ROOT, '..')
@@ -44,16 +45,29 @@ function assert(condition, message) {
   if (!condition) fail(message)
 }
 
-function loadKnowledgeIds() {
-  const file = path.join(REPO_ROOT, 'data', 'nodes.json')
-  if (!existsSync(file)) return new Set()
-  try {
-    const parsed = JSON.parse(readFileSync(file, 'utf8'))
-    return new Set((parsed.nodes || []).map((n) => String(n.id || '')).filter(Boolean))
-  } catch {
-    fail('data/nodes.json 无法解析；请先运行 npm run graph:check')
-    return new Set()
+function loadKnowledgeIdsFromSources() {
+  const patterns = [
+    '../23-核心概念网络/**/*.md',
+    '../24-经典节点/**/*.md',
+    '../25-人物节点/**/*.md',
+    '../26-流派节点/**/*.md',
+    '../27-方法节点/**/*.md',
+    '../28-修行阶段/**/*.md',
+    '../29-修行路线图/**/*.md',
+    '../30-体系总览/**/*.md',
+    '../32-争议辨析层/**/*.md'
+  ]
+  const ids = new Set()
+  for (const rel of fg.sync(patterns, { cwd: WEBSITE_ROOT, onlyFiles: true, unique: true })) {
+    try {
+      const parsed = matter(readFileSync(path.resolve(WEBSITE_ROOT, rel), 'utf8').replace(/^\uFEFF/, ''))
+      if (parsed.data?.id) ids.add(String(parsed.data.id))
+    } catch (e) {
+      fail(`无法读取 V3 源文件 ${rel}：${e?.message || e}`)
+    }
   }
+  assert(ids.size > 0, '未从 V3 源 Markdown 读取到任何节点 ID')
+  return ids
 }
 
 for (const rel of requiredDocs) assert(existsSync(path.join(REPO_ROOT, rel)), `缺少规范文件：${rel}`)
@@ -110,7 +124,7 @@ try {
 assert(relationData.scope === 'practice_layer_only', '实践关系文件 scope 必须为 practice_layer_only')
 assert(Array.isArray(relationData.relations), '实践关系 relations 必须为数组')
 
-const knowledgeIds = loadKnowledgeIds()
+const knowledgeIds = loadKnowledgeIdsFromSources()
 const relationIds = new Set()
 const relationKeys = new Set()
 for (const r of relationData.relations || []) {
@@ -123,8 +137,7 @@ for (const r of relationData.relations || []) {
 
   if (String(r.target).startsWith('practice.')) assert(ids.has(r.target), `实践关系 target 不存在：${r.target}`)
   if (String(r.target).startsWith('concept.') || String(r.target).startsWith('method.') || String(r.target).startsWith('classic.')) {
-    assert(knowledgeIds.size > 0, '无法读取 V3 节点，不能验证知识端点')
-    assert(knowledgeIds.has(r.target), `实践关系知识端点不在 V3：${r.target}`)
+    assert(knowledgeIds.has(r.target), `实践关系知识端点不在 V3 源节点：${r.target}`)
   }
   if (r.relation === 'safety_constrained_by') assert(String(r.target).startsWith('policy.'), `安全约束目标必须是 policy.*：${r.target}`)
 
@@ -146,5 +159,5 @@ assert(practicePage.includes('<PracticeJournal />'), '实践首页尚未挂载 P
 assert(themeIndex.includes("app.component('PracticeJournal'"), '主题入口尚未全局注册 PracticeJournal')
 
 if (!process.exitCode) {
-  console.log(`[实践体系检查] 通过：${files.length} 张实践卡，${relationData.relations.length} 条实践关系，本地记录组件与隐私约束有效。`)
+  console.log(`[实践体系检查] 通过：${files.length} 张实践卡，${relationData.relations.length} 条实践关系，V3 源端点与本地隐私约束有效。`)
 }
