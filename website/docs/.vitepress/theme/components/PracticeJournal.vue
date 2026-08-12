@@ -13,6 +13,7 @@ import {
   mergeImportPayload,
   normalizeRecord
 } from '../practice/practice-model.mjs'
+import { parseAndMigrateStored, PRACTICE_MIGRATIONS } from '../practice/practice-migrations.mjs'
 import { aggregateRecent } from '../practice/practice-stats.mjs'
 import { buildSafetyReview, reviewDraftSafety } from '../practice/practice-safety.mjs'
 import { buildAiPrompt, buildReviewSummary, buildStageAiPrompt, buildStageReviewSummary } from '../practice/practice-ai.mjs'
@@ -45,11 +46,21 @@ function persist() {
 onMounted(() => {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    if (raw) {
-      const parsed = JSON.parse(raw)
-      if (parsed?.schemaVersion === SCHEMA_VERSION && Array.isArray(parsed.records)) {
-        records.value = parsed.records.map(normalizeRecord).filter(Boolean)
-      }
+    const loaded = parseAndMigrateStored(raw, {
+      currentVersion: SCHEMA_VERSION,
+      normalizeRecord,
+      migrations: PRACTICE_MIGRATIONS
+    })
+    if (!loaded.ok) {
+      notice.value = loaded.error || '本地记录版本无法读取。原数据没有被自动覆盖。'
+      ready.value = true
+      return
+    }
+    records.value = loaded.records
+    if (loaded.migrated) {
+      notice.value = `本地记录已从 schema v${loaded.sourceVersion} 迁移到 v${loaded.targetVersion}。迁移前数据未被自动删除。`
+    } else if (loaded.rejected) {
+      notice.value = `已读取本地记录，其中 ${loaded.rejected} 条记录未通过当前数据校验；原始存储没有被自动覆盖。`
     }
   } catch {
     notice.value = '本地记录读取失败。原数据没有被自动覆盖，可先导出浏览器存储后再处理。'
@@ -134,7 +145,8 @@ async function importData(event) {
     if (!result.ok) throw new Error(result.error)
     records.value = result.records
     persist()
-    notice.value = `已导入 ${result.accepted} 条可识别记录${result.rejected ? `，拒绝 ${result.rejected} 条未知或非法记录` : ''}；同 ID 记录已合并。`
+    const migrationText = result.migrated ? `，已从 schema v${result.sourceVersion} 迁移到 v${result.targetVersion}` : ''
+    notice.value = `已导入 ${result.accepted} 条可识别记录${result.rejected ? `，拒绝 ${result.rejected} 条未知或非法记录` : ''}${migrationText}；同 ID 记录已合并。`
   } catch (error) {
     notice.value = `导入失败：${error?.message || '文件不是受支持的问道志记录格式'}。`
   }
