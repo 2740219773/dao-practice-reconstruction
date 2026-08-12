@@ -1,0 +1,146 @@
+# 第一批人物与方法节点规范关系。
+# 字段名保留英文仅用于程序解析；关系含义以《节点关系规范》为准。
+version: "1.0"
+status: review
+source_registry: 31-知识图谱整合/来源标识注册表-v1.yml
+
+relation_semantics:
+  traditional_attribution:
+    directed: true
+    description: 传统作者归属或复合文本归属；不等于现代研究已确认的单一作者关系。
+  related_to:
+    symmetric: true
+    description: 一般关联，不表示历史传承、因果或固定实践步骤。
+  source_of:
+    directed: true
+    description: 文本或材料是某概念、方法节点的直接来源。
+  contrasts_with:
+    symmetric: true
+    description: 研究上的重要对照，不表示彼此排斥或简单替代。
+
+relations:
+  # 人物—经典
+  - id: relation.pm.001
+    source: person.laozi
+    target: classic.daodejing
+    relation: traditional_attribution
+    scope: 中国传统长期将《道德经》归于老子；现代研究对人物身份、作者与文本形成存在争议
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.research.sep.daoism
+
+  - id: relation.pm.002
+    source: person.zhuangzi
+    target: classic.zhuangzi
+    relation: traditional_attribution
+    scope: 庄周与今本《庄子》核心材料密切相关，但今本是庄周及其他作者、后学材料的复合文本
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.research.sep.zhuangzi
+
+  # 张伯端—内丹
+  - id: relation.pm.003
+    source: person.zhangboduan
+    target: method.neidan
+    relation: related_to
+    scope: 张伯端及《悟真篇》所代表的北宋内丹语境；不表示张伯端“创立全部内丹”
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.research.pregadio.wuzhenpian
+
+  # 《庄子》—心斋/坐忘直接来源
+  - id: relation.pm.004
+    source: classic.zhuangzi
+    target: method.xinzhai
+    relation: source_of
+    scope: 《庄子·人间世》心斋相关段落是心斋节点的直接先秦文本来源
+    evidence: A
+    verification: verified
+    source_refs:
+      - source.zhuangzi.renjianshi.xinzhai
+
+  - id: relation.pm.005
+    source: classic.zhuangzi
+    target: method.zuowang
+    relation: source_of
+    scope: 《庄子·大宗师》坐忘相关段落是坐忘节点的直接先秦文本来源
+    evidence: A
+    verification: verified
+    source_refs:
+      - source.zhuangzi.dazongshi.zuowang
+
+  # 心斋—核心概念
+  - id: relation.pm.006
+    source: method.xinzhai
+    target: concept.xu
+    relation: related_to
+    scope: 《庄子·人间世》直接以“虚者，心斋也”建立关系
+    evidence: A
+    verification: verified
+    source_refs:
+      - source.zhuangzi.renjianshi.xinzhai
+      - source.project.topic002.xu
+
+  - id: relation.pm.007
+    source: method.xinzhai
+    target: concept.xin
+    relation: related_to
+    scope: 心斋围绕心、志、虚及应物关系展开
+    evidence: A
+    verification: verified
+    source_refs:
+      - source.zhuangzi.renjianshi.xinzhai
+
+  # 心斋—坐忘
+  - id: relation.pm.008
+    source: method.xinzhai
+    target: method.zuowang
+    relation: related_to
+    scope: 同属《庄子》重要修养表达；不表示心斋之后必然进入坐忘，也不表示固定练习阶段
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.zhuangzi.renjianshi.xinzhai
+      - source.zhuangzi.dazongshi.zuowang
+
+  # 坐忘—核心概念与后世静修语境
+  - id: relation.pm.009
+    source: method.zuowang
+    target: concept.shen
+    relation: related_to
+    scope: 《庄子·大宗师》“堕肢体、离形”等形体与自身语境
+    evidence: A
+    verification: verified
+    source_refs:
+      - source.zhuangzi.dazongshi.zuowang
+
+  - id: relation.pm.010
+    source: method.zuowang
+    target: concept.jing
+    relation: related_to
+    scope: 后世《坐忘论》收心、守静、泰定等体系中的安定语境；不得反读为《庄子》原始步骤
+    evidence: A
+    verification: verified
+    source_refs:
+      - source.zuowanglun.shouxin
+      - source.zuowanglun.taiding
+      - source.project.topic001.jing
+
+  # 内外丹对照
+  - id: relation.pm.011
+    source: method.neidan
+    target: method.waidan
+    relation: contrasts_with
+    scope: 现代研究用于区分两类主要炼丹传统；二者共享部分术语、象征和历史背景，但不是简单替代或单线发展关系
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.research.pregadio.jindan
+
+notes:
+  - person.zhangboduan authored classic.wuzhenpian 已存在于经典关系-v1.yml，不在本文件重复维护。
+  - classic.cantongqi 与 method.neidan / method.waidan 的关系已存在于经典关系-v1.yml，不重复维护。
+  - person.zhuangzi 与 method.xinzhai / method.zuowang 不建立 practices 边，因为文本存在相关表述并不等于历史庄周本人有可考实践记录。
