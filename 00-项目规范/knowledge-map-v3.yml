@@ -2,7 +2,7 @@
 # 本文件是图谱构建清单，不重复维护节点正文。
 # 字段名保留英文仅用于程序解析。
 
-version: "3.3"
+version: "3.4"
 status: review
 mode: manifest
 
@@ -13,6 +13,7 @@ principles:
   - 知识导航、历史发展、师承和实践步骤必须分开。
   - 旧 V2 在迁移期保留兼容，但不再作为新增关系的主来源。
   - 人物与作品必须区分确定作者关系和传统归属关系。
+  - school 仅是兼容顶层类型，正式节点必须用 school_kind 区分思想传统、宗教宗派、宗教传统和修炼传统。
 
 node_sources:
   core_concepts:
@@ -25,6 +26,7 @@ node_sources:
       - concept.xin
       - concept.xi
       - concept.shen
+
   classics:
     path: 24-经典节点
     expected_ids:
@@ -34,14 +36,27 @@ node_sources:
       - classic.huangdineijing
       - classic.cantongqi
       - classic.wuzhenpian
+
   persons:
     path: 25-人物节点
     expected_ids:
       - person.laozi
       - person.zhuangzi
       - person.zhangboduan
+      - person.gehong
+      - person.weiboyang
+      - person.wangchongyang
+
   schools:
     path: 26-流派节点
+    expected_ids:
+      - school.xianqin_daojia
+      - school.huanglao
+      - school.danding
+      - school.quanzhen
+      - school.zhengyi
+    required_field: school_kind
+
   methods:
     path: 27-方法节点
     expected_ids:
@@ -49,43 +64,79 @@ node_sources:
       - method.waidan
       - method.xinzhai
       - method.zuowang
+      - method.fulu_keyi
+
   stages:
     path: 28-修行阶段
+
   routes:
     path: 29-修行路线图
+
   research:
     paths:
       - 11-专题研究
       - 32-争议辨析层
 
 # 已被新版知识卡引用，但当前尚无正式 V3 节点的对象。
-# 这里既可登记“尚无文件”，也可登记“已有旧文件但尚未迁移”的对象。
 # 构建器应将其标记为 planned，而不是误判为丢失或自动创建空节点。
 planned_nodes:
-  - id: school.xianqin_daojia
-    name: 先秦道家
+  - id: classic.baopuzi
+    name: 抱朴子
+    type: classic
+    status: planned
+    reason: 葛洪人物节点已完成迁移，《抱朴子》需要按经典文本分层、内外篇及成书问题正式建卡。
+
+  - id: school.tianshi
+    name: 天师道
     type: school
+    school_kind: religious_tradition
     status: planned
-    reason: 已被“道、老子、庄子”等节点引用，后续思想传统/宗教宗派分类审计时正式建立；需说明“道家”作为后起思想史分类的性质。
-  - id: person.gehong
-    name: 葛洪
-    type: person
+    reason: 正一道历史根源需要通过独立天师道节点分层表达，不能把东汉天师共同体与后世正一完全合并。
+
+  - id: method.daoyin
+    name: 导引
+    type: method
     status: planned
-    reason: 仓库已有旧版人物文件，但尚未按 V3 知识卡模型迁移；外丹节点只保留待审关联。
+    reason: 仓库已有旧版文件并被核心概念引用，尚未按 V3 规范完成来源和方法边界迁移。
+
+  - id: method.tuna
+    name: 吐纳
+    type: method
+    status: planned
+    reason: 仓库已有旧版文件，需与息、调息、服气区分后迁移。
+
+  - id: method.fuqi
+    name: 服气
+    type: method
+    status: planned
+    reason: 仓库已有旧版文件，需按历史时期和文献来源迁移。
+
+  - id: research.medobs
+    name: 身体观察研究
+    type: research
+    status: planned
+    reason: 旧 MEDOBS 接口仍被部分核心节点引用，需确认最终研究节点结构后正式接入。
 
 relation_sources:
   - path: 31-知识图谱整合/核心概念关系-v1.yml
     scope: 七个核心概念第一版规范关系
     status: review
+
   - path: 31-知识图谱整合/经典关系-v1.yml
     scope: 六部第一批经典与核心概念、方法、人物之间的规范关系
     status: review
+
   - path: 31-知识图谱整合/人物与方法关系-v1.yml
     scope: 老子、庄子、张伯端以及内丹、外丹、心斋、坐忘的第一版规范关系
     status: review
 
+  - path: 31-知识图谱整合/人物与流派关系-v1.yml
+    scope: 葛洪、魏伯阳、王重阳以及先秦道家、黄老、丹道、全真、正一的第一版规范关系
+    status: review
+
 source_registry:
   path: 31-知识图谱整合/来源标识注册表-v1.yml
+  version: "1.3"
   status: review
 
 schemas:
@@ -98,11 +149,13 @@ legacy_compatibility:
   knowledge_map_v2:
     path: 00-项目规范/knowledge-map-v2.yml
     status: legacy
-    policy: 只用于迁移期兼容，不再新增未经新版关系规范审校的边。
+    policy: 只用于迁移期兼容，不再作为新增关系主来源。
+
   legacy_concept_cards:
     path: 04-概念卡
     status: evidence_source
     policy: 暂作为详细研究与原文编号入口，完成来源迁移前不删除。
+
   legacy_nodes:
     paths:
       - 25-人物节点
@@ -132,6 +185,10 @@ quality_gates:
   - related_to 与 contrasts_with 作为对称关系只维护一条规范边。
   - develops 与 influences 必须有历史证据，不得由知识导航箭头自动生成。
   - authored 只用于较稳定作者关系；传统托名或复合文本优先使用 traditional_attribution。
+  - founded 只用于有历史研究支持的组织/运动创建关系，不用于后起思想分类或跨时代修炼传统。
+  - 所有正式 school 节点必须存在 school_kind。
+  - intellectual_tradition 不得自动拥有创建者或成员组织关系。
+  - practice_tradition 不得伪装成单一连续宗教组织。
   - 方法关系不得自动解释为实践步骤。
   - planned_nodes 不得被网站或 AI 当作已有正式正文节点展示。
   - 经典作者、成书年代和文本分层必须优先使用学术研究来源，不能只依据传统归属字段。
