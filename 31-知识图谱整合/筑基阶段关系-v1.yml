@@ -1,0 +1,31 @@
+# 筑基阶段第一版规范关系。
+# 只表达范围明确的后世内丹阶段模型，不建立跨传统统一步骤链。
+version: "1.0"
+status: review
+source_registry: 31-知识图谱整合/来源标识注册表-v1.yml
+
+relations:
+  - id: relation.stage.001
+    source: stage.zhuji
+    target: method.neidan
+    relation: related_to
+    scope: “筑基”在部分后世内丹阶段模型中表示正式炼化前的基础准备；不代表全部内丹传统或全部道家修养共享相同步骤
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.research.wangmu.foundations
+
+  - id: relation.stage.002
+    source: stage.zhuji
+    target: classic.wuzhenpian
+    relation: related_to
+    scope: 王沐的四阶段内丹整理以《悟真篇》体系为主要基础之一；该边表示后世解释模型与文本传统的关系，不表示《悟真篇》原文直接列出完全相同的四阶段标题
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.research.wangmu.foundations
+
+notes:
+  - 不建立“筑基 → 精气神 → 性命双修”步骤链。
+  - 精气神已建模为 concept.jingqishen；性命双修已建模为 concept.xingming_shuangxiu。
+  - source.research.wangmu.foundations 当前由 stage.zhuji 节点自身 sources 声明，后续来源注册表升级时再纳入全局 canonical registry。
