@@ -1,7 +1,6 @@
 ---
 layout: home
 title: 问道志
-description: 传统道家知识的来源整理、概念辨析与现代重构——不急于相信，也不急于否定。
-# 首页内容由自定义主题 HomeLayout 组件渲染（方案七：6 屏结构），
-# 本文件仅保留 frontmatter 与少量元信息。
+description: 从原文、证据与争议出发，支撑学习、低风险基础实践、记录与复盘。
+# 首页内容由自定义主题 HomeLayout 组件渲染；本文件仅保留 frontmatter 与元信息。
 ---
