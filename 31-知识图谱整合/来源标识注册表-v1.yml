@@ -1,6 +1,6 @@
 # 来源主 ID 与迁移期别名注册表。
 # 字段名保留英文仅用于程序解析。
-version: "1.3"
+version: "1.4"
 status: review
 
 sources:
@@ -171,15 +171,13 @@ sources:
     type: project
     name: TOPIC-001 静专题证据总账
     reference: 11-专题研究/TOPIC-001-静/证据总账.md
-    aliases:
-      - source.topic001.jing
+    aliases: [source.topic001.jing]
 
   - canonical_id: source.project.topic002.xu
     type: project
     name: TOPIC-002 虚专题证据总账
     reference: 11-专题研究/TOPIC-002-虚/证据总账.md
-    aliases:
-      - source.topic002.xu
+    aliases: [source.topic002.xu]
 
   - canonical_id: source.project.legacy.concept0001
     type: project
@@ -292,7 +290,7 @@ sources:
 
   - canonical_id: source.research.cambridge.quanzhen_lineage
     type: historical
-    name: Reburials of Eminent Masters: The Construction of Quanzhen Daoist Lineages in North China under Mongol Rule
+    name: Reburials of Eminent Masters
     reference: Jinping Wang，Journal of Chinese History，2024；用于全真“五祖七真”等后世谱系建构问题
     aliases: []
 
@@ -306,6 +304,49 @@ sources:
     type: traditional
     name: 道教文化中心资料库 - 丹鼎派
     reference: 用于记录“丹鼎派”作为炼丹相关诸传统通称的传统/近现代分类方式；不单独作为正式宗派存在的历史证据
+    aliases: []
+
+  # 第二批方法研究来源
+  - canonical_id: source.research.kohn.daoyin
+    type: historical
+    name: Daoyin: Chinese Healing Exercises
+    reference: Livia Kohn，Asian Medicine 3.1，2007；用于导引历史、身体运动与养生传统研究
+    aliases: []
+
+  - canonical_id: source.research.brill.selfcare_excavated
+    type: historical
+    name: The Way of Self-care and Medicinal Practices Gleaned from Excavated Materials
+    reference: Histories of Spiritual Traditions in China；用于出土养生材料、吐纳及导引呼吸术语研究
+    aliases: []
+
+  - canonical_id: source.research.brill.yangsheng
+    type: historical
+    name: Chinese Yangsheng: Self-help and Self-image
+    reference: Asian Medicine 7.1，2012；用于马王堆《导引图》、张家山《引书》与早期养生实践
+    aliases: []
+
+  - canonical_id: source.research.kohn.daoist_meditation
+    type: historical
+    name: Daoist Meditation: From 100 CE to the Present
+    reference: The Oxford Handbook of Meditation；用于中古以后道教坐式修养、服气、存想、内观和内丹的历史分期
+    aliases: []
+
+  - canonical_id: source.research.roth.classical_meditation
+    type: historical
+    name: Classical Daoist Meditation / Meditation in the Classical Daoist Tradition
+    reference: Harold D. Roth；用于先秦至汉初身、息、注意与虚静相关修养的研究解释
+    aliases: []
+
+  - canonical_id: source.research.campany.avoiding_grains
+    type: historical
+    name: Making Transcendents - Avoiding Grains
+    reference: Robert Ford Campany，2009；用于中古辟谷、服气与相关神仙实践的社会宗教史研究
+    aliases: []
+
+  - canonical_id: source.research.stanleybaker.health
+    type: historical
+    name: Health and Philosophy in Pre- and Early Imperial China
+    reference: Michael Stanley-Baker，Oxford University Press，2019；用于早期养生、气与呼吸控制历史背景
     aliases: []
 
 migration_rules:
