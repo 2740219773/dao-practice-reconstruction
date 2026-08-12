@@ -254,7 +254,7 @@ sources:
 
   - canonical_id: source.research.unschuld.huangdineijing
     type: historical
-    name: Huang Di Nei Jing Su Wen: Nature, Knowledge, Imagery in an Ancient Chinese Medical Text
+    name: "Huang Di Nei Jing Su Wen: Nature, Knowledge, Imagery in an Ancient Chinese Medical Text"
     reference: Paul U. Unschuld，University of California Press，2003；用于《素问》文本史与成书问题
     aliases: []
 
@@ -272,7 +272,7 @@ sources:
 
   - canonical_id: source.research.pregadio.wuzhenpian
     type: historical
-    name: Awakening to Reality: The Regulated Verses of the Wuzhen pian
+    name: "Awakening to Reality: The Regulated Verses of the Wuzhen pian"
     reference: Fabrizio Pregadio，2009；用于张伯端、《悟真篇》作者、年代、内丹定位、南宗后世谱系及与《参同契》的关系
     aliases: []
 
@@ -284,7 +284,7 @@ sources:
 
   - canonical_id: source.research.komjathy.quanzhen
     type: historical
-    name: The Way of Complete Perfection: A Quanzhen Daoist Anthology
+    name: "The Way of Complete Perfection: A Quanzhen Daoist Anthology"
     reference: Louis Komjathy，SUNY Press，2013；用于全真运动形成、王重阳及第一代全真人物
     aliases: []
 
@@ -296,7 +296,7 @@ sources:
 
   - canonical_id: source.research.kleeman.celestial_masters
     type: historical
-    name: Celestial Masters: History and Ritual in Early Daoist Communities
+    name: "Celestial Masters: History and Ritual in Early Daoist Communities"
     reference: Terry F. Kleeman，2016；用于天师道早期组织、正一盟威及后续正一传统的历史背景
     aliases: []
 
@@ -309,7 +309,7 @@ sources:
   # 第二批方法研究来源
   - canonical_id: source.research.kohn.daoyin
     type: historical
-    name: Daoyin: Chinese Healing Exercises
+    name: "Daoyin: Chinese Healing Exercises"
     reference: Livia Kohn，Asian Medicine 3.1，2007；用于导引历史、身体运动与养生传统研究
     aliases: []
 
@@ -321,13 +321,13 @@ sources:
 
   - canonical_id: source.research.brill.yangsheng
     type: historical
-    name: Chinese Yangsheng: Self-help and Self-image
+    name: "Chinese Yangsheng: Self-help and Self-image"
     reference: Asian Medicine 7.1，2012；用于马王堆《导引图》、张家山《引书》与早期养生实践
     aliases: []
 
   - canonical_id: source.research.kohn.daoist_meditation
     type: historical
-    name: Daoist Meditation: From 100 CE to the Present
+    name: "Daoist Meditation: From 100 CE to the Present"
     reference: The Oxford Handbook of Meditation；用于中古以后道教坐式修养、服气、存想、内观和内丹的历史分期
     aliases: []
 
