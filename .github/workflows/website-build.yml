@@ -25,7 +25,7 @@ jobs:
         run: npm run graph:check
       - name: 实践体系一致性检查
         run: npm run practice:check
-      - name: 发布状态回归测试
+      - name: 发布状态与实践场景回归测试
         run: npm test
       - name: 构建网站
         run: npm run build
@@ -41,7 +41,7 @@ jobs:
           test -f docs/.vitepress/dist/topics/jing.html
           test -f docs/.vitepress/dist/method/index.html
           test -f docs/.vitepress/dist/safety/index.html
-          # V2.0 实践入口与八张基础实践卡必须由仓库源文件自动生成
+          # V2.x 实践入口与八张基础实践卡必须由仓库源文件自动生成
           test -f docs/.vitepress/dist/practice/index.html
           test -f docs/.vitepress/dist/practice/card/precheck.html
           test -f docs/.vitepress/dist/practice/card/posture.html
@@ -51,6 +51,12 @@ jobs:
           test -f docs/.vitepress/dist/practice/card/short-sitting.html
           test -f docs/.vitepress/dist/practice/card/movement-stillness.html
           test -f docs/.vitepress/dist/practice/card/daily-awareness.html
+          # 实践详情必须展示机器生成的知识回链与“不等同”边界
+          grep -q "关联与边界" docs/.vitepress/dist/practice/card/natural-breath.html
+          grep -q "吐纳" docs/.vitepress/dist/practice/card/natural-breath.html
+          grep -q "服气" docs/.vitepress/dist/practice/card/natural-breath.html
+          grep -q "安全边界 V0.2" docs/.vitepress/dist/practice/card/natural-breath.html
+          grep -q "导引" docs/.vitepress/dist/practice/card/movement-stillness.html
           # 旧统一知识详情页仍需保持兼容
           test -f docs/.vitepress/dist/knowledge/文献-0001-道德经.html
           test -f docs/.vitepress/dist/knowledge/原文-0001-道德经第十六章.html
