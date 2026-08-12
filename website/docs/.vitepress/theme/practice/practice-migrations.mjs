@@ -1,7 +1,20 @@
+export function migrationRegistry(entries = []) {
+  const map = new Map()
+  for (const [fromVersion, migrate] of entries) {
+    if (!Number.isInteger(Number(fromVersion)) || typeof migrate !== 'function') throw new Error('迁移注册表必须使用整数版本与函数')
+    map.set(Number(fromVersion), migrate)
+  }
+  return map
+}
+
+// 当前 schema 仍为 v1，因此注册表为空。
+// 真正发布 v2 前，必须在这里增加 [1, migrateV1ToV2] 并先补自动化测试。
+export const PRACTICE_MIGRATIONS = migrationRegistry([])
+
 export function migrateEnvelope(payload, {
   currentVersion,
   normalizeRecord,
-  migrations = new Map()
+  migrations = PRACTICE_MIGRATIONS
 } = {}) {
   if (!payload || typeof payload !== 'object' || !Array.isArray(payload.records)) {
     return { ok: false, code: 'invalid_structure', error: '记录结构不支持', records: [], migrated: false }
@@ -80,13 +93,4 @@ export function parseAndMigrateStored(rawText, options = {}) {
   } catch {
     return { ok: false, code: 'invalid_json', error: '本地记录不是有效 JSON；原数据不会被覆盖。', records: [], migrated: false }
   }
-}
-
-export function migrationRegistry(entries = []) {
-  const map = new Map()
-  for (const [fromVersion, migrate] of entries) {
-    if (!Number.isInteger(Number(fromVersion)) || typeof migrate !== 'function') throw new Error('迁移注册表必须使用整数版本与函数')
-    map.set(Number(fromVersion), migrate)
-  }
-  return map
 }
