@@ -1,8 +1,9 @@
 /**
- * theme/index.ts —— 自定义主题入口（方案 14.1）
- * 不再导出 DefaultTheme：由 Layout.vue 根据页面 layout 分发到 5 种布局。
+ * theme/index.ts —— 自定义主题入口
+ * 根布局由 Layout.vue 分发；少量跨 Markdown 页面复用的交互组件在此全局注册。
  */
 import Layout from './Layout.vue'
+import PracticeJournal from './components/PracticeJournal.vue'
 import './style.css'
 import './styles/tokens.css'
 import './styles/typography.css'
@@ -14,6 +15,6 @@ import './styles/fidelity.css'
 export default {
   Layout,
   enhanceApp({ app }) {
-    // 预留：全局组件注册（如需要）
+    app.component('PracticeJournal', PracticeJournal)
   }
 }
