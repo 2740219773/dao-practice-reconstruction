@@ -32,11 +32,14 @@ jobs:
           test -f docs/.vitepress/dist/index.html
           test -f docs/.vitepress/dist/knowledge/index.html
           test -f docs/.vitepress/dist/graph/index.html
+          test -f docs/.vitepress/dist/graph/node/concept.dao.html
+          test -f docs/.vitepress/dist/graph/node/classic.baopuzi.html
+          test -f docs/.vitepress/dist/graph/node/school.tianshi.html
           test -f docs/.vitepress/dist/question-map/index.html
           test -f docs/.vitepress/dist/topics/jing.html
           test -f docs/.vitepress/dist/method/index.html
           test -f docs/.vitepress/dist/safety/index.html
-          # 统一知识详情页（自动生成，cleanUrls 无 .html 后缀）
+          # 旧统一知识详情页仍需保持兼容
           test -f docs/.vitepress/dist/knowledge/文献-0001-道德经.html
           test -f docs/.vitepress/dist/knowledge/原文-0001-道德经第十六章.html
           test -f docs/.vitepress/dist/knowledge/概念-0001-静.html
