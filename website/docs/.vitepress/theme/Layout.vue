@@ -20,11 +20,11 @@ const route = useRoute()
 
 const navLinks = [
   { text: '问道', link: '/' },
-  { text: '问题地图', link: '/question-map/' },
+  { text: '我要学习', link: '/question-map/' },
+  { text: '我要实践', link: '/practice/' },
   { text: '专题研究', link: '/topics/' },
   { text: '典籍与概念', link: '/knowledge/' },
-  { text: '知识图谱', link: '/graph/' },
-  { text: '研究方法', link: '/method/' }
+  { text: '知识图谱', link: '/graph/' }
 ]
 
 const layoutMap: Record<string, any> = {
@@ -77,6 +77,7 @@ function onKeydown(e: KeyboardEvent) {
       </div>
       <nav v-show="mobileOpen" class="wdz-nav__mobile" :class="{ 'is-open': mobileOpen }" aria-label="移动端导航">
         <a v-for="l in navLinks" :key="l.link" :class="{ 'is-active': isActive(l.link) }" :href="l.link">{{ l.text }}</a>
+        <a href="/method/">研究方法</a>
         <a href="/safety/">安全边界</a>
         <a href="/about/">关于问道志</a>
       </nav>
@@ -87,12 +88,12 @@ function onKeydown(e: KeyboardEvent) {
     <footer class="wdz-footer">
       <div class="wdz-footer__inner">
         <div class="wdz-footer__grid">
-          <div><div class="wdz-footer__brand">问道志</div><p class="wdz-footer__desc">不急于相信，也不急于否定。<br />传统道家知识的来源整理、概念辨析与现代重构。</p></div>
-          <div class="wdz-footer__col"><h4>阅读</h4><a href="/question-map/">问题地图</a><a href="/topics/">全部专题</a><a href="/topics/jing">「静」专题</a><a href="/knowledge/">典籍与概念</a><a href="/graph/">知识图谱</a><a href="/method/">研究方法</a></div>
-          <div class="wdz-footer__col"><h4>项目</h4><a href="/about/">关于问道志</a><a href="/safety/">安全边界</a><a href="/updates/">更新记录</a><a href="https://github.com/2740219773/dao-practice-reconstruction">GitHub 仓库</a></div>
-          <div class="wdz-footer__col"><h4>边界</h4><a href="/safety/#知识研究">知识研究</a><a href="/safety/#需要专业意见">需要专业意见</a><a href="/safety/#立即停止并求助">应立即停止并求助</a></div>
+          <div><div class="wdz-footer__brand">问道志</div><p class="wdz-footer__desc">不急于相信，也不急于否定。<br />以可靠研究支撑学习、辨析与低风险基础实践。</p></div>
+          <div class="wdz-footer__col"><h4>学习</h4><a href="/question-map/">我要学习</a><a href="/topics/">专题研究</a><a href="/knowledge/">典籍与概念</a><a href="/graph/">知识图谱</a><a href="/method/">研究方法</a></div>
+          <div class="wdz-footer__col"><h4>实践</h4><a href="/practice/">我要实践</a><a href="/practice/card/precheck">开始前安全检查</a><a href="/practice/card/natural-breath">自然察息</a><a href="/practice/card/short-sitting">短时基础安坐</a><a href="/safety/">安全边界</a></div>
+          <div class="wdz-footer__col"><h4>项目</h4><a href="/about/">关于问道志</a><a href="/updates/">更新记录</a><a href="https://github.com/2740219773/dao-practice-reconstruction">GitHub 仓库</a></div>
         </div>
-        <div class="wdz-footer__bottom"><span>问道志 · 内容持续整理中 · 不构成练习指导或医疗建议</span><span>内容以知识卡与原文为源，修订记录见 GitHub</span></div>
+        <div class="wdz-footer__bottom"><span>问道志 · 研究与实践均持续修订 · 不构成医疗建议</span><span>知识与实践正文以仓库为源；中高风险内容不生成自动教程</span></div>
       </div>
     </footer>
 

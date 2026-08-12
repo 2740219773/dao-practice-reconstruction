@@ -39,6 +39,16 @@ jobs:
           test -f docs/.vitepress/dist/topics/jing.html
           test -f docs/.vitepress/dist/method/index.html
           test -f docs/.vitepress/dist/safety/index.html
+          # V2.0 实践入口与八张基础实践卡必须由仓库源文件自动生成
+          test -f docs/.vitepress/dist/practice/index.html
+          test -f docs/.vitepress/dist/practice/card/precheck.html
+          test -f docs/.vitepress/dist/practice/card/posture.html
+          test -f docs/.vitepress/dist/practice/card/contact-awareness.html
+          test -f docs/.vitepress/dist/practice/card/natural-breath.html
+          test -f docs/.vitepress/dist/practice/card/attention-return.html
+          test -f docs/.vitepress/dist/practice/card/short-sitting.html
+          test -f docs/.vitepress/dist/practice/card/movement-stillness.html
+          test -f docs/.vitepress/dist/practice/card/daily-awareness.html
           # 旧统一知识详情页仍需保持兼容
           test -f docs/.vitepress/dist/knowledge/文献-0001-道德经.html
           test -f docs/.vitepress/dist/knowledge/原文-0001-道德经第十六章.html
