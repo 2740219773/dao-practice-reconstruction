@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import {
   STORAGE_KEY,
   SCHEMA_VERSION,
@@ -27,6 +27,7 @@ const notice = ref('')
 const fileInput = ref(null)
 
 const selectedPractice = computed(() => practices.find((p) => p.id === form.value.practiceId) || practices[0])
+const isSkipped = computed(() => form.value.startState === 'skipped')
 const stats = computed(() => aggregateRecent(records.value, { now: new Date(), days: 7 }))
 const safetyReview = computed(() => buildSafetyReview(stats.value, { periodLabel: '最近7天' }))
 const ruleAdvice = computed(() => safetyReview.value.primary)
@@ -38,6 +39,14 @@ const stageReview = computed(() => buildStageReview(records.value, { now: new Da
 const stageRows = computed(() => stageCapabilityRows(stageReview.value))
 const stageSummary = computed(() => buildStageReviewSummary(stageReview.value, new Date()))
 const stageAiPrompt = computed(() => buildStageAiPrompt(stageSummary.value))
+
+watch(() => form.value.startState, (value) => {
+  if (value !== 'skipped') return
+  form.value.durationMinutes = 0
+  form.value.postureState = 'not_observed'
+  form.value.breathState = 'not_observed'
+  form.value.attentionState = 'not_practiced'
+})
 
 function persist() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify({ schemaVersion: SCHEMA_VERSION, records: records.value }))
@@ -87,6 +96,8 @@ function saveRecord() {
 
   if (result.record.severity === 'red') {
     notice.value = '记录已保存在本机。你标记了红色事件：请停止相关实践，并优先查看安全边界，不继续加练。'
+  } else if (result.record.startState === 'skipped') {
+    notice.value = '已记录“今天决定不练”。主动不练不会被计为失败，也不会生成补练要求。'
   } else if (result.overLimit) {
     notice.value = `已按实际保存。本次 ${result.record.durationMinutes} 分钟超过该卡当前审查上限 ${result.reviewedMax} 分钟；这是事实记录，不代表下一次应该继续超时。`
   } else {
@@ -127,6 +138,7 @@ function exportData() {
   a.download = `wendaozhi-practice-records-${form.value.date}.json`
   a.click()
   URL.revokeObjectURL(url)
+  notice.value = `已生成本地 JSON 备份，共 ${payload.records.length} 条记录。文件不会自动上传。`
 }
 
 function triggerImport() {
@@ -152,9 +164,12 @@ async function importData(event) {
   }
 }
 
-function removeRecord(id) {
-  records.value = records.value.filter((record) => record.id !== id)
+function removeRecord(record) {
+  const label = practiceLabels[record.practiceId] || record.practiceId
+  if (!confirm(`确认删除 ${record.date} · ${label} 这条本地记录？此操作无法撤销。`)) return
+  records.value = records.value.filter((item) => item.id !== record.id)
   persist()
+  notice.value = '该条本地记录已删除。'
 }
 
 function clearAll() {
@@ -162,6 +177,21 @@ function clearAll() {
   records.value = []
   persist()
   notice.value = '本地实践记录已清空。'
+}
+
+function onTabKeydown(event) {
+  if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return
+  const buttons = Array.from(event.currentTarget.querySelectorAll('[role="tab"]'))
+  const current = buttons.indexOf(document.activeElement)
+  if (current < 0) return
+  event.preventDefault()
+  let next = current
+  if (event.key === 'ArrowLeft') next = (current - 1 + buttons.length) % buttons.length
+  if (event.key === 'ArrowRight') next = (current + 1) % buttons.length
+  if (event.key === 'Home') next = 0
+  if (event.key === 'End') next = buttons.length - 1
+  buttons[next]?.focus()
+  buttons[next]?.click()
 }
 </script>
 
@@ -176,28 +206,30 @@ function clearAll() {
       <span class="pj-local">本地优先</span>
     </header>
 
-    <nav class="pj-tabs" aria-label="记录工具分页">
-      <button :class="{ active: tab === 'record' }" @click="tab = 'record'">每日记录</button>
-      <button :class="{ active: tab === 'review' }" @click="tab = 'review'">最近7天</button>
-      <button :class="{ active: tab === 'stage' }" @click="tab = 'stage'">30天与阶段</button>
-      <button :class="{ active: tab === 'data' }" @click="tab = 'data'">数据管理</button>
+    <nav class="pj-tabs" aria-label="记录工具分页" role="tablist" @keydown="onTabKeydown">
+      <button role="tab" :aria-selected="tab === 'record'" :tabindex="tab === 'record' ? 0 : -1" :class="{ active: tab === 'record' }" @click="tab = 'record'">每日记录</button>
+      <button role="tab" :aria-selected="tab === 'review'" :tabindex="tab === 'review' ? 0 : -1" :class="{ active: tab === 'review' }" @click="tab = 'review'">最近7天</button>
+      <button role="tab" :aria-selected="tab === 'stage'" :tabindex="tab === 'stage' ? 0 : -1" :class="{ active: tab === 'stage' }" @click="tab = 'stage'">30天与阶段</button>
+      <button role="tab" :aria-selected="tab === 'data'" :tabindex="tab === 'data' ? 0 : -1" :class="{ active: tab === 'data' }" @click="tab = 'data'">数据管理</button>
     </nav>
 
-    <p v-if="notice" class="pj-notice" :class="{ danger: notice.includes('红色') }">{{ notice }}</p>
+    <p v-if="notice" class="pj-notice" :class="{ danger: notice.includes('红色') }" role="status" aria-live="polite">{{ notice }}</p>
     <div v-if="!ready" class="pj-loading">正在读取本机记录…</div>
 
     <form v-else-if="tab === 'record'" class="pj-form" @submit.prevent="saveRecord">
       <div class="pj-grid">
         <label><span>日期</span><input v-model="form.date" type="date" required /></label>
         <label><span>实践卡</span><select v-model="form.practiceId"><option v-for="p in practices" :key="p.id" :value="p.id">{{ p.name }}</option></select></label>
-        <label><span>实际时长（分钟）</span><input v-model.number="form.durationMinutes" type="number" min="0" max="120" /><small>该卡当前审查上限：{{ selectedPractice.max }} 分钟。若实际超时仍应如实记录。</small></label>
         <label><span>开始前状态</span><select v-model="form.startState"><option value="good">顺畅</option><option value="acceptable">可接受</option><option value="interfered">有明显干扰</option><option value="skipped">今天决定不练</option></select></label>
-        <label><span>身体姿势</span><select v-model="form.postureState"><option value="comfortable">舒适</option><option value="acceptable">可接受</option><option value="adjusted">中途已调整</option><option value="stopped">因姿势停止</option><option value="not_observed">未观察</option></select></label>
-        <label><span>呼吸自然度</span><select v-model="form.breathState"><option value="mostly_natural">自然为主</option><option value="sometimes_controlled">偶尔主动控制</option><option value="clearly_controlled">明显主动控制</option><option value="not_observed">未观察呼吸</option></select></label>
-        <label><span>注意返回</span><select v-model="form.attentionState"><option value="returned">能发现并返回</option><option value="sometimes_returned">偶尔能</option><option value="difficult">今天较困难</option><option value="not_practiced">未练此项</option></select></label>
+        <label v-if="!isSkipped"><span>实际时长（分钟）</span><input v-model.number="form.durationMinutes" type="number" min="0" max="120" /><small>该卡当前审查上限：{{ selectedPractice.max }} 分钟。若实际超时仍应如实记录。</small></label>
+        <label v-if="!isSkipped"><span>身体姿势</span><select v-model="form.postureState"><option value="comfortable">舒适</option><option value="acceptable">可接受</option><option value="adjusted">中途已调整</option><option value="stopped">因姿势停止</option><option value="not_observed">未观察</option></select></label>
+        <label v-if="!isSkipped"><span>呼吸自然度</span><select v-model="form.breathState"><option value="mostly_natural">自然为主</option><option value="sometimes_controlled">偶尔主动控制</option><option value="clearly_controlled">明显主动控制</option><option value="not_observed">未观察呼吸</option></select></label>
+        <label v-if="!isSkipped"><span>注意返回</span><select v-model="form.attentionState"><option value="returned">能发现并返回</option><option value="sometimes_returned">偶尔能</option><option value="difficult">今天较困难</option><option value="not_practiced">未练此项</option></select></label>
         <label><span>情绪状态</span><select v-model="form.emotionState"><option value="stable">稳定</option><option value="fluctuating">有波动但可接受</option><option value="interfered">明显干扰</option><option value="stopped">因此停止</option></select></label>
-        <label><span>练后状态</span><select v-model="form.afterState"><option value="normal">正常回到日常</option><option value="need_rest">需要缓一缓</option><option value="affected">现实功能明显受影响</option></select></label>
+        <label v-if="!isSkipped"><span>练后状态</span><select v-model="form.afterState"><option value="normal">正常回到日常</option><option value="need_rest">需要缓一缓</option><option value="affected">现实功能明显受影响</option></select></label>
       </div>
+
+      <p v-if="isSkipped" class="pj-skip-note"><strong>今天不练也是有效记录。</strong> 系统会把时长记为 0，不要求填写姿势、呼吸、注意和练后状态，也不会生成补练要求。</p>
 
       <fieldset class="pj-issues">
         <legend>本次出现的问题（可多选）</legend>
@@ -278,7 +310,7 @@ function clearAll() {
 
     <div v-else class="pj-data">
       <section class="pj-panel"><h3>本地数据</h3><p>当前浏览器共有 <strong>{{ records.length }}</strong> 条记录。默认没有账号、没有云同步、没有自动上传。</p><div class="pj-actions"><button class="pj-secondary" type="button" @click="exportData">导出 JSON</button><button class="pj-secondary" type="button" @click="triggerImport">导入 JSON</button><button class="pj-danger" type="button" @click="clearAll">清空本机记录</button><input ref="fileInput" type="file" accept="application/json,.json" hidden @change="importData" /></div></section>
-      <section class="pj-panel"><h3>最近记录</h3><p v-if="!records.length">还没有本地记录。</p><div v-for="r in records.slice(0, 10)" :key="r.id" class="pj-record"><div><strong>{{ r.date }} · {{ practiceLabels[r.practiceId] || r.practiceId }}</strong><span>{{ r.startState === 'skipped' ? '主动决定不练' : `${r.durationMinutes} 分钟` }} · {{ r.severity === 'red' ? '红色事件' : r.severity === 'yellow' ? '黄色事件' : '无升级事件' }}</span><small v-if="r.note">{{ r.note }}</small></div><button type="button" @click="removeRecord(r.id)">删除</button></div></section>
+      <section class="pj-panel"><h3>最近记录</h3><p v-if="!records.length">还没有本地记录。</p><div v-for="r in records.slice(0, 10)" :key="r.id" class="pj-record"><div><strong>{{ r.date }} · {{ practiceLabels[r.practiceId] || r.practiceId }}</strong><span>{{ r.startState === 'skipped' ? '主动决定不练' : `${r.durationMinutes} 分钟` }} · {{ r.severity === 'red' ? '红色事件' : r.severity === 'yellow' ? '黄色事件' : '无升级事件' }}</span><small v-if="r.note">{{ r.note }}</small></div><button type="button" :aria-label="`删除 ${r.date} ${practiceLabels[r.practiceId] || r.practiceId} 记录`" @click="removeRecord(r)">删除</button></div></section>
       <details class="pj-privacy"><summary>隐私与数据边界</summary><p>实践记录可能包含身体、情绪和生活信息。当前版本只使用浏览器本地存储；清理浏览器数据可能导致记录丢失，重要记录请自行导出。若以后增加云同步，会另行设计权限、删除和隐私规则。</p></details>
     </div>
   </section>
@@ -286,7 +318,7 @@ function clearAll() {
 
 <style scoped>
 .practice-journal{margin:36px 0;padding:24px;border:1px solid var(--vp-c-divider);border-radius:18px;background:var(--vp-c-bg-soft);box-shadow:0 14px 40px rgba(0,0,0,.04)}
-.pj-head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start}.pj-head h2{margin:4px 0 8px;font-size:26px}.pj-head p{margin:0;color:var(--vp-c-text-2)}.pj-kicker{font-size:12px;letter-spacing:.12em;color:var(--vp-c-text-2)}.pj-local{white-space:nowrap;border:1px solid var(--vp-c-divider);border-radius:999px;padding:6px 10px;font-size:12px}.pj-tabs{display:flex;gap:8px;margin:22px 0}.pj-tabs button{border:1px solid var(--vp-c-divider);background:var(--vp-c-bg);padding:9px 14px;border-radius:999px;cursor:pointer;color:var(--vp-c-text-2)}.pj-tabs button.active{color:var(--vp-c-text-1);border-color:var(--vp-c-text-2);font-weight:600}.pj-notice{padding:11px 14px;border-radius:10px;background:var(--vp-c-bg);border-left:3px solid var(--vp-c-text-2);font-size:14px}.pj-notice.danger,.pj-redbox{border-left-color:#b42318}.pj-loading{padding:24px;text-align:center;color:var(--vp-c-text-2)}.pj-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.pj-grid--small{margin-top:18px}.pj-form label,.pj-wide{display:flex;flex-direction:column;gap:6px;font-size:14px}.pj-form label>span{font-weight:600}.pj-form label small{color:var(--vp-c-text-2);font-weight:400}.pj-form input,.pj-form select,.pj-form textarea{width:100%;box-sizing:border-box;border:1px solid var(--vp-c-divider);border-radius:9px;background:var(--vp-c-bg);color:var(--vp-c-text-1);padding:10px 11px;font:inherit}.pj-wide{margin-top:14px}.pj-issues{margin:18px 0 0;padding:14px;border:1px solid var(--vp-c-divider);border-radius:12px}.pj-issues legend{padding:0 6px;font-weight:600}.pj-check{display:inline-flex!important;flex-direction:row!important;align-items:center;gap:7px!important;margin:5px 16px 5px 0;font-weight:400!important}.pj-check input{width:auto!important}.pj-draft-notes{margin:14px 0 0}.pj-draft-notes p{margin:7px 0;padding:10px 12px;border-left:3px solid #b7791f;background:var(--vp-c-bg);border-radius:8px;font-size:13px}.pj-draft-notes p.red{border-left-color:#b42318}.pj-redbox{display:flex;flex-direction:column;gap:4px;margin:16px 0;padding:12px 14px;border-left:3px solid #b42318;background:var(--vp-c-bg);border-radius:8px}.pj-primary,.pj-secondary,.pj-danger{border-radius:9px;padding:10px 14px;cursor:pointer;font:inherit}.pj-primary{margin-top:18px;border:0;background:var(--vp-c-text-1);color:var(--vp-c-bg);font-weight:700}.pj-secondary{border:1px solid var(--vp-c-divider);background:var(--vp-c-bg);color:var(--vp-c-text-1)}.pj-danger{border:1px solid #b42318;background:transparent;color:#b42318}.pj-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.pj-stats div{padding:16px;border:1px solid var(--vp-c-divider);border-radius:12px;background:var(--vp-c-bg);display:flex;flex-direction:column}.pj-stats strong{font-size:26px}.pj-stats span{font-size:12px;color:var(--vp-c-text-2)}.pj-panel{margin-top:16px;padding:18px;border:1px solid var(--vp-c-divider);border-radius:12px;background:var(--vp-c-bg)}.pj-panel h3{margin:0 0 8px}.pj-panel p{margin:6px 0}.pj-panel small{color:var(--vp-c-text-2)}.pj-flags{padding-left:20px;color:var(--vp-c-text-2)}.pj-prompt{width:100%;box-sizing:border-box;margin:10px 0;border:1px solid var(--vp-c-divider);border-radius:9px;padding:11px;background:var(--vp-c-bg-soft);color:var(--vp-c-text-1);font:inherit;line-height:1.6}.pj-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}.pj-record{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--vp-c-divider)}.pj-record:first-of-type{border-top:0}.pj-record div{display:flex;flex-direction:column;gap:3px}.pj-record span,.pj-record small{color:var(--vp-c-text-2)}.pj-record button{align-self:flex-start;border:0;background:none;color:var(--vp-c-text-2);cursor:pointer}.pj-privacy{margin-top:16px;color:var(--vp-c-text-2)}
+.pj-head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start}.pj-head h2{margin:4px 0 8px;font-size:26px}.pj-head p{margin:0;color:var(--vp-c-text-2)}.pj-kicker{font-size:12px;letter-spacing:.12em;color:var(--vp-c-text-2)}.pj-local{white-space:nowrap;border:1px solid var(--vp-c-divider);border-radius:999px;padding:6px 10px;font-size:12px}.pj-tabs{display:flex;gap:8px;margin:22px 0}.pj-tabs button{border:1px solid var(--vp-c-divider);background:var(--vp-c-bg);padding:9px 14px;border-radius:999px;cursor:pointer;color:var(--vp-c-text-2)}.pj-tabs button.active{color:var(--vp-c-text-1);border-color:var(--vp-c-text-2);font-weight:600}.pj-notice{padding:11px 14px;border-radius:10px;background:var(--vp-c-bg);border-left:3px solid var(--vp-c-text-2);font-size:14px}.pj-notice.danger,.pj-redbox{border-left-color:#b42318}.pj-loading{padding:24px;text-align:center;color:var(--vp-c-text-2)}.pj-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.pj-grid--small{margin-top:18px}.pj-form label,.pj-wide{display:flex;flex-direction:column;gap:6px;font-size:14px}.pj-form label>span{font-weight:600}.pj-form label small{color:var(--vp-c-text-2);font-weight:400}.pj-form input,.pj-form select,.pj-form textarea{width:100%;box-sizing:border-box;border:1px solid var(--vp-c-divider);border-radius:9px;background:var(--vp-c-bg);color:var(--vp-c-text-1);padding:10px 11px;font:inherit}.pj-wide{margin-top:14px}.pj-skip-note{margin:16px 0 0;padding:12px 14px;border-left:3px solid var(--vp-c-text-2);background:var(--vp-c-bg);border-radius:8px;color:var(--vp-c-text-2)}.pj-issues{margin:18px 0 0;padding:14px;border:1px solid var(--vp-c-divider);border-radius:12px}.pj-issues legend{padding:0 6px;font-weight:600}.pj-check{display:inline-flex!important;flex-direction:row!important;align-items:center;gap:7px!important;margin:5px 16px 5px 0;font-weight:400!important}.pj-check input{width:auto!important}.pj-draft-notes{margin:14px 0 0}.pj-draft-notes p{margin:7px 0;padding:10px 12px;border-left:3px solid #b7791f;background:var(--vp-c-bg);border-radius:8px;font-size:13px}.pj-draft-notes p.red{border-left-color:#b42318}.pj-redbox{display:flex;flex-direction:column;gap:4px;margin:16px 0;padding:12px 14px;border-left:3px solid #b42318;background:var(--vp-c-bg);border-radius:8px}.pj-primary,.pj-secondary,.pj-danger{border-radius:9px;padding:10px 14px;cursor:pointer;font:inherit}.pj-primary{margin-top:18px;border:0;background:var(--vp-c-text-1);color:var(--vp-c-bg);font-weight:700}.pj-secondary{border:1px solid var(--vp-c-divider);background:var(--vp-c-bg);color:var(--vp-c-text-1)}.pj-danger{border:1px solid #b42318;background:transparent;color:#b42318}.pj-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.pj-stats div{padding:16px;border:1px solid var(--vp-c-divider);border-radius:12px;background:var(--vp-c-bg);display:flex;flex-direction:column}.pj-stats strong{font-size:26px}.pj-stats span{font-size:12px;color:var(--vp-c-text-2)}.pj-panel{margin-top:16px;padding:18px;border:1px solid var(--vp-c-divider);border-radius:12px;background:var(--vp-c-bg)}.pj-panel h3{margin:0 0 8px}.pj-panel p{margin:6px 0}.pj-panel small{color:var(--vp-c-text-2)}.pj-flags{padding-left:20px;color:var(--vp-c-text-2)}.pj-prompt{width:100%;box-sizing:border-box;margin:10px 0;border:1px solid var(--vp-c-divider);border-radius:9px;padding:11px;background:var(--vp-c-bg-soft);color:var(--vp-c-text-1);font:inherit;line-height:1.6}.pj-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}.pj-record{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--vp-c-divider)}.pj-record:first-of-type{border-top:0}.pj-record div{display:flex;flex-direction:column;gap:3px}.pj-record span,.pj-record small{color:var(--vp-c-text-2)}.pj-record button{align-self:flex-start;border:0;background:none;color:var(--vp-c-text-2);cursor:pointer}.pj-privacy{margin-top:16px;color:var(--vp-c-text-2)}
 .pj-days{display:grid;grid-template-columns:repeat(15,1fr);gap:6px;margin:14px 0}.pj-day{aspect-ratio:1;border-radius:4px;border:1px solid var(--vp-c-divider);background:var(--vp-c-bg-soft)}.pj-day.practiced{background:color-mix(in srgb,var(--vp-c-text-1) 50%,var(--vp-c-bg))}.pj-day.skipped{background:color-mix(in srgb,var(--vp-c-text-2) 24%,var(--vp-c-bg))}.pj-day.yellow{outline:2px solid #b7791f;outline-offset:1px}.pj-day.red{outline:2px solid #b42318;outline-offset:1px}.pj-legend{display:flex;flex-wrap:wrap;gap:10px 16px;margin:10px 0;font-size:12px;color:var(--vp-c-text-2)}.pj-legend span{display:inline-flex;align-items:center;gap:6px}.pj-legend i{display:inline-block;width:12px;height:12px;border:1px solid var(--vp-c-divider);border-radius:3px;background:var(--vp-c-bg-soft)}.pj-legend i.practiced{background:color-mix(in srgb,var(--vp-c-text-1) 50%,var(--vp-c-bg))}.pj-legend i.skipped{background:color-mix(in srgb,var(--vp-c-text-2) 24%,var(--vp-c-bg))}.pj-legend i.yellow{border:2px solid #b7791f}.pj-legend i.red{border:2px solid #b42318}.pj-capabilities{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}.pj-capability{padding:14px;border:1px solid var(--vp-c-divider);border-radius:11px;background:var(--vp-c-bg-soft)}.pj-capability>div{display:flex;justify-content:space-between;gap:12px}.pj-capability>div span{font-size:12px;color:var(--vp-c-text-2)}.pj-capability p{font-size:13px;color:var(--vp-c-text-2)}.pj-capability.unstable,.pj-capability.paused{border-left:3px solid #b42318}.pj-capability.partial,.pj-capability.insufficient{border-left:3px solid #b7791f}.pj-capability.stable{border-left:3px solid var(--vp-c-text-2)}.pj-boundary{margin-top:14px!important;padding:10px 12px;border-left:3px solid var(--vp-c-divider);background:var(--vp-c-bg-soft);font-size:13px;color:var(--vp-c-text-2)}.pj-decision{border-left:4px solid var(--vp-c-text-2)}.pj-decision.pause_for_safety,.pj-decision.step_back_or_pause{border-left-color:#b42318}.pj-decision.return_reviewed_load{border-left-color:#b7791f}.pj-decision.discuss_diversion{border-left-color:var(--vp-c-text-1)}
 @media(max-width:720px){.practice-journal{padding:18px;margin:24px 0}.pj-head{flex-direction:column}.pj-grid{grid-template-columns:1fr}.pj-stats{grid-template-columns:repeat(2,1fr)}.pj-tabs{overflow:auto}.pj-tabs button{white-space:nowrap}.pj-record{flex-direction:column}.pj-days{grid-template-columns:repeat(10,1fr)}.pj-capabilities{grid-template-columns:1fr}.pj-capability>div{flex-direction:column;gap:3px}}
 </style>
