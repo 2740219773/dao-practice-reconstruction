@@ -1,0 +1,50 @@
+# 扩展概念第一版规范关系。
+# 本文件处理从旧“修行阶段”层纠正出来的概念节点。
+version: "1.0"
+status: review
+source_registry: 31-知识图谱整合/来源标识注册表-v1.yml
+
+relations:
+  - id: relation.ec.001
+    source: concept.jingqishen
+    target: method.neidan
+    relation: related_to
+    scope: 精、气、神是多种内丹理论中的重要构成与炼化对象；具体术语、次第与解释因文本和传统而异
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.research.pregadio.jindan
+
+  - id: relation.ec.002
+    source: concept.jingqishen
+    target: concept.qi
+    relation: related_to
+    scope: 气是精气神组合中的一项；组合节点研究三者关系，不替代气在先秦、医学、养生和内丹中的多义性节点
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.research.pregadio.jindan
+
+  - id: relation.ec.003
+    source: concept.xingming_shuangxiu
+    target: method.neidan
+    relation: related_to
+    scope: 性、命及二者关系是宋元以后内丹的重要理论维度，不同传统对先后与侧重点的表述并不统一
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.research.pregadio.wuzhenpian
+
+  - id: relation.ec.004
+    source: concept.xingming_shuangxiu
+    target: classic.wuzhenpian
+    relation: related_to
+    scope: 《悟真篇》及其后世接受史是研究宋以后性命关系的重要文本入口；不表示“性命双修”是全书唯一主题或固定最终阶段
+    evidence: B
+    verification: provisional
+    source_refs:
+      - source.research.pregadio.wuzhenpian
+
+notes:
+  - 本文件不建立“筑基 → 精气神 → 性命双修”步骤链。
+  - 精气神是概念组合，性命双修是理论原则，两者均不再作为 stage 节点。
