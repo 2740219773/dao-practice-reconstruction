@@ -15,7 +15,7 @@ const checks = [
   ['问题地图', '/question-map/'],
   ['安全边界', '/safety/'],
   ['实践工作台', '/practice/'],
-  ['自然察息实践卡', '/practice/card/natural-breath.html'],
+  ['自然察息实践卡', '/practice/card/natural-breath'],
   ['构建信息', '/build-info.json']
 ]
 
@@ -89,12 +89,18 @@ async function main() {
 
   const host = new URL(baseUrl).hostname
   if (host === 'localhost' || host === '127.0.0.1') {
-    console.log('[smoke] 本地预览不解释 Cloudflare _redirects，跳过旧 URL 重定向断言。')
+    console.log('[smoke] 本地预览不解释 Cloudflare _redirects，跳过线上重定向断言。')
   } else {
     const legacy = await get('/library/')
-    const location = legacy.headers.get('location') || ''
-    if (![301, 302, 307, 308].includes(legacy.status) || !location.includes('/knowledge/')) {
-      throw new Error(`旧资料库路径未正确重定向：${legacy.status} ${location}`)
+    const legacyLocation = legacy.headers.get('location') || ''
+    if (![301, 302, 307, 308].includes(legacy.status) || !legacyLocation.includes('/knowledge/')) {
+      throw new Error(`旧资料库路径未正确重定向：${legacy.status} ${legacyLocation}`)
+    }
+
+    const htmlPractice = await get('/practice/card/natural-breath.html')
+    const practiceLocation = htmlPractice.headers.get('location') || ''
+    if (![301, 302, 307, 308].includes(htmlPractice.status) || !practiceLocation.includes('/practice/card/natural-breath')) {
+      throw new Error(`实践卡 .html 规范化重定向异常：${htmlPractice.status} ${practiceLocation}`)
     }
   }
 
