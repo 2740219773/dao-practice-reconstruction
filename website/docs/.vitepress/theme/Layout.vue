@@ -1,9 +1,9 @@
 <script setup lang="ts">
 /**
  * Layout.vue —— 根布局
- * 根据 frontmatter.layout 分发页面布局；渲染顶栏（≤6 项导航 + 搜索 + 汉堡）与页尾。
+ * 根据 frontmatter.layout 分发页面布局；渲染顶栏（≤6 项导航 + 搜索 + 主题 + 汉堡）与页尾。
  */
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useData, useRoute } from 'vitepress'
 import HomeLayout from './layouts/HomeLayout.vue'
 import TopicsLayout from './layouts/TopicsLayout.vue'
@@ -18,6 +18,7 @@ import SearchModal from './components/SearchModal.vue'
 const { frontmatter } = useData()
 const route = useRoute()
 
+const THEME_KEY = 'wendaozhi.reading.theme'
 const navLinks = [
   { text: '问道', link: '/' },
   { text: '我要学习', link: '/question-map/' },
@@ -40,6 +41,31 @@ const layoutComp = computed(() => layoutMap[String(frontmatter.value.layout)] ||
 
 const mobileOpen = ref(false)
 const searchOpen = ref(false)
+const readingTheme = ref<'light' | 'dark'>('light')
+const themeLabel = computed(() => readingTheme.value === 'dark' ? '切换到日读' : '切换到夜读')
+
+function applyTheme(next: 'light' | 'dark', persist = true) {
+  readingTheme.value = next
+  if (typeof document !== 'undefined') {
+    document.documentElement.dataset.wdzTheme = next
+    document.documentElement.style.colorScheme = next
+  }
+  if (persist && typeof localStorage !== 'undefined') localStorage.setItem(THEME_KEY, next)
+}
+
+function toggleTheme() {
+  applyTheme(readingTheme.value === 'dark' ? 'light' : 'dark')
+}
+
+onMounted(() => {
+  const stored = localStorage.getItem(THEME_KEY)
+  if (stored === 'light' || stored === 'dark') {
+    applyTheme(stored, false)
+    return
+  }
+  const systemDark = globalThis.matchMedia?.('(prefers-color-scheme: dark)').matches
+  applyTheme(systemDark ? 'dark' : 'light', false)
+})
 
 function isActive(link: string): boolean {
   const p = route.path
@@ -66,6 +92,10 @@ function onKeydown(e: KeyboardEvent) {
           <a v-for="l in navLinks" :key="l.link" class="wdz-nav__link" :class="{ 'is-active': isActive(l.link) }" :href="l.link">{{ l.text }}</a>
         </nav>
         <div class="wdz-nav__actions">
+          <button class="wdz-nav__theme-btn" type="button" :aria-label="themeLabel" :title="themeLabel" :aria-pressed="readingTheme === 'dark'" @click="toggleTheme">
+            <svg v-if="readingTheme === 'dark'" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+            <svg v-else width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M20.2 15.1A8.5 8.5 0 0 1 8.9 3.8 8.5 8.5 0 1 0 20.2 15.1Z"/></svg>
+          </button>
           <button class="wdz-nav__search-btn" type="button" aria-label="搜索" title="搜索（/）" @click="searchOpen = true">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" /></svg>
           </button>
