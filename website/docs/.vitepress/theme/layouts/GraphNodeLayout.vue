@@ -37,6 +37,10 @@ function relationDirection(rel: GraphRelation) {
     : `← ${REL_LABELS[rel.relation] || rel.relation}`
 }
 function nodeUrl(id: string) { return `/graph/node/${encodeURIComponent(id)}` }
+function peerUrl(rel: GraphRelation) {
+  const p = peer(rel)
+  return p ? nodeUrl(p.id) : '#'
+}
 function sourceUrl(path: string) {
   return `https://github.com/2740219773/dao-practice-reconstruction/blob/main/${path.split('/').map(encodeURIComponent).join('/')}`
 }
@@ -65,14 +69,12 @@ function sourceUrl(path: string) {
     </header>
 
     <div class="node-grid">
-      <article class="node-body wdz-prose">
-        <Content />
-      </article>
+      <article class="node-body wdz-prose"><Content /></article>
 
       <aside class="node-side">
         <section>
           <h2>直接关系</h2>
-          <a v-for="rel in relations" :key="rel.id" class="node-rel" :href="peer(rel) ? nodeUrl(peer(rel)!.id) : '#'">
+          <a v-for="rel in relations" :key="rel.id" class="node-rel" :href="peerUrl(rel)">
             <div><strong>{{ peer(rel)?.name || '未知节点' }}</strong><span>{{ relationDirection(rel) }}</span></div>
             <p v-if="rel.scope">{{ rel.scope }}</p>
             <small v-if="rel.evidence || rel.verification">{{ rel.evidence || '—' }} · {{ rel.verification || '未标记' }}</small>
@@ -107,5 +109,5 @@ function sourceUrl(path: string) {
 </template>
 
 <style scoped>
-.graph-node-page{max-width:1320px;margin:0 auto;padding:42px 28px 72px}.node-breadcrumb{display:flex;gap:6px;margin-bottom:24px;color:#8a867e;font-size:13px}.node-breadcrumb a{color:#725a49;text-decoration:none}.node-hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:32px;padding:10px 0 30px;border-bottom:1px solid #d9d5ca}.node-kind{margin:0 0 8px;color:#8a5f45;font-size:12px;letter-spacing:.16em}.node-hero h1{margin:0;font-size:clamp(36px,5vw,56px);font-weight:540}.node-id{margin:8px 0 0;color:#979188;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px}.node-summary{max-width:800px;margin:18px 0 0;color:#625f59;line-height:1.85}.node-tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:18px}.node-tags span{padding:5px 9px;border:1px solid #ddd7cc;border-radius:99px;color:#736e66;font-size:12px;background:#ffffff73}.node-hero__actions{display:flex;flex-direction:column;gap:8px;align-self:end}.node-hero__actions a{padding:9px 12px;border:1px solid #d8d2c6;color:#604d40;text-decoration:none;font-size:13px;text-align:center}.node-hero__actions a:hover{background:#f1eee7}.node-grid{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:52px;padding-top:36px}.node-body{min-width:0}.node-body :deep(h1:first-child){display:none}.node-side{display:flex;flex-direction:column;gap:28px}.node-side section{border-top:1px solid #d9d5ca;padding-top:16px}.node-side h2{margin:0 0 10px;font-size:14px;font-weight:600;letter-spacing:.08em}.node-rel{display:block;padding:11px 0;border-top:1px solid #ebe7de;color:inherit;text-decoration:none}.node-rel>div{display:flex;justify-content:space-between;gap:10px}.node-rel strong{font-size:14px;font-weight:560}.node-rel span{color:#805e49;font-size:11px;white-space:nowrap}.node-rel p,.node-source p,.node-claim p{margin:6px 0 0;color:#747069;font-size:12px;line-height:1.6}.node-rel small,.node-source small,.node-claim small{display:block;margin-top:5px;color:#99938a;font-size:11px}.node-rel:hover strong{text-decoration:underline;text-underline-offset:3px}.node-source,.node-claim{padding:10px 0;border-top:1px solid #ebe7de}.node-source strong{font-size:13px;font-weight:560}.graph-node-missing{padding:72px 28px}@media(max-width:900px){.node-hero{grid-template-columns:1fr}.node-hero__actions{flex-direction:row;align-self:start}.node-grid{grid-template-columns:1fr;gap:32px}.node-side{border-top:1px solid #d9d5ca;padding-top:18px}}@media(max-width:600px){.graph-node-page{padding:30px 18px 54px}.node-hero__actions{flex-direction:column;width:100%}}
+.graph-node-page{max-width:1320px;margin:0 auto;padding:42px 28px 72px}.node-breadcrumb{display:flex;gap:6px;margin-bottom:24px;color:#8a867e;font-size:13px}.node-breadcrumb a{color:#725a49;text-decoration:none}.node-hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:32px;padding:10px 0 30px;border-bottom:1px solid #d9d5ca}.node-kind{margin:0 0 8px;color:#8a5f45;font-size:12px;letter-spacing:.16em}.node-hero h1{margin:0;font-size:clamp(36px,5vw,56px);font-weight:540}.node-id{margin:8px 0 0;color:#979188;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px}.node-summary{max-width:800px;margin:18px 0 0;color:#625f59;line-height:1.85}.node-tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:18px}.node-tags span{padding:5px 9px;border:1px solid #ddd7cc;border-radius:99px;color:#736e66;font-size:12px;background:#ffffff73}.node-hero__actions{display:flex;flex-direction:column;gap:8px;align-self:end}.node-hero__actions a{padding:9px 12px;border:1px solid #d8d2c6;color:#604d40;text-decoration:none;font-size:13px;text-align:center}.node-hero__actions a:hover{background:#f1eee7}.node-grid{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:52px;padding-top:36px}.node-body{min-width:0}.node-side{display:flex;flex-direction:column;gap:28px}.node-side section{border-top:1px solid #d9d5ca;padding-top:16px}.node-side h2{margin:0 0 10px;font-size:14px;font-weight:600;letter-spacing:.08em}.node-rel{display:block;padding:11px 0;border-top:1px solid #ebe7de;color:inherit;text-decoration:none}.node-rel>div{display:flex;justify-content:space-between;gap:10px}.node-rel strong{font-size:14px;font-weight:560}.node-rel span{color:#805e49;font-size:11px;white-space:nowrap}.node-rel p,.node-source p,.node-claim p{margin:6px 0 0;color:#747069;font-size:12px;line-height:1.6}.node-rel small,.node-source small,.node-claim small{display:block;margin-top:5px;color:#99938a;font-size:11px}.node-rel:hover strong{text-decoration:underline;text-underline-offset:3px}.node-source,.node-claim{padding:10px 0;border-top:1px solid #ebe7de}.node-source strong{font-size:13px;font-weight:560}.graph-node-missing{padding:72px 28px}@media(max-width:900px){.node-hero{grid-template-columns:1fr}.node-hero__actions{flex-direction:row;align-self:start}.node-grid{grid-template-columns:1fr;gap:32px}.node-side{border-top:1px solid #d9d5ca;padding-top:18px}}@media(max-width:600px){.graph-node-page{padding:30px 18px 54px}.node-hero__actions{flex-direction:column;width:100%}}
 </style>
