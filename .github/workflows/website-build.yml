@@ -31,6 +31,7 @@ jobs:
         run: |
           test -f docs/.vitepress/dist/index.html
           test -f docs/.vitepress/dist/knowledge/index.html
+          test -f docs/.vitepress/dist/graph/index.html
           test -f docs/.vitepress/dist/question-map/index.html
           test -f docs/.vitepress/dist/topics/jing.html
           test -f docs/.vitepress/dist/method/index.html
