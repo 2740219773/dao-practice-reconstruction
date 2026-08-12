@@ -2,7 +2,7 @@
 # 本文件是图谱构建清单，不重复维护节点正文。
 # 字段名保留英文仅用于程序解析。
 
-version: "3.6"
+version: "3.7"
 status: review
 mode: manifest
 
@@ -14,6 +14,7 @@ principles:
   - 旧 V2 在迁移期保留兼容，但不再作为新增关系的主来源。
   - 人物与作品必须区分确定作者关系和传统归属关系。
   - school 仅是兼容顶层类型，正式节点必须用 school_kind 区分思想传统、宗教宗派、宗教传统和修炼传统。
+  - 目录位置不决定节点本体类型；legacy 节点经审计后可以从 stage 等旧目录迁移到更准确的 concept、research 等类型。
   - 冻结工作包允许保留 planned 节点，不为追求 planned 清零而绕过项目治理规则。
 
 node_sources:
@@ -27,6 +28,8 @@ node_sources:
       - concept.xin
       - concept.xi
       - concept.shen
+      - concept.jingqishen
+      - concept.xingming_shuangxiu
 
   classics:
     path: 24-经典节点
@@ -95,7 +98,11 @@ planned_nodes:
 
 relation_sources:
   - path: 31-知识图谱整合/核心概念关系-v1.yml
-    scope: 七个核心概念第一版规范关系
+    scope: 七个第一批核心概念规范关系
+    status: review
+
+  - path: 31-知识图谱整合/扩展概念关系-v1.yml
+    scope: 精气神、性命双修从旧阶段层迁移后的第一版规范关系
     status: review
 
   - path: 31-知识图谱整合/经典关系-v1.yml
@@ -148,7 +155,7 @@ legacy_compatibility:
       - 28-修行阶段
       - 29-修行路线图
     status: mixed
-    policy: 只有进入 expected_ids 的节点才视为已完成 V3 迁移；目录中其他旧文件不得自动视为正式 V3 数据。
+    policy: 只有进入 expected_ids 的节点才视为已完成 V3 迁移；目录中其他旧文件不得自动视为正式 V3 数据。精气神、性命双修的旧 stage 文件仅保留迁移说明，正式正文位于 23-核心概念网络。
 
 build_targets:
   nodes:
@@ -174,6 +181,7 @@ quality_gates:
   - intellectual_tradition 不得自动拥有创建者或成员组织关系。
   - practice_tradition 不得伪装成单一连续宗教组织。
   - 方法关系不得自动解释为实践步骤。
+  - 概念组合或理论原则不得仅因处于旧“修行阶段”目录就自动建模为 stage。
   - 吐纳、服气、导引、静坐等方法不得因现代相似性被自动合并。
   - planned_nodes 不得被网站或 AI 当作已有正式正文节点展示。
   - 经典作者、成书年代和文本分层必须优先使用学术研究来源，不能只依据传统归属字段。
