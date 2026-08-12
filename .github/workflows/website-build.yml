@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
 
 jobs:
   build:
@@ -20,6 +21,8 @@ jobs:
           cache-dependency-path: website/package-lock.json
       - name: 安装依赖
         run: npm ci
+      - name: 知识图谱一致性检查
+        run: npm run graph:check
       - name: 发布状态回归测试
         run: npm test
       - name: 构建网站
@@ -37,6 +40,11 @@ jobs:
           test -f docs/.vitepress/dist/knowledge/原文-0001-道德经第十六章.html
           test -f docs/.vitepress/dist/knowledge/概念-0001-静.html
           test -f docs/.vitepress/dist/build-info.json
+          # V3 图谱构建产物位于仓库根目录 data/
+          test -f ../data/nodes.json
+          test -f ../data/relations.json
+          test -f ../data/graph.json
+          test -f ../data/build-report.json
       - name: 线上冒烟测试
         if: ${{ vars.WDZ_SMOKE_BASE_URL != '' }}
         env:
@@ -45,9 +53,15 @@ jobs:
       - name: 线上冒烟测试未配置
         if: ${{ vars.WDZ_SMOKE_BASE_URL == '' }}
         run: echo "未配置 WDZ_SMOKE_BASE_URL，跳过线上冒烟测试。"
-      - name: 上传构建产物
+      - name: 上传网站构建产物
         uses: actions/upload-artifact@v4
         with:
           name: wendaozhi-dist
           path: website/docs/.vitepress/dist
+          retention-days: 14
+      - name: 上传知识图谱数据
+        uses: actions/upload-artifact@v4
+        with:
+          name: wendaozhi-graph-data
+          path: data
           retention-days: 14
