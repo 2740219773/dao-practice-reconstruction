@@ -6,6 +6,10 @@ on:
   pull_request:
   workflow_dispatch:
 
+concurrency:
+  group: website-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -29,6 +33,8 @@ jobs:
         run: npm test
       - name: 构建网站
         run: npm run build
+      - name: Chromium实践工作台端到端回归
+        run: npm run test:e2e:practice
       - name: 验证构建产物
         run: |
           test -f docs/.vitepress/dist/index.html
@@ -51,7 +57,7 @@ jobs:
           test -f docs/.vitepress/dist/practice/card/short-sitting.html
           test -f docs/.vitepress/dist/practice/card/movement-stillness.html
           test -f docs/.vitepress/dist/practice/card/daily-awareness.html
-          # 条件标签页正文由 practice:check + node:test 校验；静态首屏只校验入口已随组件构建
+          # 条件标签页正文由 practice:check + node:test + Chromium E2E 校验
           grep -q "30天与阶段" docs/.vitepress/dist/practice/index.html
           grep -q "PRACTICE-003" docs/.vitepress/dist/practice/index.html
           # 实践详情必须展示机器生成的知识回链与“不等同”边界
@@ -70,14 +76,14 @@ jobs:
           test -f ../data/relations.json
           test -f ../data/graph.json
           test -f ../data/build-report.json
-      - name: 线上冒烟测试
-        if: ${{ vars.WDZ_SMOKE_BASE_URL != '' }}
+      - name: Cloudflare Pages线上部署验证
+        if: ${{ github.event_name != 'pull_request' }}
         env:
-          WDZ_SMOKE_BASE_URL: ${{ vars.WDZ_SMOKE_BASE_URL }}
+          WDZ_SMOKE_BASE_URL: https://wendaozhi.pages.dev
+          WDZ_EXPECT_COMMIT: ${{ github.sha }}
+          WDZ_SMOKE_ATTEMPTS: 36
+          WDZ_SMOKE_RETRY_MS: 10000
         run: npm run smoke
-      - name: 线上冒烟测试未配置
-        if: ${{ vars.WDZ_SMOKE_BASE_URL == '' }}
-        run: echo "未配置 WDZ_SMOKE_BASE_URL，跳过线上冒烟测试。"
       - name: 上传网站构建产物
         uses: actions/upload-artifact@v4
         with:
