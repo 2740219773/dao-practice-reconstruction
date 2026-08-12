@@ -1,6 +1,6 @@
 # 来源主 ID 与迁移期别名注册表。
 # 字段名保留英文仅用于程序解析。
-version: "1.2"
+version: "1.3"
 status: review
 
 sources:
@@ -185,49 +185,49 @@ sources:
     type: project
     name: 旧版静概念卡
     reference: 04-概念卡/概念-0001-静.md
-    aliases:
-      - source.legacy.jing
+    aliases: [source.legacy.jing]
 
   - canonical_id: source.project.legacy.concept0002
     type: project
     name: 旧版虚概念卡
     reference: 04-概念卡/概念-0002-虚.md
-    aliases:
-      - source.legacy.xu
+    aliases: [source.legacy.xu]
 
   - canonical_id: source.project.legacy.concept0003
     type: project
     name: 旧版心概念卡
     reference: 04-概念卡/概念-0003-心.md
-    aliases:
-      - source.legacy.xin
+    aliases: [source.legacy.xin]
 
   - canonical_id: source.project.legacy.concept0004
     type: project
     name: 旧版气概念卡
     reference: 04-概念卡/概念-0004-气.md
-    aliases:
-      - source.legacy.qi
+    aliases: [source.legacy.qi]
 
   - canonical_id: source.project.legacy.concept0005
     type: project
     name: 旧版息概念卡
     reference: 04-概念卡/概念-0005-息.md
-    aliases:
-      - source.legacy.xi
+    aliases: [source.legacy.xi]
 
   - canonical_id: source.project.legacy.concept0006
     type: project
     name: 旧版身概念卡
     reference: 04-概念卡/概念-0006-身.md
-    aliases:
-      - source.legacy.shen
+    aliases: [source.legacy.shen]
 
-  # 学术研究来源：用于作者、成书、文本分层和接受史，不替代经典原文
+  # 学术研究来源：文本史、人物、流派与接受史
   - canonical_id: source.research.sep.daoism
     type: historical
-    name: Stanford Encyclopedia of Philosophy - Laozi / Daoism
-    reference: 用于老子传统传记、历史身份、《老子》作者与文本形成以及道家/道教分类问题
+    name: Stanford Encyclopedia of Philosophy - Daoism
+    reference: 用于老子传统传记、历史身份、《老子》作者与文本形成，以及“道家”后起分类问题
+    aliases: []
+
+  - canonical_id: source.research.sep.religious_daoism
+    type: historical
+    name: Stanford Encyclopedia of Philosophy - Religious Daoism
+    reference: 用于黄老、早期道教形成及思想传统与制度宗教之间的历史区分
     aliases: []
 
   - canonical_id: source.research.sep.zhuangzi
@@ -236,10 +236,22 @@ sources:
     reference: 关于今本《庄子》多作者、多层文本结构及庄周时代的研究综述
     aliases: []
 
+  - canonical_id: source.research.sep.gehong
+    type: historical
+    name: Stanford Encyclopedia of Philosophy - Chinese Philosophy and Chinese Medicine / Ge Hong
+    reference: 用于葛洪、《抱朴子》及其炼丹、养生与医学相关历史定位
+    aliases: []
+
   - canonical_id: source.research.oup.yijing.redmond_hon
     type: historical
     name: Teaching the I Ching (Book of Changes)
     reference: Geoffrey Redmond、Tze-ki Hon，Oxford University Press，2014；用于《周易》早期文本、十翼与经典形成问题
+    aliases: []
+
+  - canonical_id: source.research.oup.daoism_philosophy
+    type: historical
+    name: Oxford Bibliographies - Daoism and Philosophy
+    reference: 用于先秦思想传统与东汉以后制度化道教的历史区分
     aliases: []
 
   - canonical_id: source.research.unschuld.huangdineijing
@@ -254,6 +266,12 @@ sources:
     reference: Fabrizio Pregadio，2011；用于《参同契》作者、成书、文本结构与丹道接受史
     aliases: []
 
+  - canonical_id: source.research.pregadio.weiboyang
+    type: historical
+    name: Cantong qi - Authorship and Two Biographies of Wei Boyang
+    reference: Fabrizio Pregadio；用于魏伯阳传统传记、《参同契》传统归属及早期作者说法的复杂性
+    aliases: []
+
   - canonical_id: source.research.pregadio.wuzhenpian
     type: historical
     name: Awakening to Reality: The Regulated Verses of the Wuzhen pian
@@ -266,9 +284,34 @@ sources:
     reference: Fabrizio Pregadio，《Encyclopedia of Taoism》及相关道教炼丹史研究；用于外丹、内丹及二者历史关系
     aliases: []
 
+  - canonical_id: source.research.komjathy.quanzhen
+    type: historical
+    name: The Way of Complete Perfection: A Quanzhen Daoist Anthology
+    reference: Louis Komjathy，SUNY Press，2013；用于全真运动形成、王重阳及第一代全真人物
+    aliases: []
+
+  - canonical_id: source.research.cambridge.quanzhen_lineage
+    type: historical
+    name: Reburials of Eminent Masters: The Construction of Quanzhen Daoist Lineages in North China under Mongol Rule
+    reference: Jinping Wang，Journal of Chinese History，2024；用于全真“五祖七真”等后世谱系建构问题
+    aliases: []
+
+  - canonical_id: source.research.kleeman.celestial_masters
+    type: historical
+    name: Celestial Masters: History and Ritual in Early Daoist Communities
+    reference: Terry F. Kleeman，2016；用于天师道早期组织、正一盟威及后续正一传统的历史背景
+    aliases: []
+
+  - canonical_id: source.reference.daoinfo.danding
+    type: traditional
+    name: 道教文化中心资料库 - 丹鼎派
+    reference: 用于记录“丹鼎派”作为炼丹相关诸传统通称的传统/近现代分类方式；不单独作为正式宗派存在的历史证据
+    aliases: []
+
 migration_rules:
   - 新增节点、关系和来源一律使用 canonical_id。
   - aliases 仅用于兼容已有文件，不得继续作为新数据主 ID。
   - 同一别名若未来发现实际指向不同句段，必须拆分并记录迁移说明。
   - general 全书占位来源后续应逐步替换为具体篇章或句段。
   - 学术研究来源用于文本史、作者归属、历史关系与研究争议，不能代替经典原文证明经典自身主张。
+  - 传统资料库、宗派自述或近现代分类资料可用于记录传统分类与自我理解，但不得单独证明复杂历史关系。
