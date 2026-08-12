@@ -1,4 +1,3 @@
-import { PRACTICES } from './practice-model.mjs'
 import { aggregateRecent, recentRecords } from './practice-stats.mjs'
 import { buildSafetyReview } from './practice-safety.mjs'
 
@@ -136,7 +135,7 @@ export function buildThirtyDayDistribution(records, { now = new Date(), days = 3
 
 export function buildStageReview(records, { now = new Date() } = {}) {
   const stats = aggregateRecent(records, { now, days: 30 })
-  const safety = buildSafetyReview(stats)
+  const safety = buildSafetyReview(stats, { periodLabel: '最近30天' })
   const capabilities = {
     body: assessBody(stats.records, safety),
     breath: assessBreath(stats.records, safety),
