@@ -15,7 +15,8 @@ import {
 } from '../practice/practice-model.mjs'
 import { aggregateRecent } from '../practice/practice-stats.mjs'
 import { buildSafetyReview, reviewDraftSafety } from '../practice/practice-safety.mjs'
-import { buildAiPrompt, buildReviewSummary } from '../practice/practice-ai.mjs'
+import { buildAiPrompt, buildReviewSummary, buildStageAiPrompt, buildStageReviewSummary } from '../practice/practice-ai.mjs'
+import { buildStageReview, stageCapabilityRows } from '../practice/practice-stage.mjs'
 
 const ready = ref(false)
 const tab = ref('record')
@@ -26,11 +27,16 @@ const fileInput = ref(null)
 
 const selectedPractice = computed(() => practices.find((p) => p.id === form.value.practiceId) || practices[0])
 const stats = computed(() => aggregateRecent(records.value, { now: new Date(), days: 7 }))
-const safetyReview = computed(() => buildSafetyReview(stats.value))
+const safetyReview = computed(() => buildSafetyReview(stats.value, { periodLabel: '最近7天' }))
 const ruleAdvice = computed(() => safetyReview.value.primary)
 const reviewSummary = computed(() => buildReviewSummary(stats.value, safetyReview.value, new Date()))
 const aiPrompt = computed(() => buildAiPrompt(reviewSummary.value))
 const draftSafetyNotes = computed(() => reviewDraftSafety(form.value))
+
+const stageReview = computed(() => buildStageReview(records.value, { now: new Date() }))
+const stageRows = computed(() => stageCapabilityRows(stageReview.value))
+const stageSummary = computed(() => buildStageReviewSummary(stageReview.value, new Date()))
+const stageAiPrompt = computed(() => buildStageAiPrompt(stageSummary.value))
 
 function persist() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify({ schemaVersion: SCHEMA_VERSION, records: records.value }))
@@ -84,13 +90,21 @@ function toggleIssue(id) {
   form.value.issues = [...set]
 }
 
-async function copyAiPrompt() {
+async function copyText(text, successMessage) {
   try {
-    await navigator.clipboard.writeText(aiPrompt.value)
-    notice.value = 'AI 复盘材料已复制。只有你主动粘贴/提交时，记录摘要才会离开本页面。'
+    await navigator.clipboard.writeText(text)
+    notice.value = successMessage
   } catch {
     notice.value = '浏览器未允许自动复制，请手动选择下方文本复制。'
   }
+}
+
+function copyAiPrompt() {
+  return copyText(aiPrompt.value, '7天 AI 复盘材料已复制。只有你主动粘贴/提交时，记录摘要才会离开本页面。')
+}
+
+function copyStageAiPrompt() {
+  return copyText(stageAiPrompt.value, '30天阶段复盘材料已复制。它只包含统计与规则判断，不会自动发送原始长备注。')
 }
 
 function exportData() {
@@ -143,16 +157,17 @@ function clearAll() {
   <section class="practice-journal" aria-label="实践记录与复盘工具">
     <header class="pj-head">
       <div>
-        <span class="pj-kicker">PRACTICE-002 · 本地记录工具</span>
-        <h2>记录 · 复盘 · 安全提醒</h2>
-        <p>数据默认只保存在当前浏览器，不自动上传，也不计算“修为分”。</p>
+        <span class="pj-kicker">PRACTICE-003 · 本地长期复盘</span>
+        <h2>记录 · 复盘 · 阶段判断</h2>
+        <p>数据默认只保存在当前浏览器，不自动上传；7天看近期问题，30天看趋势和阶段状态，不计算“修为分”。</p>
       </div>
       <span class="pj-local">本地优先</span>
     </header>
 
     <nav class="pj-tabs" aria-label="记录工具分页">
       <button :class="{ active: tab === 'record' }" @click="tab = 'record'">每日记录</button>
-      <button :class="{ active: tab === 'review' }" @click="tab = 'review'">最近7天复盘</button>
+      <button :class="{ active: tab === 'review' }" @click="tab = 'review'">最近7天</button>
+      <button :class="{ active: tab === 'stage' }" @click="tab = 'stage'">30天与阶段</button>
       <button :class="{ active: tab === 'data' }" @click="tab = 'data'">数据管理</button>
     </nav>
 
@@ -204,7 +219,49 @@ function clearAll() {
       </div>
       <section class="pj-panel"><h3>规则型复盘</h3><p>{{ ruleAdvice }}</p><ul v-if="safetyReview.flags.length > 1" class="pj-flags"><li v-for="flag in safetyReview.flags.slice(1)" :key="flag.code">{{ flag.text }}</li></ul><small>这是依据明确规则生成的提醒，不是医学判断或传统境界判断。</small></section>
       <section class="pj-panel"><h3>重复问题</h3><p v-if="!stats.issueCounts.length">最近7天暂无已记录问题。</p><ul v-else><li v-for="([id, count]) in stats.issueCounts" :key="id">{{ issueLabels[id] || id }}：{{ count }} 次</li></ul></section>
-      <section class="pj-panel"><h3>给 AI 的复盘材料</h3><p>这里只在浏览器中整理统计摘要，不会自动发送，也不会把个人长备注自动带入摘要。你可以自行复制后提交给 AI。</p><textarea class="pj-prompt" :value="aiPrompt" rows="17" readonly></textarea><button class="pj-secondary" type="button" @click="copyAiPrompt">复制复盘材料</button></section>
+      <section class="pj-panel"><h3>给 AI 的7天复盘材料</h3><p>这里只在浏览器中整理统计摘要，不会自动发送，也不会把个人长备注自动带入摘要。</p><textarea class="pj-prompt" :value="aiPrompt" rows="17" readonly></textarea><button class="pj-secondary" type="button" @click="copyAiPrompt">复制7天复盘材料</button></section>
+    </div>
+
+    <div v-else-if="tab === 'stage'" class="pj-stage">
+      <div class="pj-stats">
+        <div><strong>{{ stageReview.stats.recordCount }}</strong><span>近30天记录</span></div>
+        <div><strong>{{ stageReview.stats.actualPracticeCount }}</strong><span>实际练习</span></div>
+        <div><strong>{{ stageReview.stats.skippedCount }}</strong><span>主动不练</span></div>
+        <div><strong>{{ stageReview.stats.totalMinutes }}</strong><span>实际分钟</span></div>
+        <div><strong>{{ stageReview.stats.overLimitCount }}</strong><span>超审查上限</span></div>
+        <div><strong>{{ stageReview.stats.yellowCount }} / {{ stageReview.stats.redCount }}</strong><span>黄色 / 红色</span></div>
+      </div>
+
+      <section class="pj-panel">
+        <h3>最近30天分布</h3>
+        <div class="pj-days" aria-label="最近30天记录分布">
+          <span v-for="day in stageReview.distribution" :key="day.date" class="pj-day" :class="[day.status, day.severity]" :title="`${day.date} · ${day.status === 'practiced' ? '有实际练习' : day.status === 'skipped' ? '主动决定不练' : '无记录'}${day.severity !== 'none' ? ` · ${day.severity === 'red' ? '红色事件' : '黄色事件'}` : ''}`"></span>
+        </div>
+        <div class="pj-legend"><span><i class="practiced"></i>实际练习</span><span><i class="skipped"></i>主动不练</span><span><i class="no-record"></i>无记录</span><span><i class="yellow"></i>黄色事件</span><span><i class="red"></i>红色事件</span></div>
+        <small>“无记录”只表示本机没有当天日志，不能推断当天一定没有练习。</small>
+      </section>
+
+      <section class="pj-panel">
+        <h3>四类基础能力 · 记录支持状态</h3>
+        <div class="pj-capabilities">
+          <article v-for="([name, item]) in stageRows" :key="name" class="pj-capability" :class="item.code">
+            <div><strong>{{ name }}</strong><span>{{ item.label }}</span></div>
+            <p>{{ item.note }}</p>
+            <small>相关有效记录：{{ item.evidence }} 次</small>
+          </article>
+        </div>
+        <p class="pj-boundary">{{ stageReview.evidenceNotice }}</p>
+      </section>
+
+      <section class="pj-panel pj-decision" :class="stageReview.decision.code">
+        <span class="pj-kicker">阶段方向</span>
+        <h3>{{ stageReview.decision.label }}</h3>
+        <p>{{ stageReview.decision.reason }}</p>
+        <p v-if="stageReview.decision.code === 'discuss_diversion'" class="pj-boundary"><strong>这不是自动晋级。</strong> 后续只进入“静修深化 / 导引深化 / 生活养修 / 丹道研究”的人工讨论；丹道仍默认仅研究。</p>
+        <p v-if="stageReview.decision.code === 'pause_for_safety'" class="pj-boundary"><a href="/safety/">优先查看安全边界 →</a></p>
+      </section>
+
+      <section class="pj-panel"><h3>给 AI 的30天阶段复盘材料</h3><p>同样只整理统计与规则结果，不自动发送原始长备注；AI不得把阶段方向改写成境界、认证或自动解锁。</p><textarea class="pj-prompt" :value="stageAiPrompt" rows="20" readonly></textarea><button class="pj-secondary" type="button" @click="copyStageAiPrompt">复制30天阶段复盘材料</button></section>
     </div>
 
     <div v-else class="pj-data">
@@ -218,5 +275,6 @@ function clearAll() {
 <style scoped>
 .practice-journal{margin:36px 0;padding:24px;border:1px solid var(--vp-c-divider);border-radius:18px;background:var(--vp-c-bg-soft);box-shadow:0 14px 40px rgba(0,0,0,.04)}
 .pj-head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start}.pj-head h2{margin:4px 0 8px;font-size:26px}.pj-head p{margin:0;color:var(--vp-c-text-2)}.pj-kicker{font-size:12px;letter-spacing:.12em;color:var(--vp-c-text-2)}.pj-local{white-space:nowrap;border:1px solid var(--vp-c-divider);border-radius:999px;padding:6px 10px;font-size:12px}.pj-tabs{display:flex;gap:8px;margin:22px 0}.pj-tabs button{border:1px solid var(--vp-c-divider);background:var(--vp-c-bg);padding:9px 14px;border-radius:999px;cursor:pointer;color:var(--vp-c-text-2)}.pj-tabs button.active{color:var(--vp-c-text-1);border-color:var(--vp-c-text-2);font-weight:600}.pj-notice{padding:11px 14px;border-radius:10px;background:var(--vp-c-bg);border-left:3px solid var(--vp-c-text-2);font-size:14px}.pj-notice.danger,.pj-redbox{border-left-color:#b42318}.pj-loading{padding:24px;text-align:center;color:var(--vp-c-text-2)}.pj-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.pj-grid--small{margin-top:18px}.pj-form label,.pj-wide{display:flex;flex-direction:column;gap:6px;font-size:14px}.pj-form label>span{font-weight:600}.pj-form label small{color:var(--vp-c-text-2);font-weight:400}.pj-form input,.pj-form select,.pj-form textarea{width:100%;box-sizing:border-box;border:1px solid var(--vp-c-divider);border-radius:9px;background:var(--vp-c-bg);color:var(--vp-c-text-1);padding:10px 11px;font:inherit}.pj-wide{margin-top:14px}.pj-issues{margin:18px 0 0;padding:14px;border:1px solid var(--vp-c-divider);border-radius:12px}.pj-issues legend{padding:0 6px;font-weight:600}.pj-check{display:inline-flex!important;flex-direction:row!important;align-items:center;gap:7px!important;margin:5px 16px 5px 0;font-weight:400!important}.pj-check input{width:auto!important}.pj-draft-notes{margin:14px 0 0}.pj-draft-notes p{margin:7px 0;padding:10px 12px;border-left:3px solid #b7791f;background:var(--vp-c-bg);border-radius:8px;font-size:13px}.pj-draft-notes p.red{border-left-color:#b42318}.pj-redbox{display:flex;flex-direction:column;gap:4px;margin:16px 0;padding:12px 14px;border-left:3px solid #b42318;background:var(--vp-c-bg);border-radius:8px}.pj-primary,.pj-secondary,.pj-danger{border-radius:9px;padding:10px 14px;cursor:pointer;font:inherit}.pj-primary{margin-top:18px;border:0;background:var(--vp-c-text-1);color:var(--vp-c-bg);font-weight:700}.pj-secondary{border:1px solid var(--vp-c-divider);background:var(--vp-c-bg);color:var(--vp-c-text-1)}.pj-danger{border:1px solid #b42318;background:transparent;color:#b42318}.pj-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.pj-stats div{padding:16px;border:1px solid var(--vp-c-divider);border-radius:12px;background:var(--vp-c-bg);display:flex;flex-direction:column}.pj-stats strong{font-size:26px}.pj-stats span{font-size:12px;color:var(--vp-c-text-2)}.pj-panel{margin-top:16px;padding:18px;border:1px solid var(--vp-c-divider);border-radius:12px;background:var(--vp-c-bg)}.pj-panel h3{margin:0 0 8px}.pj-panel p{margin:6px 0}.pj-panel small{color:var(--vp-c-text-2)}.pj-flags{padding-left:20px;color:var(--vp-c-text-2)}.pj-prompt{width:100%;box-sizing:border-box;margin:10px 0;border:1px solid var(--vp-c-divider);border-radius:9px;padding:11px;background:var(--vp-c-bg-soft);color:var(--vp-c-text-1);font:inherit;line-height:1.6}.pj-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}.pj-record{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--vp-c-divider)}.pj-record:first-of-type{border-top:0}.pj-record div{display:flex;flex-direction:column;gap:3px}.pj-record span,.pj-record small{color:var(--vp-c-text-2)}.pj-record button{align-self:flex-start;border:0;background:none;color:var(--vp-c-text-2);cursor:pointer}.pj-privacy{margin-top:16px;color:var(--vp-c-text-2)}
-@media(max-width:720px){.practice-journal{padding:18px;margin:24px 0}.pj-head{flex-direction:column}.pj-grid{grid-template-columns:1fr}.pj-stats{grid-template-columns:repeat(2,1fr)}.pj-tabs{overflow:auto}.pj-tabs button{white-space:nowrap}.pj-record{flex-direction:column}}
+.pj-days{display:grid;grid-template-columns:repeat(15,1fr);gap:6px;margin:14px 0}.pj-day{aspect-ratio:1;border-radius:4px;border:1px solid var(--vp-c-divider);background:var(--vp-c-bg-soft)}.pj-day.practiced{background:color-mix(in srgb,var(--vp-c-text-1) 50%,var(--vp-c-bg))}.pj-day.skipped{background:color-mix(in srgb,var(--vp-c-text-2) 24%,var(--vp-c-bg))}.pj-day.yellow{outline:2px solid #b7791f;outline-offset:1px}.pj-day.red{outline:2px solid #b42318;outline-offset:1px}.pj-legend{display:flex;flex-wrap:wrap;gap:10px 16px;margin:10px 0;font-size:12px;color:var(--vp-c-text-2)}.pj-legend span{display:inline-flex;align-items:center;gap:6px}.pj-legend i{display:inline-block;width:12px;height:12px;border:1px solid var(--vp-c-divider);border-radius:3px;background:var(--vp-c-bg-soft)}.pj-legend i.practiced{background:color-mix(in srgb,var(--vp-c-text-1) 50%,var(--vp-c-bg))}.pj-legend i.skipped{background:color-mix(in srgb,var(--vp-c-text-2) 24%,var(--vp-c-bg))}.pj-legend i.yellow{border:2px solid #b7791f}.pj-legend i.red{border:2px solid #b42318}.pj-capabilities{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}.pj-capability{padding:14px;border:1px solid var(--vp-c-divider);border-radius:11px;background:var(--vp-c-bg-soft)}.pj-capability>div{display:flex;justify-content:space-between;gap:12px}.pj-capability>div span{font-size:12px;color:var(--vp-c-text-2)}.pj-capability p{font-size:13px;color:var(--vp-c-text-2)}.pj-capability.unstable,.pj-capability.paused{border-left:3px solid #b42318}.pj-capability.partial,.pj-capability.insufficient{border-left:3px solid #b7791f}.pj-capability.stable{border-left:3px solid var(--vp-c-text-2)}.pj-boundary{margin-top:14px!important;padding:10px 12px;border-left:3px solid var(--vp-c-divider);background:var(--vp-c-bg-soft);font-size:13px;color:var(--vp-c-text-2)}.pj-decision{border-left:4px solid var(--vp-c-text-2)}.pj-decision.pause_for_safety,.pj-decision.step_back_or_pause{border-left-color:#b42318}.pj-decision.return_reviewed_load{border-left-color:#b7791f}.pj-decision.discuss_diversion{border-left-color:var(--vp-c-text-1)}
+@media(max-width:720px){.practice-journal{padding:18px;margin:24px 0}.pj-head{flex-direction:column}.pj-grid{grid-template-columns:1fr}.pj-stats{grid-template-columns:repeat(2,1fr)}.pj-tabs{overflow:auto}.pj-tabs button{white-space:nowrap}.pj-record{flex-direction:column}.pj-days{grid-template-columns:repeat(10,1fr)}.pj-capabilities{grid-template-columns:1fr}.pj-capability>div{flex-direction:column;gap:3px}}
 </style>
