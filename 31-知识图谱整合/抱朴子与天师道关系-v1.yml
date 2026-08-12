@@ -1,0 +1,52 @@
+# 《抱朴子》与天师道第一版规范关系。
+# 字段名保留英文仅用于程序解析；关系含义以《节点关系规范》为准。
+version: "1.0"
+status: review
+source_registry: 31-知识图谱整合/来源标识注册表-v1.yml
+
+relations:
+  - id: relation.bt.001
+    source: person.gehong
+    target: classic.baopuzi
+    relation: authored
+    scope: 葛洪与《抱朴子》内篇、外篇核心作者关系；传世编排与内外篇后世合编问题另行记录
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.research.sep.gehong
+
+  - id: relation.bt.002
+    source: classic.baopuzi
+    target: method.waidan
+    relation: related_to
+    scope: 《抱朴子》内篇保存重要炼丹、金丹与神仙方术材料；仅表示历史研究关联，不提供危险操作细节
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.research.sep.gehong
+      - source.research.pregadio.jindan
+
+  - id: relation.bt.003
+    source: school.tianshi
+    target: school.zhengyi
+    relation: related_to
+    scope: 东汉天师道及正一盟威传统是后世正一道历史来源的重要组成，但其组织、授箓和仪式体系经历长期重构，二者不能直接等同
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.research.kleeman.celestial_masters
+
+  - id: relation.bt.004
+    source: school.tianshi
+    target: method.fulu_keyi
+    relation: related_to
+    scope: 早期天师共同体已有章表、请祷、授箓及共同体仪式等宗教实践；后世成熟符箓科仪不能整体反读为东汉形态
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.research.kleeman.celestial_masters
+
+notes:
+  - 葛洪—《抱朴子》使用 authored，但不据此忽略内篇、外篇的文本与合编史差异。
+  - 天师道—正一道暂使用 related_to，以保留长期历史连续与重构并存的复杂性。
+  - 天师道与符箓科仪的关系是宗教实践史关系，不是个人修炼步骤。
