@@ -1,0 +1,174 @@
+# 第二批人物与流派/传统规范关系。
+# 字段名保留英文仅用于程序解析；关系含义以《节点关系规范》为准。
+version: "1.0"
+status: review
+source_registry: 31-知识图谱整合/来源标识注册表-v1.yml
+
+relations:
+  # 魏伯阳与《参同契》传统归属
+  - id: relation.ps.001
+    source: person.weiboyang
+    target: classic.cantongqi
+    relation: traditional_attribution
+    scope: 后世炼丹传统长期将《周易参同契》归于魏伯阳；早期作者与文本形成存在复杂说法
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.research.pregadio.weiboyang
+      - source.research.pregadio.cantongqi
+
+  # 王重阳与全真
+  - id: relation.ps.002
+    source: person.wangchongyang
+    target: school.quanzhen
+    relation: founded
+    scope: 十二世纪全真运动形成及第一代弟子群体的历史语境
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.research.komjathy.quanzhen
+
+  - id: relation.ps.003
+    source: school.quanzhen
+    target: method.neidan
+    relation: related_to
+    scope: 全真修炼与内丹传统关系密切，但全真宗教生活不能缩减为单一内丹技术
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.research.komjathy.quanzhen
+
+  # 先秦道家作为后起思想史分类
+  - id: relation.ps.004
+    source: school.xianqin_daojia
+    target: person.laozi
+    relation: related_to
+    scope: 汉代以后思想史分类将老子置于“道家”核心位置；不表示老子本人自称属于统一宗派
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.research.sep.daoism
+
+  - id: relation.ps.005
+    source: school.xianqin_daojia
+    target: person.zhuangzi
+    relation: related_to
+    scope: 庄子后世成为道家思想代表人物；不表示与老子存在已证实直接师承
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.research.sep.daoism
+      - source.research.sep.zhuangzi
+
+  - id: relation.ps.006
+    source: school.xianqin_daojia
+    target: classic.daodejing
+    relation: related_to
+    scope: 《道德经》是后世道家思想史分类中的核心文本之一
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.research.sep.daoism
+
+  - id: relation.ps.007
+    source: school.xianqin_daojia
+    target: classic.zhuangzi
+    relation: related_to
+    scope: 今本《庄子》是后世道家思想传统的重要文本，但内部为复合文本
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.research.sep.zhuangzi
+
+  # 黄老
+  - id: relation.ps.008
+    source: school.huanglao
+    target: classic.daodejing
+    relation: related_to
+    scope: 汉初黄老传统对老子及《道德经》的政治、修养和宇宙秩序解释
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.research.sep.religious_daoism
+
+  - id: relation.ps.009
+    source: school.huanglao
+    target: school.xianqin_daojia
+    relation: related_to
+    scope: 黄老与后世“道家”分类存在历史和思想交叉，但不能完全等同
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.research.sep.religious_daoism
+      - source.research.sep.daoism
+
+  # 丹道传统
+  - id: relation.ps.010
+    source: school.danding
+    target: method.waidan
+    relation: related_to
+    scope: 外丹属于中国炼丹史和丹道传统的重要组成之一
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.research.pregadio.jindan
+
+  - id: relation.ps.011
+    source: school.danding
+    target: method.neidan
+    relation: related_to
+    scope: 内丹是唐宋以后丹道/金丹传统的重要发展方向之一，不表示由外丹线性替代而来
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.research.pregadio.jindan
+
+  - id: relation.ps.012
+    source: person.gehong
+    target: school.danding
+    relation: related_to
+    scope: 葛洪在现代丹道史研究地图中属于早期炼丹、外丹相关重要人物；不表示其历史上加入名为“丹鼎派”的统一组织
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.research.sep.gehong
+      - source.research.pregadio.jindan
+
+  - id: relation.ps.013
+    source: person.weiboyang
+    target: school.danding
+    relation: related_to
+    scope: 魏伯阳因《参同契》传统归属而在后世丹道祖师叙述中具有重要位置；不是“丹鼎派创建者”关系
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.research.pregadio.weiboyang
+      - source.research.pregadio.cantongqi
+
+  - id: relation.ps.014
+    source: person.zhangboduan
+    target: school.danding
+    relation: related_to
+    scope: 张伯端与《悟真篇》属于北宋内丹及后世丹道接受史的重要节点；不表示创立全部丹道传统
+    evidence: B
+    verification: verified
+    source_refs:
+      - source.research.pregadio.wuzhenpian
+
+  # 正一与符箓科仪
+  - id: relation.ps.015
+    source: school.zhengyi
+    target: method.fulu_keyi
+    relation: related_to
+    scope: 正一/天师相关传统与符箓、章表、授箓及斋醮仪式长期关系密切；不表示正一道只包含符箓科仪
+    evidence: B
+    verification: provisional
+    source_refs:
+      - source.research.kleeman.celestial_masters
+
+notes:
+  - related_to 为一般对称关系，文件只维护一条规范边。
+  - 魏伯阳与《参同契》只使用 traditional_attribution，不升级为 authored。
+  - 王重阳与全真道可使用 founded，但后世“五祖七真”谱系不得因此自动视为王重阳生前已固定。
+  - 先秦道家、黄老属于 intellectual_tradition，不建立 founded 关系。
+  - 丹道传统属于 practice_tradition，不建立单一创建者。
