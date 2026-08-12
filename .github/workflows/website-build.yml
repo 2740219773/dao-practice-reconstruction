@@ -51,11 +51,9 @@ jobs:
           test -f docs/.vitepress/dist/practice/card/short-sitting.html
           test -f docs/.vitepress/dist/practice/card/movement-stillness.html
           test -f docs/.vitepress/dist/practice/card/daily-awareness.html
-          # V2.3 记录页必须真实包含30天与阶段复盘，不允许只存在规则模块
+          # 条件标签页正文由 practice:check + node:test 校验；静态首屏只校验入口已随组件构建
           grep -q "30天与阶段" docs/.vitepress/dist/practice/index.html
-          grep -q "四类基础能力" docs/.vitepress/dist/practice/index.html
-          grep -q "可以讨论下一阶段或分流" docs/.vitepress/dist/practice/index.html
-          grep -q "不是自动晋级" docs/.vitepress/dist/practice/index.html
+          grep -q "PRACTICE-003" docs/.vitepress/dist/practice/index.html
           # 实践详情必须展示机器生成的知识回链与“不等同”边界
           grep -q "关联与边界" docs/.vitepress/dist/practice/card/natural-breath.html
           grep -q "吐纳" docs/.vitepress/dist/practice/card/natural-breath.html
