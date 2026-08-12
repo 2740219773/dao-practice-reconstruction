@@ -2,7 +2,7 @@
 # 本文件是图谱构建清单，不重复维护节点正文。
 # 字段名保留英文仅用于程序解析。
 
-version: "3.5"
+version: "3.6"
 status: review
 mode: manifest
 
@@ -14,6 +14,7 @@ principles:
   - 旧 V2 在迁移期保留兼容，但不再作为新增关系的主来源。
   - 人物与作品必须区分确定作者关系和传统归属关系。
   - school 仅是兼容顶层类型，正式节点必须用 school_kind 区分思想传统、宗教宗派、宗教传统和修炼传统。
+  - 冻结工作包允许保留 planned 节点，不为追求 planned 清零而绕过项目治理规则。
 
 node_sources:
   core_concepts:
@@ -36,6 +37,7 @@ node_sources:
       - classic.huangdineijing
       - classic.cantongqi
       - classic.wuzhenpian
+      - classic.baopuzi
 
   persons:
     path: 25-人物节点
@@ -55,6 +57,7 @@ node_sources:
       - school.danding
       - school.quanzhen
       - school.zhengyi
+      - school.tianshi
     required_field: school_kind
 
   methods:
@@ -84,24 +87,11 @@ node_sources:
 # 已被新版知识卡引用，但当前尚无正式 V3 节点的对象。
 # 构建器应将其标记为 planned，而不是误判为丢失或自动创建空节点。
 planned_nodes:
-  - id: classic.baopuzi
-    name: 抱朴子
-    type: classic
-    status: planned
-    reason: 葛洪人物节点已完成迁移，《抱朴子》需要按经典文本分层、内外篇及成书问题正式建卡。
-
-  - id: school.tianshi
-    name: 天师道
-    type: school
-    school_kind: religious_tradition
-    status: planned
-    reason: 正一道历史根源需要通过独立天师道节点分层表达，不能把东汉天师共同体与后世正一完全合并。
-
   - id: research.medobs
     name: 身体观察研究
     type: research
     status: planned
-    reason: 旧 MEDOBS 接口仍被部分核心节点引用，需确认最终研究节点结构后正式接入。
+    reason: MEDOBS-001 工作包仍处于项目负责人确认的冻结状态；冻结期只保留范围、模板和接口，不收集资料、不建立正式医学观察卡，待既定解锁条件满足后再正式接入。
 
 relation_sources:
   - path: 31-知识图谱整合/核心概念关系-v1.yml
@@ -109,7 +99,7 @@ relation_sources:
     status: review
 
   - path: 31-知识图谱整合/经典关系-v1.yml
-    scope: 六部第一批经典与核心概念、方法、人物之间的规范关系
+    scope: 第一批核心经典与概念、方法、人物之间的规范关系
     status: review
 
   - path: 31-知识图谱整合/人物与方法关系-v1.yml
@@ -122,6 +112,10 @@ relation_sources:
 
   - path: 31-知识图谱整合/第二批方法关系-v1.yml
     scope: 导引、吐纳、服气、静坐与核心概念、内丹、坐忘之间的规范关系
+    status: review
+
+  - path: 31-知识图谱整合/抱朴子与天师道关系-v1.yml
+    scope: 葛洪—《抱朴子》作者关系，以及天师道—正一道/符箓科仪的第一版规范关系
     status: review
 
 source_registry:
@@ -184,3 +178,4 @@ quality_gates:
   - planned_nodes 不得被网站或 AI 当作已有正式正文节点展示。
   - 经典作者、成书年代和文本分层必须优先使用学术研究来源，不能只依据传统归属字段。
   - 涉及外丹、辟谷、服气、极端呼吸等有现实风险的历史方法不得输出可复现危险操作、剂量或替代医疗建议。
+  - 冻结工作包不得因图谱建设而被自动激活。
