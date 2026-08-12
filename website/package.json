@@ -9,6 +9,7 @@
   "scripts": {
     "graph": "node scripts/构建知识图谱.mjs",
     "graph:check": "node scripts/构建知识图谱.mjs --check",
+    "practice:check": "node scripts/检查实践体系.mjs",
     "dev": "npm run graph && node scripts/生成网站页面.mjs && vitepress dev docs",
     "build": "npm run graph && node scripts/生成网站页面.mjs && vitepress build docs",
     "preview": "vitepress preview docs",

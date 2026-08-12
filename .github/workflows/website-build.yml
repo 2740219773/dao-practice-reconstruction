@@ -23,6 +23,8 @@ jobs:
         run: npm ci
       - name: 知识图谱一致性检查
         run: npm run graph:check
+      - name: 实践体系一致性检查
+        run: npm run practice:check
       - name: 发布状态回归测试
         run: npm test
       - name: 构建网站

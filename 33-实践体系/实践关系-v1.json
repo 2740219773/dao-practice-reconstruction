@@ -1,0 +1,219 @@
+{
+  "version": "1.0",
+  "scope": "practice_layer_only",
+  "notes": [
+    "本文件只表达问道志现代实践层关系，不进入 V3 历史知识图谱。",
+    "prerequisite_for 表示现代教学依赖，不表示古代宗派次第。",
+    "contextualized_by 表示背景关联，not_equivalent_to 用于显式防止历史方法与现代教学单元混同。"
+  ],
+  "relations": [
+    {
+      "id": "practice-rel-001",
+      "source": "practice.basic.precheck",
+      "target": "practice.basic.posture",
+      "relation": "prerequisite_for",
+      "scope": "问道志基础能力教学顺序",
+      "sourceRefs": ["source.project.practice.design.v02"]
+    },
+    {
+      "id": "practice-rel-002",
+      "source": "practice.basic.posture",
+      "target": "practice.basic.contact_awareness",
+      "relation": "prerequisite_for",
+      "scope": "问道志基础能力教学顺序",
+      "sourceRefs": ["source.project.practice.design.v02"]
+    },
+    {
+      "id": "practice-rel-003",
+      "source": "practice.basic.contact_awareness",
+      "target": "practice.basic.natural_breath",
+      "relation": "prerequisite_for",
+      "scope": "问道志基础能力教学顺序",
+      "sourceRefs": ["source.project.practice.design.v02"]
+    },
+    {
+      "id": "practice-rel-004",
+      "source": "practice.basic.natural_breath",
+      "target": "practice.basic.attention_return",
+      "relation": "prerequisite_for",
+      "scope": "问道志基础能力教学顺序；察息不稳定时允许继续停留在身体觉察，不强制升级",
+      "sourceRefs": ["source.project.practice.design.v02"]
+    },
+    {
+      "id": "practice-rel-005",
+      "source": "practice.basic.attention_return",
+      "target": "practice.basic.short_sitting",
+      "relation": "prerequisite_for",
+      "scope": "问道志基础能力教学顺序",
+      "sourceRefs": ["source.project.practice.design.v02"]
+    },
+    {
+      "id": "practice-rel-006",
+      "source": "practice.basic.short_sitting",
+      "target": "practice.basic.movement_stillness",
+      "relation": "prerequisite_for",
+      "scope": "问道志基础能力教学顺序；允许按个人状态跳过或回退",
+      "sourceRefs": ["source.project.practice.design.v02"]
+    },
+    {
+      "id": "practice-rel-007",
+      "source": "practice.basic.movement_stillness",
+      "target": "practice.basic.daily_awareness",
+      "relation": "prerequisite_for",
+      "scope": "问道志基础能力教学顺序",
+      "sourceRefs": ["source.project.practice.design.v02"]
+    },
+    {
+      "id": "practice-rel-008",
+      "source": "practice.basic.posture",
+      "target": "concept.shen",
+      "relation": "contextualized_by",
+      "scope": "身体/身的传统概念研究可提供历史与思想背景，但不规定本卡姿势步骤",
+      "sourceRefs": ["source.project.practice.design.v02"]
+    },
+    {
+      "id": "practice-rel-009",
+      "source": "practice.basic.posture",
+      "target": "method.jingzuo",
+      "relation": "not_equivalent_to",
+      "scope": "普通舒适姿势教学不等于跨时期历史静坐方法",
+      "sourceRefs": ["source.project.practice.design.v02"]
+    },
+    {
+      "id": "practice-rel-010",
+      "source": "practice.basic.contact_awareness",
+      "target": "concept.shen",
+      "relation": "contextualized_by",
+      "scope": "只作身/形主题背景关联，不自动等同传统内观",
+      "sourceRefs": ["source.project.practice.design.v02"]
+    },
+    {
+      "id": "practice-rel-011",
+      "source": "practice.basic.natural_breath",
+      "target": "concept.xi",
+      "relation": "contextualized_by",
+      "scope": "传统息概念提供文本背景；本卡不从息字直接推出技术",
+      "sourceRefs": ["source.project.practice.design.v02"]
+    },
+    {
+      "id": "practice-rel-012",
+      "source": "practice.basic.natural_breath",
+      "target": "method.tuna",
+      "relation": "not_equivalent_to",
+      "scope": "自然观察呼吸不等于吐纳",
+      "sourceRefs": ["source.project.practice.design.v02"]
+    },
+    {
+      "id": "practice-rel-013",
+      "source": "practice.basic.natural_breath",
+      "target": "method.fuqi",
+      "relation": "not_equivalent_to",
+      "scope": "自然观察呼吸不等于服气",
+      "sourceRefs": ["source.project.practice.design.v02"]
+    },
+    {
+      "id": "practice-rel-014",
+      "source": "practice.basic.attention_return",
+      "target": "concept.xin",
+      "relation": "contextualized_by",
+      "scope": "心与注意/收心问题的传统研究背景",
+      "sourceRefs": ["source.project.practice.design.v02"]
+    },
+    {
+      "id": "practice-rel-015",
+      "source": "practice.basic.attention_return",
+      "target": "method.zuowang",
+      "relation": "contextualized_by",
+      "scope": "《坐忘论》收心等材料作为历史比较背景",
+      "sourceRefs": ["source.zuowanglun.shouxin", "source.project.practice.design.v02"]
+    },
+    {
+      "id": "practice-rel-016",
+      "source": "practice.basic.attention_return",
+      "target": "method.zuowang",
+      "relation": "not_equivalent_to",
+      "scope": "现代注意返回基础不等于《庄子》坐忘或唐代坐忘体系",
+      "sourceRefs": ["source.project.practice.design.v02"]
+    },
+    {
+      "id": "practice-rel-017",
+      "source": "practice.basic.short_sitting",
+      "target": "method.jingzuo",
+      "relation": "contextualized_by",
+      "scope": "历史坐式修养提供比较背景",
+      "sourceRefs": ["source.project.practice.design.v02"]
+    },
+    {
+      "id": "practice-rel-018",
+      "source": "practice.basic.short_sitting",
+      "target": "method.zuowang",
+      "relation": "not_equivalent_to",
+      "scope": "短时基础安坐不等于坐忘",
+      "sourceRefs": ["source.project.practice.design.v02"]
+    },
+    {
+      "id": "practice-rel-019",
+      "source": "practice.basic.short_sitting",
+      "target": "method.neidan",
+      "relation": "not_equivalent_to",
+      "scope": "短时基础安坐不等于内丹或内丹筑基",
+      "sourceRefs": ["source.project.practice.design.v02"]
+    },
+    {
+      "id": "practice-rel-020",
+      "source": "practice.basic.movement_stillness",
+      "target": "method.daoyin",
+      "relation": "contextualized_by",
+      "scope": "导引史为身体练习研究提供背景",
+      "sourceRefs": ["source.project.practice.design.v02"]
+    },
+    {
+      "id": "practice-rel-021",
+      "source": "practice.basic.movement_stillness",
+      "target": "method.daoyin",
+      "relation": "not_equivalent_to",
+      "scope": "轻柔动静转换不等于任何古代导引套路复原",
+      "sourceRefs": ["source.project.practice.design.v02"]
+    },
+    {
+      "id": "practice-rel-022",
+      "source": "practice.basic.daily_awareness",
+      "target": "concept.xin",
+      "relation": "contextualized_by",
+      "scope": "只表示日常心性与注意问题存在传统讨论背景，不等同现代日常觉察",
+      "sourceRefs": ["source.project.practice.design.v02"]
+    },
+    {
+      "id": "practice-rel-023",
+      "source": "practice.basic.daily_awareness",
+      "target": "concept.jing",
+      "relation": "contextualized_by",
+      "scope": "静的传统概念可作为比较背景，不要求日常保持特殊静态意识",
+      "sourceRefs": ["source.project.practice.design.v02"]
+    },
+    {
+      "id": "practice-rel-024",
+      "source": "practice.basic.precheck",
+      "target": "policy.safety.v02",
+      "relation": "safety_constrained_by",
+      "scope": "所有实践均受项目上位安全边界约束",
+      "sourceRefs": ["source.project.safety.v02"]
+    },
+    {
+      "id": "practice-rel-025",
+      "source": "practice.basic.natural_breath",
+      "target": "policy.safety.v02",
+      "relation": "safety_constrained_by",
+      "scope": "察息仅限自然状态观察，不进入主动呼吸干预",
+      "sourceRefs": ["source.project.safety.v02"]
+    },
+    {
+      "id": "practice-rel-026",
+      "source": "practice.basic.short_sitting",
+      "target": "policy.safety.v02",
+      "relation": "safety_constrained_by",
+      "scope": "短时安坐受时长、可停止和异常分流边界约束",
+      "sourceRefs": ["source.project.safety.v02"]
+    }
+  ]
+}
