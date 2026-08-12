@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * Layout.vue —— 根布局（方案 6.1 / 6.2）
- * 根据 frontmatter.layout 分发到 5 种布局；渲染顶栏（6 项导航 + 搜索 + 汉堡）与页尾。
+ * 根据 frontmatter.layout 分发页面布局；渲染顶栏（≤6 项导航 + 搜索 + 汉堡）与页尾。
  */
 import { computed, ref, watch } from 'vue'
 import { useData, useRoute } from 'vitepress'
@@ -10,18 +10,20 @@ import TopicsLayout from './layouts/TopicsLayout.vue'
 import ConceptTopicLayout from './layouts/ConceptTopicLayout.vue'
 import QuestionLayout from './layouts/QuestionLayout.vue'
 import KnowledgeLayout from './layouts/KnowledgeLayout.vue'
+import GraphLayout from './layouts/GraphLayout.vue'
 import ArticleLayout from './layouts/ArticleLayout.vue'
 import SearchModal from './components/SearchModal.vue'
 
-const { frontmatter, site } = useData()
+const { frontmatter } = useData()
 const route = useRoute()
 
-/** 一级导航（方案 6.1：按用户任务组织，≤6 项） */
+/** 一级导航：按用户任务组织，控制在 6 项以内 */
 const navLinks = [
   { text: '问道', link: '/' },
   { text: '问题地图', link: '/question-map/' },
   { text: '专题研究', link: '/topics/' },
   { text: '典籍与概念', link: '/knowledge/' },
+  { text: '知识图谱', link: '/graph/' },
   { text: '研究方法', link: '/method/' }
 ]
 
@@ -30,7 +32,8 @@ const layoutMap: Record<string, any> = {
   topic: ConceptTopicLayout,
   topics: TopicsLayout,
   question: QuestionLayout,
-  knowledge: KnowledgeLayout
+  knowledge: KnowledgeLayout,
+  graph: GraphLayout
 }
 const layoutComp = computed(() => layoutMap[String(frontmatter.value.layout)] || ArticleLayout)
 
@@ -43,13 +46,11 @@ function isActive(link: string): boolean {
   return p === link || p.startsWith(link)
 }
 
-// 路由变化时关闭移动菜单与搜索
 watch(() => route.path, () => {
   mobileOpen.value = false
   searchOpen.value = false
 })
 
-// 键盘：Escape 关闭搜索
 function onKeydown(e: KeyboardEvent) {
   if (e.key === 'Escape') searchOpen.value = false
 }
@@ -57,7 +58,6 @@ function onKeydown(e: KeyboardEvent) {
 
 <template>
   <div class="wdz-shell" @keydown="onKeydown">
-    <!-- 顶部导航 -->
     <header class="wdz-nav">
       <div class="wdz-nav__inner">
         <a class="wdz-nav__brand" href="/">
@@ -94,7 +94,6 @@ function onKeydown(e: KeyboardEvent) {
           </button>
         </div>
       </div>
-      <!-- 移动端菜单 -->
       <nav v-show="mobileOpen" class="wdz-nav__mobile" :class="{ 'is-open': mobileOpen }" aria-label="移动端导航">
         <a
           v-for="l in navLinks"
@@ -107,12 +106,10 @@ function onKeydown(e: KeyboardEvent) {
       </nav>
     </header>
 
-    <!-- 主内容：按布局分发 -->
     <main class="wdz-main">
       <component :is="layoutComp" />
     </main>
 
-    <!-- 页尾（方案 6.2） -->
     <footer class="wdz-footer">
       <div class="wdz-footer__inner">
         <div class="wdz-footer__grid">
@@ -126,6 +123,7 @@ function onKeydown(e: KeyboardEvent) {
             <a href="/topics/">全部专题</a>
             <a href="/topics/jing">「静」专题</a>
             <a href="/knowledge/">典籍与概念</a>
+            <a href="/graph/">知识图谱</a>
             <a href="/method/">研究方法</a>
           </div>
           <div class="wdz-footer__col">
@@ -149,7 +147,6 @@ function onKeydown(e: KeyboardEvent) {
       </div>
     </footer>
 
-    <!-- 搜索浮层 -->
     <SearchModal v-model:open="searchOpen" />
   </div>
 </template>
