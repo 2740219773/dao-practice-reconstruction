@@ -2,19 +2,20 @@
 # 本文件是图谱构建清单，不重复维护节点正文。
 # 字段名保留英文仅用于程序解析。
 
-version: "3.7"
+version: "3.8"
 status: review
 mode: manifest
 
 principles:
   - Markdown 知识卡是节点内容主来源，不在本文件复制正文。
   - 关系数据由独立关系文件维护。
-  - 来源 ID 由统一注册表管理。
+  - 来源 ID 由统一注册表管理；阶段审计新增来源可先由节点 sources 声明，后续注册表版本集中升级时统一收口。
   - 知识导航、历史发展、师承和实践步骤必须分开。
   - 旧 V2 在迁移期保留兼容，但不再作为新增关系的主来源。
   - 人物与作品必须区分确定作者关系和传统归属关系。
   - school 仅是兼容顶层类型，正式节点必须用 school_kind 区分思想传统、宗教宗派、宗教传统和修炼传统。
   - 目录位置不决定节点本体类型；legacy 节点经审计后可以从 stage 等旧目录迁移到更准确的 concept、research 等类型。
+  - stage 必须限定到具体文本、传统或体系，不得自动解释为全道家普遍步骤。
   - 冻结工作包允许保留 planned 节点，不为追求 planned 清零而绕过项目治理规则。
 
 node_sources:
@@ -78,6 +79,8 @@ node_sources:
 
   stages:
     path: 28-修行阶段
+    expected_ids:
+      - stage.zhuji
 
   routes:
     path: 29-修行路线图
@@ -103,6 +106,10 @@ relation_sources:
 
   - path: 31-知识图谱整合/扩展概念关系-v1.yml
     scope: 精气神、性命双修从旧阶段层迁移后的第一版规范关系
+    status: review
+
+  - path: 31-知识图谱整合/筑基阶段关系-v1.yml
+    scope: 筑基作为部分后世内丹体系阶段概念的第一版规范关系
     status: review
 
   - path: 31-知识图谱整合/经典关系-v1.yml
@@ -155,7 +162,7 @@ legacy_compatibility:
       - 28-修行阶段
       - 29-修行路线图
     status: mixed
-    policy: 只有进入 expected_ids 的节点才视为已完成 V3 迁移；目录中其他旧文件不得自动视为正式 V3 数据。精气神、性命双修的旧 stage 文件仅保留迁移说明，正式正文位于 23-核心概念网络。
+    policy: 只有进入 expected_ids 的节点才视为已完成 V3 迁移；目录中其他旧文件不得自动视为正式 V3 数据。精气神、性命双修的旧 stage 文件仅保留迁移说明，正式正文位于 23-核心概念网络；筑基仅以 tradition_specific 范围进入 V3。
 
 build_targets:
   nodes:
@@ -171,7 +178,7 @@ build_targets:
 quality_gates:
   - 所有正式节点 ID 必须唯一。
   - 所有关系 target/source 必须指向正式节点或 planned_nodes 中明确登记的待建节点。
-  - source_refs 必须能在来源注册表或节点来源中解析。
+  - source_refs 必须能在来源注册表或正式节点自身 sources 中解析。
   - verified 判断不得引用未核对来源作为唯一依据。
   - related_to 与 contrasts_with 作为对称关系只维护一条规范边。
   - develops 与 influences 必须有历史证据，不得由知识导航箭头自动生成。
@@ -181,6 +188,7 @@ quality_gates:
   - intellectual_tradition 不得自动拥有创建者或成员组织关系。
   - practice_tradition 不得伪装成单一连续宗教组织。
   - 方法关系不得自动解释为实践步骤。
+  - stage 节点必须说明适用传统、文本或体系；不得把体系特定阶段升级为普遍修炼次第。
   - 概念组合或理论原则不得仅因处于旧“修行阶段”目录就自动建模为 stage。
   - 吐纳、服气、导引、静坐等方法不得因现代相似性被自动合并。
   - planned_nodes 不得被网站或 AI 当作已有正式正文节点展示。
