@@ -34,6 +34,9 @@ export const ISSUE_OPTIONS = Object.freeze([
 export const ISSUE_LABELS = Object.fromEntries(ISSUE_OPTIONS)
 export const KNOWN_ISSUES = new Set(ISSUE_OPTIONS.map(([id]) => id))
 
+const EMOTION_STATES = new Set(['not_observed', 'stable', 'fluctuating', 'interfered', 'stopped'])
+const NEXT_STEPS = new Set(['not_decided', 'continue', 'shorten', 'lower_frequency', 'step_back', 'pause_unit', 'daily_only', 'pause_all', 'professional_opinion'])
+
 export function localDateString(date = new Date()) {
   const y = date.getFullYear()
   const m = String(date.getMonth() + 1).padStart(2, '0')
@@ -63,13 +66,13 @@ export function createEmptyRecord(date = new Date()) {
     postureState: 'not_observed',
     breathState: 'not_observed',
     attentionState: 'not_practiced',
-    emotionState: 'stable',
+    emotionState: 'not_observed',
     afterState: 'normal',
     issues: [],
     severity: 'none',
     adjustment: '',
     note: '',
-    nextStep: 'continue'
+    nextStep: 'not_decided'
   }
 }
 
@@ -84,6 +87,8 @@ export function normalizeRecord(raw) {
   const issues = Array.isArray(raw.issues)
     ? [...new Set(raw.issues.filter((item) => typeof item === 'string' && KNOWN_ISSUES.has(item)))]
     : []
+  const emotionState = EMOTION_STATES.has(raw.emotionState) ? raw.emotionState : 'not_observed'
+  const nextStep = NEXT_STEPS.has(raw.nextStep) ? raw.nextStep : 'not_decided'
 
   return {
     ...createEmptyRecord(),
@@ -96,6 +101,8 @@ export function normalizeRecord(raw) {
     durationMinutes,
     issues,
     severity,
+    emotionState,
+    nextStep,
     adjustment: typeof raw.adjustment === 'string' ? raw.adjustment.slice(0, 160) : '',
     note: typeof raw.note === 'string' ? raw.note.slice(0, 600) : ''
   }
@@ -112,7 +119,9 @@ export function sanitizeDraftForPractice(form) {
     postureState: skipped || !practiceUsesField(practiceId, 'posture') ? 'not_observed' : form.postureState,
     breathState: skipped || !practiceUsesField(practiceId, 'breath') ? 'not_observed' : form.breathState,
     attentionState: skipped || !practiceUsesField(practiceId, 'attention') ? 'not_practiced' : form.attentionState,
-    afterState: skipped || !practiceUsesField(practiceId, 'after') ? 'normal' : form.afterState
+    emotionState: skipped ? 'not_observed' : (EMOTION_STATES.has(form.emotionState) ? form.emotionState : 'not_observed'),
+    afterState: skipped || !practiceUsesField(practiceId, 'after') ? 'normal' : form.afterState,
+    nextStep: NEXT_STEPS.has(form.nextStep) ? form.nextStep : 'not_decided'
   }
 }
 
