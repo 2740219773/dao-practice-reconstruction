@@ -33,7 +33,9 @@ assert(themeIndex.includes('installPracticeSafetyReduction'), '主题入口未�
 
 assert(safetyReduction.includes('异常与安全（没有则跳过）'), '异常安全入口缺少正常态极简文案')
 assert(safetyReduction.includes('需要安全核对 · 已展开'), '异常安全入口缺少提醒态文案')
-assert(safetyReduction.includes("form.classList.add('pj-safety-expanded')"), '草稿安全提醒不能自动展开异常区')
+assert(safetyReduction.includes('const needsAttention ='), '异常安全层缺少统一需要关注判断')
+assert(safetyReduction.includes('setExpanded(button, form, true)'), '需要关注时不能自动展开异常区')
+assert(safetyReduction.includes('setButtonText'), '渐进展开同步必须保持幂等，避免 MutationObserver 文案循环')
 assert(!/severity\.value\s*=\s*['\"](?:yellow|red)/.test(safetyReduction), '渐进展开层不得自动替用户判定黄色或红色')
 
 assert(tests.includes('新记录默认不虚构情绪状态或下次决定'), '自动测试未覆盖默认不推断字段')
