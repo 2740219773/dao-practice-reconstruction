@@ -200,11 +200,13 @@ async function runScenario(cdp) {
     throw new Error(`反向预选后最小字段异常：${JSON.stringify(reversed.labels)}`)
   }
 
-  // URL 参数不能绕过红色安全状态：注入红色记录后再从自然察息入口进入，应强制回到安全检查。
+  // URL 参数不能绕过红色安全状态：使用工作台同源的本地 YYYY-MM-DD 日期注入红色记录，应强制回到安全检查。
   await evaluate(cdp, `(() => {
     const data=JSON.parse(localStorage.getItem(${JSON.stringify(STORAGE_KEY)})||'{}');
     const base=data.records?.[0] || {};
-    const red={...base,id:'daily-e2e-red',createdAt:new Date().toISOString(),date:new Date().toLocaleDateString('en-CA'),practiceId:'practice.basic.precheck',durationMinutes:1,startState:'acceptable',severity:'red',issues:['function_impact'],afterState:'affected'};
+    const today=document.querySelector('.pj-form input[type="date"]')?.value;
+    if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(today || '')) throw new Error('无法读取工作台本地日期');
+    const red={...base,id:'daily-e2e-red',createdAt:new Date().toISOString(),date:today,practiceId:'practice.basic.precheck',durationMinutes:1,startState:'acceptable',severity:'red',issues:['function_impact'],afterState:'affected'};
     localStorage.setItem(${JSON.stringify(STORAGE_KEY)},JSON.stringify({schemaVersion:1,records:[red]}));
     location.href=${JSON.stringify(`${BASE_URL}/practice/?practice=natural-breath#practice-journal`)};
     return true;
