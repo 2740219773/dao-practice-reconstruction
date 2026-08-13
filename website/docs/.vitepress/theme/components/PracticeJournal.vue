@@ -38,6 +38,7 @@ const selectedObservationLabels = computed(() => selectedPractice.value.fields.m
 
 const stats = computed(() => aggregateRecent(records.value, { now: new Date(), days: 7 }))
 const safetyReview = computed(() => buildSafetyReview(stats.value, { periodLabel: '最近7天' }))
+const hasSafetyBlock = computed(() => ['red', 'yellow'].includes(safetyReview.value.level))
 const ruleAdvice = computed(() => safetyReview.value.primary)
 const reviewSummary = computed(() => buildReviewSummary(stats.value, safetyReview.value, new Date()))
 const aiPrompt = computed(() => buildAiPrompt(reviewSummary.value))
@@ -50,7 +51,7 @@ const stageAiPrompt = computed(() => buildStageAiPrompt(stageSummary.value))
 
 const lastActualRecord = computed(() => records.value.find((record) => record.startState !== 'skipped' && practices.some((p) => p.id === record.practiceId)))
 const focusPractice = computed(() => {
-  if (safetyReview.value.level === 'red' || safetyReview.value.level === 'yellow') return practices[0]
+  if (hasSafetyBlock.value) return practices[0]
   return practices.find((p) => p.id === lastActualRecord.value?.practiceId) || practices[0]
 })
 const focusPracticeUrl = computed(() => practiceCardUrl(focusPractice.value.id))
@@ -278,7 +279,7 @@ function onTabKeydown(event) {
       </div>
       <div class="pj-today__actions">
         <a v-if="safetyReview.level === 'red'" class="pj-primary pj-link-button" href="/safety/">查看安全边界</a>
-        <button v-else class="pj-primary" type="button" @click="startToday">{{ lastActualRecord && safetyReview.level === 'none' ? '继续上次并记录' : '开始今日记录' }}</button>
+        <button v-else class="pj-primary" type="button" @click="startToday">{{ lastActualRecord && !hasSafetyBlock ? '继续上次并记录' : '开始今日记录' }}</button>
         <a class="pj-secondary pj-link-button" :href="focusPracticeUrl">查看当前实践卡</a>
         <button class="pj-secondary" type="button" @click="skipToday">今天决定不练</button>
       </div>
