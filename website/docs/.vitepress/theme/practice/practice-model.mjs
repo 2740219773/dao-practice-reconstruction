@@ -4,14 +4,14 @@ export const STORAGE_KEY = 'wendaozhi.practice.records.v1'
 export const SCHEMA_VERSION = 1
 
 export const PRACTICES = Object.freeze([
-  { id: 'practice.basic.precheck', name: '01 准备与安全检查', max: 3 },
-  { id: 'practice.basic.posture', name: '02 调身与舒适姿势', max: 5 },
-  { id: 'practice.basic.contact_awareness', name: '03 身体接触觉察', max: 5 },
-  { id: 'practice.basic.natural_breath', name: '04 自然察息', max: 5 },
-  { id: 'practice.basic.attention_return', name: '05 注意返回与收心基础', max: 6 },
-  { id: 'practice.basic.short_sitting', name: '06 短时基础安坐', max: 10 },
-  { id: 'practice.basic.movement_stillness', name: '07 轻柔动静转换', max: 8 },
-  { id: 'practice.basic.daily_awareness', name: '08 日用觉察', max: 3 }
+  { id: 'practice.basic.precheck', slug: 'precheck', name: '01 准备与安全检查', max: 3, fields: [] },
+  { id: 'practice.basic.posture', slug: 'posture', name: '02 调身与舒适姿势', max: 5, fields: ['posture', 'after'] },
+  { id: 'practice.basic.contact_awareness', slug: 'contact-awareness', name: '03 身体接触觉察', max: 5, fields: ['posture', 'after'] },
+  { id: 'practice.basic.natural_breath', slug: 'natural-breath', name: '04 自然察息', max: 5, fields: ['breath', 'after'] },
+  { id: 'practice.basic.attention_return', slug: 'attention-return', name: '05 注意返回与收心基础', max: 6, fields: ['attention', 'after'] },
+  { id: 'practice.basic.short_sitting', slug: 'short-sitting', name: '06 短时基础安坐', max: 10, fields: ['posture', 'breath', 'attention', 'after'] },
+  { id: 'practice.basic.movement_stillness', slug: 'movement-stillness', name: '07 轻柔动静转换', max: 8, fields: ['posture', 'after'] },
+  { id: 'practice.basic.daily_awareness', slug: 'daily-awareness', name: '08 日用觉察', max: 3, fields: ['attention', 'after'] }
 ])
 
 export const PRACTICE_BY_ID = new Map(PRACTICES.map((item) => [item.id, item]))
@@ -39,6 +39,16 @@ export function localDateString(date = new Date()) {
   const m = String(date.getMonth() + 1).padStart(2, '0')
   const day = String(date.getDate()).padStart(2, '0')
   return `${y}-${m}-${day}`
+}
+
+export function practiceUsesField(practiceId, field) {
+  const practice = PRACTICE_BY_ID.get(String(practiceId))
+  return Boolean(practice?.fields?.includes(field))
+}
+
+export function practiceCardUrl(practiceId) {
+  const practice = PRACTICE_BY_ID.get(String(practiceId))
+  return practice ? `/practice/card/${practice.slug}` : '/practice/'
 }
 
 export function createEmptyRecord(date = new Date()) {
@@ -91,6 +101,21 @@ export function normalizeRecord(raw) {
   }
 }
 
+export function sanitizeDraftForPractice(form) {
+  const practiceId = String(form?.practiceId || '')
+  if (!PRACTICE_BY_ID.has(practiceId)) return form
+
+  const skipped = form.startState === 'skipped'
+  return {
+    ...form,
+    durationMinutes: skipped ? 0 : form.durationMinutes,
+    postureState: skipped || !practiceUsesField(practiceId, 'posture') ? 'not_observed' : form.postureState,
+    breathState: skipped || !practiceUsesField(practiceId, 'breath') ? 'not_observed' : form.breathState,
+    attentionState: skipped || !practiceUsesField(practiceId, 'attention') ? 'not_practiced' : form.attentionState,
+    afterState: skipped || !practiceUsesField(practiceId, 'after') ? 'normal' : form.afterState
+  }
+}
+
 export function validateDraft(form) {
   if (!form || !PRACTICE_BY_ID.has(String(form.practiceId))) {
     return { ok: false, error: '实践卡不存在或已失效。' }
@@ -109,16 +134,17 @@ export function validateDraft(form) {
 }
 
 export function createStoredRecord(form, { id, createdAt = new Date().toISOString() }) {
-  const check = validateDraft(form)
+  const cleaned = sanitizeDraftForPractice(form)
+  const check = validateDraft(cleaned)
   if (!check.ok) return { ok: false, error: check.error }
 
   const record = normalizeRecord({
-    ...form,
+    ...cleaned,
     id,
     schemaVersion: SCHEMA_VERSION,
     createdAt,
     durationMinutes: check.actual,
-    issues: Array.isArray(form.issues) ? [...form.issues] : []
+    issues: Array.isArray(cleaned.issues) ? [...cleaned.issues] : []
   })
   if (!record) return { ok: false, error: '记录内容无法通过数据校验。' }
 
