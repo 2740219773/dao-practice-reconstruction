@@ -250,6 +250,7 @@ function renderPracticeCard(card, relationContext) {
   const y = card.data
   const body = card.content.replace(/^\s*#\s+[^\n]+\n+/, '').trim()
   const relationBlock = renderPracticeRelations(card, relationContext)
+  const recordUrl = `/practice/?practice=${encodeURIComponent(String(y.slug))}#practice-journal`
   const parts = [
     '---',
     `title: ${JSON.stringify(y.name)}`,
@@ -262,11 +263,15 @@ function renderPracticeCard(card, relationContext) {
     '---',
     `<!-- 自动生成：源文件 ${card.relPath}；请修改源 Markdown，不要修改本页。 -->`,
     '',
-    `> **实践层说明：** 本卡是问道志现代低风险教学单元，风险等级 **${y.risk_level}**，不等同于任何古代功法复原。开始前请阅读 [安全边界](/safety/)。`
+    `> **实践层说明：** 本卡是问道志现代低风险教学单元，风险等级 **${y.risk_level}**，不等同于任何古代功法复原。开始前请阅读 [安全边界](/safety/)。`,
+    '',
+    `[记录本次实践 →](${recordUrl})`,
+    '',
+    '> 该入口只会把本卡预选到工作台，不会自动开始、自动保存或改变阶段；若存在安全回退信号，安全规则优先。'
   ]
   if (body) parts.push('', body)
   if (relationBlock) parts.push('', '---', '', relationBlock)
-  parts.push('', `::: source 来源与修订\n\n源文件：[${card.relPath}](https://github.com/2740219773/dao-practice-reconstruction/blob/main/${card.relPath.split('/').map(encodeURIComponent).join('/')})。本页由构建器自动生成，仓库 Markdown 是唯一人工维护正文；“关联与边界”来自实践关系数据。\n\n返回 [我要实践](/practice/)。\n\n:::`)
+  parts.push('', `::: source 来源与修订\n\n源文件：[${card.relPath}](https://github.com/2740219773/dao-practice-reconstruction/blob/main/${card.relPath.split('/').map(encodeURIComponent).join('/')})。本页由构建器自动生成，仓库 Markdown 是唯一人工维护正文；“关联与边界”来自实践关系数据。\n\n[记录本次实践](${recordUrl}) · 返回 [我要实践](/practice/)。\n\n:::`)
   return parts.join('\n') + '\n'
 }
 
