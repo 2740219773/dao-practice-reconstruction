@@ -37,6 +37,8 @@ jobs:
         run: npm run test:e2e:practice
       - name: Chromium今日修持减负端到端回归
         run: npm run test:e2e:daily
+      - name: Chromium7天产品观察端到端回归
+        run: npm run test:e2e:trial
       - name: Chromium日读夜读端到端回归
         run: npm run test:e2e:theme
       - name: 验证构建产物
@@ -65,6 +67,7 @@ jobs:
           grep -q "30天与阶段" docs/.vitepress/dist/practice/index.html
           grep -q "PRACTICE-004" docs/.vitepress/dist/practice/index.html
           grep -q "今日修持" docs/.vitepress/dist/practice/index.html
+          grep -q "7天产品观察" docs/.vitepress/dist/practice/index.html
           # 实践详情必须展示机器生成的知识回链与“不等同”边界
           grep -q "关联与边界" docs/.vitepress/dist/practice/card/natural-breath.html
           grep -q "吐纳" docs/.vitepress/dist/practice/card/natural-breath.html
