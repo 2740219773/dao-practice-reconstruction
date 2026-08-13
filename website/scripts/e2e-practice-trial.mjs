@@ -168,7 +168,7 @@ async function runScenario(cdp) {
   const cleared = await evaluate(cdp, `({trial:localStorage.getItem(${JSON.stringify(TRIAL_KEY)}),practice:localStorage.getItem(${JSON.stringify(PRACTICE_KEY)}),notice:document.querySelector('.pt__notice')?.textContent||''})`)
   if (cleared.trial !== null || cleared.practice !== sentinel || !cleared.notice.includes('修持记录未受影响')) throw new Error(`清空产品观察边界异常：${JSON.stringify(cleared)}`)
 
-  console.log('[trial-e2e] 通过：产品观察默认折叠、未使用时减负、独立保存、刷新保留、清空确认与修持记录隔离正常。')
+  console.log('[trial-e2e] 通过：产品观察独立保存、修持记录隔离、默认折叠、未使用时减负、刷新保留与清空确认正常。')
 }
 
 async function main() {
