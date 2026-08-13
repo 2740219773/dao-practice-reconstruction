@@ -35,6 +35,8 @@ jobs:
         run: npm run build
       - name: Chromium实践工作台端到端回归
         run: npm run test:e2e:practice
+      - name: Chromium今日修持减负端到端回归
+        run: npm run test:e2e:daily
       - name: Chromium日读夜读端到端回归
         run: npm run test:e2e:theme
       - name: 验证构建产物
@@ -49,6 +51,7 @@ jobs:
           test -f docs/.vitepress/dist/topics/jing.html
           test -f docs/.vitepress/dist/method/index.html
           test -f docs/.vitepress/dist/safety/index.html
+          # V2.x 实践入口与八张基础实践卡必须由仓库源文件自动生成
           test -f docs/.vitepress/dist/practice/index.html
           test -f docs/.vitepress/dist/practice/card/precheck.html
           test -f docs/.vitepress/dist/practice/card/posture.html
@@ -58,17 +61,22 @@ jobs:
           test -f docs/.vitepress/dist/practice/card/short-sitting.html
           test -f docs/.vitepress/dist/practice/card/movement-stillness.html
           test -f docs/.vitepress/dist/practice/card/daily-awareness.html
+          # 条件标签页正文由 practice:check + node:test + Chromium E2E 校验
           grep -q "30天与阶段" docs/.vitepress/dist/practice/index.html
-          grep -q "PRACTICE-003" docs/.vitepress/dist/practice/index.html
+          grep -q "PRACTICE-004" docs/.vitepress/dist/practice/index.html
+          grep -q "今日修持" docs/.vitepress/dist/practice/index.html
+          # 实践详情必须展示机器生成的知识回链与“不等同”边界
           grep -q "关联与边界" docs/.vitepress/dist/practice/card/natural-breath.html
           grep -q "吐纳" docs/.vitepress/dist/practice/card/natural-breath.html
           grep -q "服气" docs/.vitepress/dist/practice/card/natural-breath.html
           grep -q "安全边界 V0.2" docs/.vitepress/dist/practice/card/natural-breath.html
           grep -q "导引" docs/.vitepress/dist/practice/card/movement-stillness.html
+          # 旧统一知识详情页仍需保持兼容
           test -f docs/.vitepress/dist/knowledge/文献-0001-道德经.html
           test -f docs/.vitepress/dist/knowledge/原文-0001-道德经第十六章.html
           test -f docs/.vitepress/dist/knowledge/概念-0001-静.html
           test -f docs/.vitepress/dist/build-info.json
+          # V3 图谱构建产物位于仓库根目录 data/
           test -f ../data/nodes.json
           test -f ../data/relations.json
           test -f ../data/graph.json
