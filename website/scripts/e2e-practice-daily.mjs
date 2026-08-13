@@ -177,7 +177,49 @@ async function runScenario(cdp) {
     if (skip.labels.includes(forbidden)) throw new Error(`不练记录仍显示无关字段：${forbidden}`)
   }
 
-  console.log('[daily-e2e] 通过：今日入口、继续上次、不练、实践卡快捷链接和按卡最小字段正常。')
+  // 实践卡 -> 工作台：真实进入自然察息卡，点击“记录本次实践”，必须只预选且不新增记录。
+  const beforeReverseCount = await evaluate(cdp, `JSON.parse(localStorage.getItem(${JSON.stringify(STORAGE_KEY)})||'{}').records?.length || 0`)
+  await evaluate(cdp, `location.href=${JSON.stringify(`${BASE_URL}/practice/card/natural-breath`)}; true`)
+  await waitFor(cdp, `document.readyState === 'complete' && document.querySelector('a[href*="practice=natural-breath"]')`)
+  const reverseLink = await evaluate(cdp, `Array.from(document.querySelectorAll('a')).find(a=>a.textContent.includes('记录本次实践'))?.getAttribute('href')`)
+  if (!reverseLink?.includes('/practice/?practice=natural-breath') || !reverseLink.includes('#practice-journal')) {
+    throw new Error(`实践卡反向记录链接异常：${reverseLink}`)
+  }
+  await evaluate(cdp, `Array.from(document.querySelectorAll('a')).find(a=>a.textContent.includes('记录本次实践')).click(); true`)
+  await waitFor(cdp, `location.pathname === '/practice/' && new URLSearchParams(location.search).get('practice') === 'natural-breath' && document.querySelector('#practice-journal .pj-form')`)
+  const reversed = await evaluate(cdp, `({
+    practice:Array.from(document.querySelectorAll('.pj-form label')).find(x=>x.querySelector('span')?.textContent.trim()==='实践卡')?.querySelector('select')?.value,
+    notice:document.querySelector('.pj-notice')?.textContent || '',
+    count:JSON.parse(localStorage.getItem(${JSON.stringify(STORAGE_KEY)})||'{}').records?.length || 0,
+    labels:Array.from(document.querySelectorAll('.pj-form label>span')).map(x=>x.textContent.trim())
+  })`)
+  if (reversed.practice !== 'practice.basic.natural_breath' || reversed.count !== beforeReverseCount || !reversed.notice.includes('不会自动开始、自动保存或改变阶段')) {
+    throw new Error(`实践卡反向预选异常：${JSON.stringify(reversed)}`)
+  }
+  if (!reversed.labels.includes('呼吸自然度') || reversed.labels.includes('身体姿势') || reversed.labels.includes('注意返回')) {
+    throw new Error(`反向预选后最小字段异常：${JSON.stringify(reversed.labels)}`)
+  }
+
+  // URL 参数不能绕过红色安全状态：注入红色记录后再从自然察息入口进入，应强制回到安全检查。
+  await evaluate(cdp, `(() => {
+    const data=JSON.parse(localStorage.getItem(${JSON.stringify(STORAGE_KEY)})||'{}');
+    const base=data.records?.[0] || {};
+    const red={...base,id:'daily-e2e-red',createdAt:new Date().toISOString(),date:new Date().toLocaleDateString('en-CA'),practiceId:'practice.basic.precheck',durationMinutes:1,startState:'acceptable',severity:'red',issues:['function_impact'],afterState:'affected'};
+    localStorage.setItem(${JSON.stringify(STORAGE_KEY)},JSON.stringify({schemaVersion:1,records:[red]}));
+    location.href=${JSON.stringify(`${BASE_URL}/practice/?practice=natural-breath#practice-journal`)};
+    return true;
+  })()`)
+  await waitFor(cdp, `document.readyState === 'complete' && document.querySelector('#practice-journal .pj-form') && document.querySelector('.pj-notice')`)
+  const safetyOverride = await evaluate(cdp, `({
+    practice:Array.from(document.querySelectorAll('.pj-form label')).find(x=>x.querySelector('span')?.textContent.trim()==='实践卡')?.querySelector('select')?.value,
+    notice:document.querySelector('.pj-notice')?.textContent || '',
+    count:JSON.parse(localStorage.getItem(${JSON.stringify(STORAGE_KEY)})||'{}').records?.length || 0
+  })`)
+  if (safetyOverride.practice !== 'practice.basic.precheck' || safetyOverride.count !== 1 || !safetyOverride.notice.includes('实践卡链接不能绕过安全状态')) {
+    throw new Error(`红色安全状态未覆盖实践卡参数：${JSON.stringify(safetyOverride)}`)
+  }
+
+  console.log('[daily-e2e] 通过：今日入口、继续上次、不练、双向实践卡导航、反向预选不自动保存、安全状态覆盖参数和按卡最小字段正常。')
 }
 
 async function main() {
