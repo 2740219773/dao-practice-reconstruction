@@ -19,6 +19,8 @@ const MIGRATION_TEST_FILE = path.join(WEBSITE_ROOT, 'tests', 'practice-migration
 const PRACTICE_PAGE = path.join(WEBSITE_ROOT, 'docs', 'practice', 'index.md')
 const THEME_INDEX = path.join(WEBSITE_ROOT, 'docs', '.vitepress', 'theme', 'index.ts')
 const PACKAGE_FILE = path.join(WEBSITE_ROOT, 'package.json')
+const GENERATOR_FILE = path.join(WEBSITE_ROOT, 'scripts', '生成网站页面.mjs')
+const DAILY_E2E_FILE = path.join(WEBSITE_ROOT, 'scripts', 'e2e-practice-daily.mjs')
 
 const requiredDocs = [
   '33-实践体系/实践系统设计方案-V0.2.md',
@@ -85,6 +87,8 @@ for (const rel of requiredDocs) assert(existsSync(path.join(REPO_ROOT, rel)), `�
 assert(existsSync(PRACTICE_DIR), '缺少 33-实践体系/实践卡 目录')
 assert(existsSync(RELATION_FILE), '缺少 33-实践体系/实践关系-v1.json')
 assert(existsSync(COMPONENT_FILE), '缺少 PracticeJournal.vue')
+assert(existsSync(GENERATOR_FILE), '缺少网站页面生成器')
+assert(existsSync(DAILY_E2E_FILE), '缺少今日修持 Chromium 回归脚本')
 for (const [file, label] of [
   [MODEL_FILE, 'practice-model.mjs'],
   [MIGRATION_FILE, 'practice-migrations.mjs'],
@@ -176,6 +180,8 @@ const ai = existsSync(AI_FILE) ? readFileSync(AI_FILE, 'utf8') : ''
 const stage = existsSync(STAGE_FILE) ? readFileSync(STAGE_FILE, 'utf8') : ''
 const tests = existsSync(TEST_FILE) ? readFileSync(TEST_FILE, 'utf8') : ''
 const migrationTests = existsSync(MIGRATION_TEST_FILE) ? readFileSync(MIGRATION_TEST_FILE, 'utf8') : ''
+const generator = existsSync(GENERATOR_FILE) ? readFileSync(GENERATOR_FILE, 'utf8') : ''
+const dailyE2E = existsSync(DAILY_E2E_FILE) ? readFileSync(DAILY_E2E_FILE, 'utf8') : ''
 const packageJson = existsSync(PACKAGE_FILE) ? JSON.parse(readFileSync(PACKAGE_FILE, 'utf8')) : { scripts: {} }
 const clientCode = [component, model, migration, stats, safety, ai, stage].join('\n')
 
@@ -208,9 +214,18 @@ assert(component.includes('buildSafetyReview'), 'PracticeJournal 应使用独立
 assert(component.includes('buildAiPrompt'), 'PracticeJournal 应使用独立 AI 摘要规则')
 assert(component.includes('buildStageReview'), 'PracticeJournal 尚未接入30天阶段复盘')
 assert(component.includes('30天与阶段'), 'PracticeJournal 缺少30天与阶段入口')
+assert(component.includes('applyPracticeEntryFromUrl'), 'PracticeJournal 缺少实践卡反向预选入口')
+assert(component.includes('URLSearchParams'), 'PracticeJournal 尚未解析 practice 查询参数')
+assert(component.includes('id="practice-journal"'), 'PracticeJournal 缺少反向入口锚点 practice-journal')
+assert(component.includes('entrySafety') && component.includes('aggregateRecent(records.value'), '实践卡 URL 入口必须先依据已载入记录计算安全状态')
+assert(generator.includes('记录本次实践'), '实践详情生成器缺少“记录本次实践”反向入口')
+assert(generator.includes('?practice=') && generator.includes('#practice-journal'), '实践详情生成器缺少 practice 参数或工作台锚点')
+assert(dailyE2E.includes('双向实践卡导航'), '今日修持 Chromium 尚未覆盖双向实践卡导航')
+assert(dailyE2E.includes('实践卡链接不能绕过安全状态'), '今日修持 Chromium 尚未覆盖 URL 参数安全覆盖')
 assert(packageJson.scripts?.['test:practice'], 'package.json 缺少 test:practice')
 assert(String(packageJson.scripts?.['test:practice'] || '').includes('practice-*.test.mjs'), 'test:practice 尚未覆盖全部实践测试文件')
 assert(String(packageJson.scripts?.test || '').includes('test:practice'), 'npm test 尚未纳入实践场景回归')
+assert(packageJson.scripts?.['test:e2e:daily'], 'package.json 缺少 test:e2e:daily')
 
 const practicePage = existsSync(PRACTICE_PAGE) ? readFileSync(PRACTICE_PAGE, 'utf8') : ''
 const themeIndex = existsSync(THEME_INDEX) ? readFileSync(THEME_INDEX, 'utf8') : ''
@@ -218,5 +233,5 @@ assert(practicePage.includes('<PracticeJournal />'), '实践首页尚未挂载 P
 assert(themeIndex.includes("app.component('PracticeJournal'"), '主题入口尚未全局注册 PracticeJournal')
 
 if (!process.exitCode) {
-  console.log(`[实践体系检查] 通过：${files.length} 张实践卡，${relationData.relations.length} 条实践关系，6 个规则模块、30天阶段复盘与schema迁移保护有效。`)
+  console.log(`[实践体系检查] 通过：${files.length} 张实践卡，${relationData.relations.length} 条实践关系，6 个规则模块、30天阶段复盘、schema迁移保护与双向实践导航有效。`)
 }
