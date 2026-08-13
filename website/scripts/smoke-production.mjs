@@ -81,8 +81,10 @@ async function main() {
     if (response.status !== 200) throw new Error(`${label} ${pathname} 返回 ${response.status}`)
     if (pathname === '/practice/') {
       const text = await response.text()
-      if (!text.includes('PRACTICE-003') || !text.includes('30天与阶段')) {
-        throw new Error('线上实践工作台尚未包含 V2.3 长期复盘入口')
+      const required = ['PRACTICE-004', '今日修持', '30天与阶段', '今天决定不练']
+      const missing = required.filter((marker) => !text.includes(marker))
+      if (missing.length) {
+        throw new Error(`线上实践工作台缺少 V2.5 锚点：${missing.join('、')}`)
       }
     }
   }
