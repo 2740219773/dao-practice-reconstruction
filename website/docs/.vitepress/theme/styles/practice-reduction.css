@@ -1,12 +1,12 @@
 /*
- * V2.7 首轮试运行第二轮减法。
+ * V2.7 首轮试运行减负。
  *
- * 这三个内容保留在既有 schema / 复盘结构中兼容旧数据，但不再主动占据每日记录首屏：
- * - “阶段方向”只应在 30 天阶段页解释，不在“今日修持”制造升级感；
- * - “情绪状态”当前不参与 7 天安全规则或 30 天能力判断，新记录默认 not_observed；
- * - “下次决定”当前不参与安全/阶段计算，新记录默认 not_decided。
- *
- * 使用 :has() 仅针对现代浏览器产品层；数据层仍有独立默认值与校验，不依赖 CSS 保证语义。
+ * 低频/复盘字段继续留在 schema 中兼容旧记录，但不主动占据每日入口。
+ * 第三轮进一步把异常与安全区改成“正常时折叠、需要时展开”：
+ * - 不删除任何安全字段；
+ * - 不自动判定黄色/红色；
+ * - 出现草稿安全提醒、已勾选异常或已选安全级别时自动展开；
+ * - “今天决定不练”不展示“本次练习异常”区。
  */
 
 /* 今日卡只保留“今天有没有记录”，不展示阶段/升级方向。 */
@@ -22,4 +22,37 @@
 /* 下次决定改为复盘语义；日常保存默认“未决定”，不再默认“继续”。 */
 .practice-journal .pj-grid--small > label:has(select option[value="continue"]) {
   display: none;
+}
+
+/* 正常记录默认不铺开 11 项异常与安全分流。 */
+.practice-journal .pj-form:not(.pj-safety-expanded) .pj-issues,
+.practice-journal .pj-form:not(.pj-safety-expanded) .pj-grid--small {
+  display: none;
+}
+
+.practice-journal .pj-safety-toggle {
+  width: 100%;
+  margin: 16px 0 0;
+  padding: 10px 12px;
+  border: 1px dashed var(--vp-c-divider);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--vp-c-text-2);
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+
+.practice-journal .pj-safety-toggle:hover,
+.practice-journal .pj-safety-toggle[aria-expanded="true"] {
+  color: var(--vp-c-text-1);
+  border-style: solid;
+  background: var(--vp-c-bg);
+}
+
+/* 不练记录没有“本次练习异常”，但事实备注仍保留。 */
+.practice-journal .pj-form.pj-safety-skipped .pj-issues,
+.practice-journal .pj-form.pj-safety-skipped .pj-grid--small,
+.practice-journal .pj-form.pj-safety-skipped .pj-draft-notes {
+  display: none !important;
 }
