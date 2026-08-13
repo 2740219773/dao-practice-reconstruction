@@ -32,9 +32,12 @@ async function waitHttp(url, timeoutMs = 20000) {
   throw new Error(`等待本地预览超时：${url}`)
 }
 
-async function waitCdp(timeoutMs = 15000) {
+async function waitCdp(timeoutMs = 30000, chromeProcess = null) {
   const start = Date.now()
   while (Date.now() - start < timeoutMs) {
+    if (chromeProcess && chromeProcess.exitCode !== null) {
+      throw new Error(`Chromium 在 DevTools 就绪前退出，exitCode=${chromeProcess.exitCode}`)
+    }
     try {
       const response = await fetch(`http://127.0.0.1:${CDP_PORT}/json/list`)
       if (response.ok) {
@@ -45,7 +48,7 @@ async function waitCdp(timeoutMs = 15000) {
     } catch {}
     await sleep(150)
   }
-  throw new Error('等待 Chromium DevTools 超时')
+  throw new Error(`等待 Chromium DevTools 超时（${timeoutMs}ms）`)
 }
 
 function connectCdp(url) {
@@ -234,7 +237,7 @@ async function main() {
     preview = spawn('npm', ['run', 'preview', '--', '--host', '127.0.0.1', '--port', '4173'], { cwd: process.cwd(), stdio: 'ignore' })
     await waitHttp(`${BASE_URL}/practice/`)
     chrome = spawn(findChrome(), ['--headless=new','--disable-gpu','--no-sandbox','--disable-dev-shm-usage','--remote-allow-origins=*',`--remote-debugging-port=${CDP_PORT}`,`--user-data-dir=${profileDir}`,`${BASE_URL}/practice/`], { stdio: 'ignore' })
-    const target = await waitCdp()
+    const target = await waitCdp(30000, chrome)
     cdp = connectCdp(target.webSocketDebuggerUrl)
     await cdp.ready
     await runScenario(cdp)
