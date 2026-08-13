@@ -16,7 +16,7 @@
     "generate": "npm run graph && node scripts/生成网站页面.mjs",
     "test:practice": "node --test tests/practice-*.test.mjs",
     "test:e2e:practice": "node scripts/e2e-practice-browser.mjs",
-    "test:e2e:daily": "node scripts/e2e-practice-daily.mjs && node scripts/e2e-practice-reduction.mjs",
+    "test:e2e:daily": "node scripts/e2e-practice-daily.mjs && node scripts/e2e-practice-reduction.mjs && node scripts/e2e-practice-safety-reduction.mjs",
     "test:e2e:trial": "node scripts/e2e-practice-trial.mjs",
     "test:e2e:theme": "node scripts/e2e-theme-browser.mjs",
     "test": "node scripts/test-publish-status.mjs && npm run test:practice",
