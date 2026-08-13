@@ -81,7 +81,51 @@ function persist() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify({ schemaVersion: SCHEMA_VERSION, records: records.value }))
 }
 
+function applyPracticeEntryFromUrl() {
+  const slug = new URLSearchParams(window.location.search).get('practice')
+  if (!slug) return
+
+  const requested = practices.find((practice) => practice.slug === slug)
+  const previousNotice = notice.value ? `${notice.value} ` : ''
+  if (!requested) {
+    notice.value = `${previousNotice}未识别实践卡入口参数，已保持当前安全起点；不会根据未知链接创建记录。`
+    return
+  }
+
+  if (safetyReview.value.level === 'red') {
+    form.value = {
+      ...createEmptyRecord(),
+      date: localDateString(),
+      practiceId: practices[0].id,
+      startState: 'acceptable'
+    }
+    notice.value = `${previousNotice}检测到最近7天红色安全事件：实践卡链接不能绕过安全状态，当前仍停留在准备与安全检查。`
+    return
+  }
+
+  if (safetyReview.value.level === 'yellow') {
+    form.value = {
+      ...createEmptyRecord(),
+      date: localDateString(),
+      practiceId: practices[0].id,
+      startState: 'acceptable'
+    }
+    notice.value = `${previousNotice}检测到最近7天需要回退或观察的信号：没有预选“${requested.name.replace(/^\d+\s*/, '')}”，先回到准备与安全检查。`
+    return
+  }
+
+  form.value = {
+    ...createEmptyRecord(),
+    date: localDateString(),
+    practiceId: requested.id,
+    startState: 'acceptable'
+  }
+  tab.value = 'record'
+  notice.value = `${previousNotice}已从“${requested.name.replace(/^\d+\s*/, '')}”实践卡返回并预选本卡。这里只是准备一条空记录，不会自动开始、自动保存或改变阶段。`
+}
+
 onMounted(() => {
+  let recordsUsable = true
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     const loaded = parseAndMigrateStored(raw, {
@@ -90,19 +134,21 @@ onMounted(() => {
       migrations: PRACTICE_MIGRATIONS
     })
     if (!loaded.ok) {
+      recordsUsable = false
       notice.value = loaded.error || '本地记录版本无法读取。原数据没有被自动覆盖。'
-      ready.value = true
-      return
-    }
-    records.value = loaded.records
-    if (loaded.migrated) {
-      notice.value = `本地记录已从 schema v${loaded.sourceVersion} 迁移到 v${loaded.targetVersion}。迁移前数据未被自动删除。`
-    } else if (loaded.rejected) {
-      notice.value = `已读取本地记录，其中 ${loaded.rejected} 条记录未通过当前数据校验；原始存储没有被自动覆盖。`
+    } else {
+      records.value = loaded.records
+      if (loaded.migrated) {
+        notice.value = `本地记录已从 schema v${loaded.sourceVersion} 迁移到 v${loaded.targetVersion}。迁移前数据未被自动删除。`
+      } else if (loaded.rejected) {
+        notice.value = `已读取本地记录，其中 ${loaded.rejected} 条记录未通过当前数据校验；原始存储没有被自动覆盖。`
+      }
     }
   } catch {
+    recordsUsable = false
     notice.value = '本地记录读取失败。原数据没有被自动覆盖，可先导出浏览器存储后再处理。'
   }
+  if (recordsUsable) applyPracticeEntryFromUrl()
   ready.value = true
 })
 
@@ -257,7 +303,7 @@ function onTabKeydown(event) {
 </script>
 
 <template>
-  <section class="practice-journal" aria-label="实践记录与复盘工具">
+  <section id="practice-journal" class="practice-journal" aria-label="实践记录与复盘工具">
     <header class="pj-head">
       <div>
         <span class="pj-kicker">PRACTICE-004 · 日常使用减负</span>
@@ -394,7 +440,7 @@ function onTabKeydown(event) {
         <h3>{{ stageReview.decision.label }}</h3>
         <p>{{ stageReview.decision.reason }}</p>
         <p v-if="stageReview.decision.code === 'discuss_diversion'" class="pj-boundary"><strong>这不是自动晋级。</strong> 后续只进入“静修深化 / 导引深化 / 生活养修 / 丹道研究”的人工讨论；丹道仍默认仅研究。</p>
-        <p v-if="stageReview.decision.code === 'pause_for_safety'" class="pj-boundary"><a href="/safety/">优先查看安全边界 →</a></p>
+        <p v-if="stageReview.decision.code === 'pause_for_safety'" class="pj-boundary"><strong>本阶段不继续向前。</strong> <a href="/safety/">优先查看安全边界 →</a></p>
       </section>
 
       <section class="pj-panel"><h3>给 AI 的30天阶段复盘材料</h3><p>同样只整理统计与规则结果，不自动发送原始长备注；AI不得把阶段方向改写成境界、认证或自动解锁。</p><textarea class="pj-prompt" :value="stageAiPrompt" rows="20" readonly></textarea><button class="pj-secondary" type="button" @click="copyStageAiPrompt">复制30天阶段复盘材料</button></section>
