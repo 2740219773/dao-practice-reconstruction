@@ -53,6 +53,7 @@
 /* 不练记录没有“本次练习异常”，但事实备注仍保留。 */
 .practice-journal .pj-form.pj-safety-skipped .pj-issues,
 .practice-journal .pj-form.pj-safety-skipped .pj-grid--small,
-.practice-journal .pj-form.pj-safety-skipped .pj-draft-notes {
+.practice-journal .pj-form.pj-safety-skipped .pj-draft-notes,
+.practice-journal .pj-form.pj-safety-skipped .pj-redbox {
   display: none !important;
 }
