@@ -4,6 +4,7 @@
  */
 import Layout from './Layout.vue'
 import PracticeJournal from './components/PracticeJournal.vue'
+import PracticeTrial from './components/PracticeTrial.vue'
 import './style.css'
 import './styles/tokens.css'
 import './styles/typography.css'
@@ -16,5 +17,6 @@ export default {
   Layout,
   enhanceApp({ app }) {
     app.component('PracticeJournal', PracticeJournal)
+    app.component('PracticeTrial', PracticeTrial)
   }
 }
