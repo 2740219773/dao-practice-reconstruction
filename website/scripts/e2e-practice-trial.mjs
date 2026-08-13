@@ -134,7 +134,9 @@ async function runScenario(cdp) {
   const cancelled = await evaluate(cdp, `(() => { window.confirm=()=>false; Array.from(document.querySelectorAll('.pt__actions button')).find(b=>b.textContent.includes('清空产品观察')).click(); return {trial:JSON.parse(localStorage.getItem(${JSON.stringify(TRIAL_KEY)})||'{}').entries?.length||0,practice:localStorage.getItem(${JSON.stringify(PRACTICE_KEY)})}; })()`)
   if (cancelled.trial !== 1 || cancelled.practice !== sentinel) throw new Error('取消清空不应删除任何记录')
 
-  const cleared = await evaluate(cdp, `(() => { window.confirm=()=>true; Array.from(document.querySelectorAll('.pt__actions button')).find(b=>b.textContent.includes('清空产品观察')).click(); return {trial:localStorage.getItem(${JSON.stringify(TRIAL_KEY)}),practice:localStorage.getItem(${JSON.stringify(PRACTICE_KEY)}),notice:document.querySelector('.pt__notice')?.textContent||''}; })()`)
+  await evaluate(cdp, `(() => { window.confirm=()=>true; Array.from(document.querySelectorAll('.pt__actions button')).find(b=>b.textContent.includes('清空产品观察')).click(); return true; })()`)
+  await waitFor(cdp, `localStorage.getItem(${JSON.stringify(TRIAL_KEY)}) === null && document.querySelector('.pt__notice')?.textContent.includes('修持记录未受影响')`)
+  const cleared = await evaluate(cdp, `({trial:localStorage.getItem(${JSON.stringify(TRIAL_KEY)}),practice:localStorage.getItem(${JSON.stringify(PRACTICE_KEY)}),notice:document.querySelector('.pt__notice')?.textContent||''})`)
   if (cleared.trial !== null || cleared.practice !== sentinel || !cleared.notice.includes('修持记录未受影响')) throw new Error(`清空产品观察边界异常：${JSON.stringify(cleared)}`)
 
   console.log('[trial-e2e] 通过：产品观察独立保存、刷新保留、清空确认与修持记录隔离正常。')
