@@ -46,7 +46,7 @@ async function waitCdp(timeoutMs = 16000) {
     } catch {}
     await sleep(180)
   }
-  throw new Error('等待7天试运行 Chromium DevTools 超时')
+  throw new Error('等待7天试运行 Chromium DevTools超时')
 }
 
 function connectCdp(url) {
@@ -91,11 +91,35 @@ async function waitFor(cdp, expression, timeoutMs = 8000) {
 async function runScenario(cdp) {
   await cdp.call('Page.enable')
   await cdp.call('Runtime.enable')
-  await waitFor(cdp, `document.readyState === 'complete' && document.querySelector('.pt__form')`)
+  await waitFor(cdp, `document.readyState === 'complete' && document.querySelector('.pt__details')`)
 
   const sentinel = JSON.stringify({ schemaVersion: 1, records: [] })
   await evaluate(cdp, `localStorage.setItem(${JSON.stringify(PRACTICE_KEY)}, ${JSON.stringify(sentinel)}); localStorage.removeItem(${JSON.stringify(TRIAL_KEY)}); location.reload(); true`)
-  await waitFor(cdp, `document.readyState === 'complete' && document.querySelector('.pt__form')`)
+  await waitFor(cdp, `document.readyState === 'complete' && document.querySelector('.pt__details')`)
+
+  const initial = await evaluate(cdp, `({open:document.querySelector('.pt__details')?.open, text:document.querySelector('.pt__details summary')?.textContent||''})`)
+  if (initial.open !== false || !initial.text.includes('可选') || !initial.text.includes('约20秒')) throw new Error(`产品观察应默认折叠且标明轻量可选：${JSON.stringify(initial)}`)
+
+  await evaluate(cdp, `document.querySelector('.pt__details summary').click(); true`)
+  await waitFor(cdp, `document.querySelector('.pt__details')?.open === true`)
+
+  const reduced = await evaluate(cdp, `(async () => {
+    const form=document.querySelector('.pt__form');
+    const labels=Array.from(form.querySelectorAll('label'));
+    const used=labels.find(x=>x.querySelector('span')?.textContent.trim()==='今天是否使用实践工作台')?.querySelector('select');
+    used.value='false'; used.dispatchEvent(new Event('change',{bubbles:true}));
+    await new Promise(r=>setTimeout(r,60));
+    return Array.from(form.querySelectorAll('label>span')).map(x=>x.textContent.trim());
+  })()`)
+  for (const hidden of ['总体操作耗时', '主要入口', '有字段不知道怎么选', '有字段感觉没有信息价值']) {
+    if (reduced.includes(hidden)) throw new Error(`未使用工作台时不应继续要求：${hidden}`)
+  }
+  if (!reduced.includes('一句话产品备注') || !reduced.includes('有“系统在催我升级或打卡”的感觉')) {
+    throw new Error(`未使用工作台时应保留备注和压力反馈：${JSON.stringify(reduced)}`)
+  }
+
+  await evaluate(cdp, `(() => { const form=document.querySelector('.pt__form'); const labels=Array.from(form.querySelectorAll('label')); const used=labels.find(x=>x.querySelector('span')?.textContent.trim()==='今天是否使用实践工作台')?.querySelector('select'); used.value='true'; used.dispatchEvent(new Event('change',{bubbles:true})); return true; })()`)
+  await waitFor(cdp, `Array.from(document.querySelectorAll('.pt__form label>span')).some(x=>x.textContent.trim()==='总体操作耗时')`)
 
   const saved = await evaluate(cdp, `(async () => {
     const form=document.querySelector('.pt__form');
@@ -124,10 +148,15 @@ async function runScenario(cdp) {
 
   if (saved.trial?.schemaVersion !== 1 || saved.trial?.entries?.length !== 1) throw new Error(`产品观察未正确保存：${JSON.stringify(saved)}`)
   if (saved.practice !== sentinel) throw new Error('保存产品观察不应修改修持记录')
-  if (!saved.notice.includes('不进入修持记录') || !saved.summary.includes('1 条产品观察')) throw new Error(`产品观察提示或摘要异常：${JSON.stringify(saved)}`)
+  if (!saved.notice.includes('不进入修持记录') || !saved.summary.includes('1 条观察')) throw new Error(`产品观察提示或摘要异常：${JSON.stringify(saved)}`)
 
   await evaluate(cdp, `location.reload(); true`)
-  await waitFor(cdp, `document.readyState === 'complete' && document.querySelector('.pt__summary')?.textContent.includes('1 条产品观察')`)
+  await waitFor(cdp, `document.readyState === 'complete' && document.querySelector('.pt__details')`)
+  const persisted = await evaluate(cdp, `({trial:JSON.parse(localStorage.getItem(${JSON.stringify(TRIAL_KEY)})||'{}'),practice:localStorage.getItem(${JSON.stringify(PRACTICE_KEY)}),open:document.querySelector('.pt__details')?.open})`)
+  if (persisted.trial?.entries?.length !== 1 || persisted.practice !== sentinel || persisted.open !== false) throw new Error(`刷新后产品观察或折叠状态异常：${JSON.stringify(persisted)}`)
+
+  await evaluate(cdp, `document.querySelector('.pt__details summary').click(); true`)
+  await waitFor(cdp, `document.querySelector('.pt__details')?.open === true && document.querySelector('.pt__summary')?.textContent.includes('1 条观察')`)
   const reloaded = await evaluate(cdp, `({ trial:JSON.parse(localStorage.getItem(${JSON.stringify(TRIAL_KEY)})||'{}'), practice:localStorage.getItem(${JSON.stringify(PRACTICE_KEY)}), summary:document.querySelector('.pt__summary')?.textContent||'' })`)
   if (reloaded.trial?.entries?.length !== 1 || reloaded.practice !== sentinel || !reloaded.summary.includes('被催促感')) throw new Error(`刷新后产品观察异常：${JSON.stringify(reloaded)}`)
 
@@ -139,7 +168,7 @@ async function runScenario(cdp) {
   const cleared = await evaluate(cdp, `({trial:localStorage.getItem(${JSON.stringify(TRIAL_KEY)}),practice:localStorage.getItem(${JSON.stringify(PRACTICE_KEY)}),notice:document.querySelector('.pt__notice')?.textContent||''})`)
   if (cleared.trial !== null || cleared.practice !== sentinel || !cleared.notice.includes('修持记录未受影响')) throw new Error(`清空产品观察边界异常：${JSON.stringify(cleared)}`)
 
-  console.log('[trial-e2e] 通过：产品观察独立保存、刷新保留、清空确认与修持记录隔离正常。')
+  console.log('[trial-e2e] 通过：产品观察默认折叠、未使用时减负、独立保存、刷新保留、清空确认与修持记录隔离正常。')
 }
 
 async function main() {
