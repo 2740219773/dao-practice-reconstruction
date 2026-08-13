@@ -72,7 +72,7 @@ test('短时基础安坐保留姿势、呼吸、注意和练后四类观察', ()
   assert.equal(result.record.afterState, 'normal')
 })
 
-test('主动决定不练时清零练习时长并清理全部练习观察字段', () => {
+test('主动决定不练时清零练习时长并清理练习观察、异常和后续决定', () => {
   const draft = createEmptyRecord(NOW)
   draft.practiceId = 'practice.basic.short_sitting'
   draft.startState = 'skipped'
@@ -82,6 +82,9 @@ test('主动决定不练时清零练习时长并清理全部练习观察字段',
   draft.attentionState = 'difficult'
   draft.emotionState = 'interfered'
   draft.afterState = 'affected'
+  draft.issues = ['dizziness_chest', 'function_impact']
+  draft.severity = 'red'
+  draft.nextStep = 'pause_all'
 
   const result = store(draft, 'skip-fields')
   assert.equal(result.ok, true)
@@ -91,6 +94,9 @@ test('主动决定不练时清零练习时长并清理全部练习观察字段',
   assert.equal(result.record.attentionState, 'not_practiced')
   assert.equal(result.record.emotionState, 'not_observed')
   assert.equal(result.record.afterState, 'normal')
+  assert.deepEqual(result.record.issues, [])
+  assert.equal(result.record.severity, 'none')
+  assert.equal(result.record.nextStep, 'not_decided')
 })
 
 test('实践卡快捷链接由统一数据模型生成', () => {
