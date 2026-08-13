@@ -102,59 +102,74 @@ onMounted(load)
 
 <template>
   <section class="pt" aria-labelledby="practice-trial-title">
-    <div class="pt__head">
-      <div>
-        <p class="pt__eyebrow">V2.7 首轮试运行</p>
-        <h3 id="practice-trial-title">7天产品观察</h3>
-        <p>只记录“系统是否好用”，不记录修持体验，不进入实践 schema，也不参与 7/30 天阶段判断。</p>
+    <details class="pt__details">
+      <summary>
+        <span>
+          <b id="practice-trial-title">7天产品观察</b>
+          <small>可选 · 约20秒 · 只记录系统是否好用</small>
+        </span>
+        <span class="pt__local">仅本地保存</span>
+      </summary>
+
+      <div class="pt__body">
+        <p class="pt__intro">不记录修持体验，不进入实践 schema，也不参与 7/30 天阶段判断。若今天没用工作台，只需留下原因或一句备注。</p>
+
+        <form class="pt__form" @submit.prevent="save">
+          <label><span>日期</span><input v-model="form.date" type="date" required /></label>
+          <label><span>今天是否使用实践工作台</span><select v-model="form.usedWorkbench"><option :value="true">是</option><option :value="false">否</option></select></label>
+
+          <template v-if="form.usedWorkbench">
+            <label><span>总体操作耗时</span><select v-model="form.duration"><option v-for="(label,key) in durationLabels" :key="key" :value="key">{{ label }}</option></select></label>
+            <label><span>主要入口</span><select v-model="form.entry"><option v-for="(label,key) in entryLabels" :key="key" :value="key">{{ label }}</option></select></label>
+
+            <label class="pt__check"><input v-model="form.unclearField" type="checkbox" /><span>有字段不知道怎么选</span></label>
+            <label v-if="form.unclearField"><span>哪个字段</span><input v-model="form.unclearFieldName" maxlength="80" placeholder="例如：开始前状态" /></label>
+
+            <label class="pt__check"><input v-model="form.lowValueField" type="checkbox" /><span>有字段感觉没有信息价值</span></label>
+            <label v-if="form.lowValueField"><span>哪个字段</span><input v-model="form.lowValueFieldName" maxlength="80" placeholder="例如：某项几乎每天都一样" /></label>
+          </template>
+
+          <label class="pt__check"><input v-model="form.pressureFeeling" type="checkbox" /><span>有“系统在催我升级或打卡”的感觉</span></label>
+          <label class="pt__wide"><span>一句话产品备注</span><textarea v-model="form.note" maxlength="240" rows="2" :placeholder="form.usedWorkbench ? '例如：记录很快，但阶段文案像等级。' : '例如：今天没打开工作台，因为入口太深。'"></textarea></label>
+
+          <div class="pt__actions">
+            <button type="submit">保存产品观察</button>
+            <button type="button" class="pt__ghost" @click="clearAll">清空产品观察</button>
+          </div>
+        </form>
+
+        <p v-if="notice" class="pt__notice" aria-live="polite">{{ notice }}</p>
+        <p v-if="storageBlocked" class="pt__warning">本地数据当前无法安全读写；不要反复提交，以免误以为已经保存。</p>
+
+        <div class="pt__summary" v-if="summary.observationCount">
+          <h4>当前试运行摘要</h4>
+          <div class="pt__stats">
+            <span><b>{{ summary.observationCount }}</b> 条观察</span>
+            <span><b>{{ summary.workbenchDays }}</b> 天使用工作台</span>
+            <span><b>{{ summary.unusedDays }}</b> 天未使用</span>
+            <span><b>{{ summary.unclearCount }}</b> 次字段难选</span>
+            <span><b>{{ summary.lowValueCount }}</b> 次低价值字段</span>
+            <span><b>{{ summary.pressureCount }}</b> 次被催促感</span>
+          </div>
+          <p v-if="summary.mostUsedEntry">最常用入口：{{ entryLabels[summary.mostUsedEntry] }}。</p>
+          <p>这些数字只用于第7天做产品减法，不代表练习频率、完成度或修炼进展。</p>
+        </div>
       </div>
-      <span class="pt__local">仅本地保存</span>
-    </div>
-
-    <form class="pt__form" @submit.prevent="save">
-      <label><span>日期</span><input v-model="form.date" type="date" required /></label>
-      <label><span>今天是否使用实践工作台</span><select v-model="form.usedWorkbench"><option :value="true">是</option><option :value="false">否</option></select></label>
-      <label><span>总体操作耗时</span><select v-model="form.duration"><option v-for="(label,key) in durationLabels" :key="key" :value="key">{{ label }}</option></select></label>
-      <label><span>主要入口</span><select v-model="form.entry"><option v-for="(label,key) in entryLabels" :key="key" :value="key">{{ label }}</option></select></label>
-
-      <label class="pt__check"><input v-model="form.unclearField" type="checkbox" /><span>有字段不知道怎么选</span></label>
-      <label v-if="form.unclearField"><span>哪个字段</span><input v-model="form.unclearFieldName" maxlength="80" placeholder="例如：开始前状态" /></label>
-
-      <label class="pt__check"><input v-model="form.lowValueField" type="checkbox" /><span>有字段感觉没有信息价值</span></label>
-      <label v-if="form.lowValueField"><span>哪个字段</span><input v-model="form.lowValueFieldName" maxlength="80" placeholder="例如：某项几乎每天都一样" /></label>
-
-      <label class="pt__check"><input v-model="form.pressureFeeling" type="checkbox" /><span>有“系统在催我升级或打卡”的感觉</span></label>
-      <label class="pt__wide"><span>一句话产品备注</span><textarea v-model="form.note" maxlength="240" rows="2" placeholder="只写产品体验，例如：记录很快，但阶段文案像等级。"></textarea></label>
-
-      <div class="pt__actions">
-        <button type="submit">保存产品观察</button>
-        <button type="button" class="pt__ghost" @click="clearAll">清空产品观察</button>
-      </div>
-    </form>
-
-    <p v-if="notice" class="pt__notice" aria-live="polite">{{ notice }}</p>
-    <p v-if="storageBlocked" class="pt__warning">本地数据当前无法安全读写；不要反复提交，以免误以为已经保存。</p>
-
-    <div class="pt__summary">
-      <h4>当前试运行摘要</h4>
-      <div class="pt__stats">
-        <span><b>{{ summary.observationCount }}</b> 条产品观察</span>
-        <span><b>{{ summary.unclearCount }}</b> 次字段难选</span>
-        <span><b>{{ summary.lowValueCount }}</b> 次低价值字段</span>
-        <span><b>{{ summary.pressureCount }}</b> 次被催促感</span>
-      </div>
-      <p v-if="summary.mostUsedEntry">最常用入口：{{ entryLabels[summary.mostUsedEntry] }}。</p>
-      <p>这些数字只用于第7天做产品减法，不代表练习频率、完成度或修炼进展。</p>
-    </div>
+    </details>
   </section>
 </template>
 
 <style scoped>
-.pt { margin: 28px 0 36px; padding: 22px; border: 1px solid var(--vp-c-divider); border-radius: 14px; background: var(--vp-c-bg-soft); }
-.pt__head { display: flex; gap: 18px; align-items: flex-start; justify-content: space-between; margin-bottom: 18px; }
-.pt__head h3 { margin: 2px 0 8px; font-size: 22px; }
-.pt__head p { margin: 0; color: var(--vp-c-text-2); line-height: 1.7; }
-.pt__eyebrow { font-size: 12px; letter-spacing: .12em; }
+.pt { margin: 22px 0 32px; }
+.pt__details { border: 1px solid var(--vp-c-divider); border-radius: 14px; background: var(--vp-c-bg-soft); overflow: hidden; }
+.pt__details > summary { list-style: none; cursor: pointer; display: flex; gap: 18px; align-items: center; justify-content: space-between; padding: 16px 18px; }
+.pt__details > summary::-webkit-details-marker { display: none; }
+.pt__details > summary span:first-child { display: grid; gap: 3px; }
+.pt__details > summary b { font-size: 16px; }
+.pt__details > summary small { color: var(--vp-c-text-2); font-size: 12px; font-weight: 400; }
+.pt__details[open] > summary { border-bottom: 1px solid var(--vp-c-divider); }
+.pt__body { padding: 18px; }
+.pt__intro { margin: 0 0 16px; color: var(--vp-c-text-2); line-height: 1.7; }
 .pt__local { white-space: nowrap; font-size: 12px; color: var(--vp-c-text-2); border: 1px solid var(--vp-c-divider); border-radius: 999px; padding: 5px 9px; }
 .pt__form { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; }
 .pt__form label { display: grid; gap: 6px; font-size: 14px; }
@@ -171,8 +186,8 @@ onMounted(load)
 .pt__summary { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--vp-c-divider); }
 .pt__summary h4 { margin: 0 0 10px; }
 .pt__summary p { margin: 8px 0 0; color: var(--vp-c-text-2); }
-.pt__stats { display: flex; gap: 14px; flex-wrap: wrap; }
+.pt__stats { display: flex; gap: 10px; flex-wrap: wrap; }
 .pt__stats span { padding: 7px 10px; border: 1px solid var(--vp-c-divider); border-radius: 8px; }
 .pt__stats b { font-size: 18px; margin-right: 3px; }
-@media (max-width: 720px) { .pt { padding: 18px; } .pt__head { display: block; } .pt__local { display: inline-block; margin-top: 10px; } .pt__form { grid-template-columns: 1fr; } .pt__wide, .pt__actions { grid-column: auto; } }
+@media (max-width: 720px) { .pt__details > summary { align-items: flex-start; } .pt__local { margin-top: 1px; } .pt__body { padding: 16px; } .pt__form { grid-template-columns: 1fr; } .pt__wide, .pt__actions { grid-column: auto; } }
 </style>
