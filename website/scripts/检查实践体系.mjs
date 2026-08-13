@@ -32,7 +32,9 @@ const requiredDocs = [
   '33-实践体系/AI实践复盘规范-V1.0.md',
   '33-实践体系/知识与实践关系规范-V1.0.md',
   '33-实践体系/30天与阶段复盘规范-V1.0.md',
-  '33-实践体系/实践记录Schema迁移规范-V1.0.md'
+  '33-实践体系/实践记录Schema迁移规范-V1.0.md',
+  '33-实践体系/7天首轮试运行方案-V1.0.md',
+  '33-实践体系/记录模板/7天试运行观察.md'
 ]
 
 const requiredFields = [
@@ -171,18 +173,20 @@ for (const relation of relationData.relations || []) {
   relationKeys.add(key)
 }
 
-const component = existsSync(COMPONENT_FILE) ? readFileSync(COMPONENT_FILE, 'utf8') : ''
-const model = existsSync(MODEL_FILE) ? readFileSync(MODEL_FILE, 'utf8') : ''
-const migration = existsSync(MIGRATION_FILE) ? readFileSync(MIGRATION_FILE, 'utf8') : ''
-const stats = existsSync(STATS_FILE) ? readFileSync(STATS_FILE, 'utf8') : ''
-const safety = existsSync(SAFETY_FILE) ? readFileSync(SAFETY_FILE, 'utf8') : ''
-const ai = existsSync(AI_FILE) ? readFileSync(AI_FILE, 'utf8') : ''
-const stage = existsSync(STAGE_FILE) ? readFileSync(STAGE_FILE, 'utf8') : ''
-const tests = existsSync(TEST_FILE) ? readFileSync(TEST_FILE, 'utf8') : ''
-const migrationTests = existsSync(MIGRATION_TEST_FILE) ? readFileSync(MIGRATION_TEST_FILE, 'utf8') : ''
-const generator = existsSync(GENERATOR_FILE) ? readFileSync(GENERATOR_FILE, 'utf8') : ''
-const dailyE2E = existsSync(DAILY_E2E_FILE) ? readFileSync(DAILY_E2E_FILE, 'utf8') : ''
-const packageJson = existsSync(PACKAGE_FILE) ? JSON.parse(readFileSync(PACKAGE_FILE, 'utf8')) : { scripts: {} }
+const component = readFileSync(COMPONENT_FILE, 'utf8')
+const model = readFileSync(MODEL_FILE, 'utf8')
+const migration = readFileSync(MIGRATION_FILE, 'utf8')
+const stats = readFileSync(STATS_FILE, 'utf8')
+const safety = readFileSync(SAFETY_FILE, 'utf8')
+const ai = readFileSync(AI_FILE, 'utf8')
+const stage = readFileSync(STAGE_FILE, 'utf8')
+const tests = readFileSync(TEST_FILE, 'utf8')
+const migrationTests = readFileSync(MIGRATION_TEST_FILE, 'utf8')
+const generator = readFileSync(GENERATOR_FILE, 'utf8')
+const dailyE2E = readFileSync(DAILY_E2E_FILE, 'utf8')
+const practicePage = readFileSync(PRACTICE_PAGE, 'utf8')
+const themeIndex = readFileSync(THEME_INDEX, 'utf8')
+const packageJson = JSON.parse(readFileSync(PACKAGE_FILE, 'utf8'))
 const clientCode = [component, model, migration, stats, safety, ai, stage].join('\n')
 
 assert(model.includes('wendaozhi.practice.records.v1'), '数据模型缺少版本化本地存储键')
@@ -222,16 +226,15 @@ assert(generator.includes('记录本次实践'), '实践详情生成器缺少“
 assert(generator.includes('?practice=') && generator.includes('#practice-journal'), '实践详情生成器缺少 practice 参数或工作台锚点')
 assert(dailyE2E.includes('双向实践卡导航'), '今日修持 Chromium 尚未覆盖双向实践卡导航')
 assert(dailyE2E.includes('实践卡链接不能绕过安全状态'), '今日修持 Chromium 尚未覆盖 URL 参数安全覆盖')
+assert(practicePage.includes('<PracticeJournal />'), '实践首页尚未挂载 PracticeJournal')
+assert(practicePage.includes('第一次正式试用：先跑 7 天'), '实践首页缺少7天首轮试运行入口')
+assert(practicePage.includes('不追求“练满”'), '实践首页缺少首轮非打卡边界')
+assert(themeIndex.includes("app.component('PracticeJournal'"), '主题入口尚未全局注册 PracticeJournal')
 assert(packageJson.scripts?.['test:practice'], 'package.json 缺少 test:practice')
 assert(String(packageJson.scripts?.['test:practice'] || '').includes('practice-*.test.mjs'), 'test:practice 尚未覆盖全部实践测试文件')
 assert(String(packageJson.scripts?.test || '').includes('test:practice'), 'npm test 尚未纳入实践场景回归')
 assert(packageJson.scripts?.['test:e2e:daily'], 'package.json 缺少 test:e2e:daily')
 
-const practicePage = existsSync(PRACTICE_PAGE) ? readFileSync(PRACTICE_PAGE, 'utf8') : ''
-const themeIndex = existsSync(THEME_INDEX) ? readFileSync(THEME_INDEX, 'utf8') : ''
-assert(practicePage.includes('<PracticeJournal />'), '实践首页尚未挂载 PracticeJournal')
-assert(themeIndex.includes("app.component('PracticeJournal'"), '主题入口尚未全局注册 PracticeJournal')
-
 if (!process.exitCode) {
-  console.log(`[实践体系检查] 通过：${files.length} 张实践卡，${relationData.relations.length} 条实践关系，6 个规则模块、30天阶段复盘、schema迁移保护与双向实践导航有效。`)
+  console.log(`[实践体系检查] 通过：${files.length} 张实践卡，${relationData.relations.length} 条实践关系，6 个规则模块、30天阶段复盘、schema迁移保护、双向实践导航与7天首轮试运行协议有效。`)
 }
