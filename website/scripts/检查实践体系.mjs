@@ -8,7 +8,9 @@ const REPO_ROOT = path.resolve(WEBSITE_ROOT, '..')
 const PRACTICE_DIR = path.join(REPO_ROOT, '33-实践体系', '实践卡')
 const RELATION_FILE = path.join(REPO_ROOT, '33-实践体系', '实践关系-v1.json')
 const COMPONENT_FILE = path.join(WEBSITE_ROOT, 'docs', '.vitepress', 'theme', 'components', 'PracticeJournal.vue')
+const TRIAL_COMPONENT_FILE = path.join(WEBSITE_ROOT, 'docs', '.vitepress', 'theme', 'components', 'PracticeTrial.vue')
 const MODEL_FILE = path.join(WEBSITE_ROOT, 'docs', '.vitepress', 'theme', 'practice', 'practice-model.mjs')
+const TRIAL_MODEL_FILE = path.join(WEBSITE_ROOT, 'docs', '.vitepress', 'theme', 'practice', 'practice-trial.mjs')
 const MIGRATION_FILE = path.join(WEBSITE_ROOT, 'docs', '.vitepress', 'theme', 'practice', 'practice-migrations.mjs')
 const STATS_FILE = path.join(WEBSITE_ROOT, 'docs', '.vitepress', 'theme', 'practice', 'practice-stats.mjs')
 const SAFETY_FILE = path.join(WEBSITE_ROOT, 'docs', '.vitepress', 'theme', 'practice', 'practice-safety.mjs')
@@ -16,11 +18,13 @@ const AI_FILE = path.join(WEBSITE_ROOT, 'docs', '.vitepress', 'theme', 'practice
 const STAGE_FILE = path.join(WEBSITE_ROOT, 'docs', '.vitepress', 'theme', 'practice', 'practice-stage.mjs')
 const TEST_FILE = path.join(WEBSITE_ROOT, 'tests', 'practice-journal.test.mjs')
 const MIGRATION_TEST_FILE = path.join(WEBSITE_ROOT, 'tests', 'practice-migrations.test.mjs')
+const TRIAL_TEST_FILE = path.join(WEBSITE_ROOT, 'tests', 'practice-trial.test.mjs')
 const PRACTICE_PAGE = path.join(WEBSITE_ROOT, 'docs', 'practice', 'index.md')
 const THEME_INDEX = path.join(WEBSITE_ROOT, 'docs', '.vitepress', 'theme', 'index.ts')
 const PACKAGE_FILE = path.join(WEBSITE_ROOT, 'package.json')
 const GENERATOR_FILE = path.join(WEBSITE_ROOT, 'scripts', '生成网站页面.mjs')
 const DAILY_E2E_FILE = path.join(WEBSITE_ROOT, 'scripts', 'e2e-practice-daily.mjs')
+const TRIAL_E2E_FILE = path.join(WEBSITE_ROOT, 'scripts', 'e2e-practice-trial.mjs')
 
 const requiredDocs = [
   '33-实践体系/实践系统设计方案-V0.2.md',
@@ -89,17 +93,21 @@ for (const rel of requiredDocs) assert(existsSync(path.join(REPO_ROOT, rel)), `�
 assert(existsSync(PRACTICE_DIR), '缺少 33-实践体系/实践卡 目录')
 assert(existsSync(RELATION_FILE), '缺少 33-实践体系/实践关系-v1.json')
 assert(existsSync(COMPONENT_FILE), '缺少 PracticeJournal.vue')
+assert(existsSync(TRIAL_COMPONENT_FILE), '缺少 PracticeTrial.vue')
 assert(existsSync(GENERATOR_FILE), '缺少网站页面生成器')
 assert(existsSync(DAILY_E2E_FILE), '缺少今日修持 Chromium 回归脚本')
+assert(existsSync(TRIAL_E2E_FILE), '缺少7天产品观察 Chromium 回归脚本')
 for (const [file, label] of [
   [MODEL_FILE, 'practice-model.mjs'],
+  [TRIAL_MODEL_FILE, 'practice-trial.mjs'],
   [MIGRATION_FILE, 'practice-migrations.mjs'],
   [STATS_FILE, 'practice-stats.mjs'],
   [SAFETY_FILE, 'practice-safety.mjs'],
   [AI_FILE, 'practice-ai.mjs'],
   [STAGE_FILE, 'practice-stage.mjs'],
   [TEST_FILE, 'practice-journal.test.mjs'],
-  [MIGRATION_TEST_FILE, 'practice-migrations.test.mjs']
+  [MIGRATION_TEST_FILE, 'practice-migrations.test.mjs'],
+  [TRIAL_TEST_FILE, 'practice-trial.test.mjs']
 ]) assert(existsSync(file), `缺少实践模块或测试：${label}`)
 
 const files = existsSync(PRACTICE_DIR)
@@ -174,7 +182,9 @@ for (const relation of relationData.relations || []) {
 }
 
 const component = readFileSync(COMPONENT_FILE, 'utf8')
+const trialComponent = readFileSync(TRIAL_COMPONENT_FILE, 'utf8')
 const model = readFileSync(MODEL_FILE, 'utf8')
+const trialModel = readFileSync(TRIAL_MODEL_FILE, 'utf8')
 const migration = readFileSync(MIGRATION_FILE, 'utf8')
 const stats = readFileSync(STATS_FILE, 'utf8')
 const safety = readFileSync(SAFETY_FILE, 'utf8')
@@ -182,17 +192,22 @@ const ai = readFileSync(AI_FILE, 'utf8')
 const stage = readFileSync(STAGE_FILE, 'utf8')
 const tests = readFileSync(TEST_FILE, 'utf8')
 const migrationTests = readFileSync(MIGRATION_TEST_FILE, 'utf8')
+const trialTests = readFileSync(TRIAL_TEST_FILE, 'utf8')
 const generator = readFileSync(GENERATOR_FILE, 'utf8')
 const dailyE2E = readFileSync(DAILY_E2E_FILE, 'utf8')
+const trialE2E = readFileSync(TRIAL_E2E_FILE, 'utf8')
 const practicePage = readFileSync(PRACTICE_PAGE, 'utf8')
 const themeIndex = readFileSync(THEME_INDEX, 'utf8')
 const packageJson = JSON.parse(readFileSync(PACKAGE_FILE, 'utf8'))
-const clientCode = [component, model, migration, stats, safety, ai, stage].join('\n')
+const clientCode = [component, trialComponent, model, trialModel, migration, stats, safety, ai, stage].join('\n')
 
 assert(model.includes('wendaozhi.practice.records.v1'), '数据模型缺少版本化本地存储键')
 assert(model.includes('SCHEMA_VERSION'), '数据模型缺少 SCHEMA_VERSION')
 assert(model.includes('mergeImportPayload'), '数据模型缺少导入合并规则')
 assert(model.includes('migrateEnvelope'), 'JSON导入尚未接入schema迁移器')
+assert(trialModel.includes('wendaozhi.practice.trial.v1'), '7天产品观察必须使用独立本地存储键')
+assert(trialModel.includes('buildTrialSummary'), '7天产品观察缺少独立摘要规则')
+assert(!trialModel.includes('practiceId') && !trialModel.includes('severity') && !trialModel.includes('durationMinutes'), '产品观察模型不得写入修持核心字段')
 assert(migration.includes('PRACTICE_MIGRATIONS'), '迁移模块缺少显式迁移注册表')
 assert(migration.includes('future_version'), '迁移模块缺少未来版本拒绝规则')
 assert(migration.includes('missing_migration'), '迁移模块缺少迁移链断裂保护')
@@ -211,7 +226,9 @@ assert(tests.includes('只允许讨论分流'), '实践测试尚未覆盖稳定�
 assert(migrationTests.includes('未来 schema 版本拒绝自动降级'), 'schema测试尚未覆盖未来版本保护')
 assert(migrationTests.includes('缺少逐版本迁移函数'), 'schema测试尚未覆盖迁移链缺失')
 assert(migrationTests.includes('不修改输入对象'), 'schema测试尚未覆盖纯函数迁移要求')
-assert(!/\bfetch\s*\(|XMLHttpRequest|axios\s*\./.test(clientCode), '实践记录第一阶段不得包含自动网络上传代码')
+assert(trialTests.includes('不生成阶段或修炼结论'), '产品观察测试必须证明不生成修炼阶段或总分')
+assert(trialTests.includes('未来试运行观察版本拒绝被旧版本覆盖'), '产品观察测试缺少未来版本保护')
+assert(!/\bfetch\s*\(|XMLHttpRequest|axios\s*\./.test(clientCode), '实践记录与产品观察不得包含自动网络上传代码')
 assert(component.includes('parseAndMigrateStored'), 'PracticeJournal 本地读取尚未接入schema迁移器')
 assert(component.includes('exportPayload') && component.includes('mergeImportPayload'), 'PracticeJournal 应使用统一 JSON 数据模型')
 assert(component.includes('buildSafetyReview'), 'PracticeJournal 应使用独立安全规则')
@@ -222,19 +239,27 @@ assert(component.includes('applyPracticeEntryFromUrl'), 'PracticeJournal 缺少�
 assert(component.includes('URLSearchParams'), 'PracticeJournal 尚未解析 practice 查询参数')
 assert(component.includes('id="practice-journal"'), 'PracticeJournal 缺少反向入口锚点 practice-journal')
 assert(component.includes('entrySafety') && component.includes('aggregateRecent(records.value'), '实践卡 URL 入口必须先依据已载入记录计算安全状态')
+assert(trialComponent.includes('TRIAL_STORAGE_KEY'), 'PracticeTrial 必须使用独立产品观察存储键')
+assert(trialComponent.includes('不进入修持记录'), 'PracticeTrial 缺少修持数据隔离说明')
+assert(trialComponent.includes('不参与阶段判断'), 'PracticeTrial 缺少阶段隔离说明')
 assert(generator.includes('记录本次实践'), '实践详情生成器缺少“记录本次实践”反向入口')
 assert(generator.includes('?practice=') && generator.includes('#practice-journal'), '实践详情生成器缺少 practice 参数或工作台锚点')
 assert(dailyE2E.includes('双向实践卡导航'), '今日修持 Chromium 尚未覆盖双向实践卡导航')
 assert(dailyE2E.includes('实践卡链接不能绕过安全状态'), '今日修持 Chromium 尚未覆盖 URL 参数安全覆盖')
+assert(trialE2E.includes('产品观察独立保存'), '7天产品观察 Chromium 尚未覆盖独立保存')
+assert(trialE2E.includes('修持记录隔离'), '7天产品观察 Chromium 尚未覆盖与修持记录隔离')
 assert(practicePage.includes('<PracticeJournal />'), '实践首页尚未挂载 PracticeJournal')
+assert(practicePage.includes('<PracticeTrial />'), '实践首页尚未挂载 PracticeTrial')
 assert(practicePage.includes('第一次正式试用：先跑 7 天'), '实践首页缺少7天首轮试运行入口')
 assert(practicePage.includes('不追求“练满”'), '实践首页缺少首轮非打卡边界')
 assert(themeIndex.includes("app.component('PracticeJournal'"), '主题入口尚未全局注册 PracticeJournal')
+assert(themeIndex.includes("app.component('PracticeTrial'"), '主题入口尚未全局注册 PracticeTrial')
 assert(packageJson.scripts?.['test:practice'], 'package.json 缺少 test:practice')
 assert(String(packageJson.scripts?.['test:practice'] || '').includes('practice-*.test.mjs'), 'test:practice 尚未覆盖全部实践测试文件')
 assert(String(packageJson.scripts?.test || '').includes('test:practice'), 'npm test 尚未纳入实践场景回归')
 assert(packageJson.scripts?.['test:e2e:daily'], 'package.json 缺少 test:e2e:daily')
+assert(packageJson.scripts?.['test:e2e:trial'], 'package.json 缺少 test:e2e:trial')
 
 if (!process.exitCode) {
-  console.log(`[实践体系检查] 通过：${files.length} 张实践卡，${relationData.relations.length} 条实践关系，6 个规则模块、30天阶段复盘、schema迁移保护、双向实践导航与7天首轮试运行协议有效。`)
+  console.log(`[实践体系检查] 通过：${files.length} 张实践卡，${relationData.relations.length} 条实践关系，6 个修持规则模块、独立7天产品观察模型、30天阶段复盘、schema迁移保护、双向实践导航与首轮试运行隔离有效。`)
 }
