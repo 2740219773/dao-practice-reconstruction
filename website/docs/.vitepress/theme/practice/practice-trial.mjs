@@ -2,7 +2,7 @@ export const TRIAL_STORAGE_KEY = 'wendaozhi.practice.trial.v1'
 export const TRIAL_SCHEMA_VERSION = 1
 
 export const TRIAL_DURATION_OPTIONS = ['under_1m', '1_to_2m', 'over_2m', 'not_saved']
-export const TRIAL_ENTRY_OPTIONS = ['today', 'card', 'direct', 'skip']
+export const TRIAL_ENTRY_OPTIONS = ['today', 'card', 'direct', 'skip', 'not_used']
 
 function text(value, max = 160) {
   return String(value ?? '').trim().slice(0, max)
@@ -14,17 +14,20 @@ function bool(value) {
 
 export function normalizeTrialEntry(input = {}) {
   const date = /^\d{4}-\d{2}-\d{2}$/.test(String(input.date || '')) ? String(input.date) : ''
-  const duration = TRIAL_DURATION_OPTIONS.includes(input.duration) ? input.duration : 'not_saved'
-  const entry = TRIAL_ENTRY_OPTIONS.includes(input.entry) ? input.entry : 'today'
+  const usedWorkbench = input.usedWorkbench !== false
+  const duration = usedWorkbench && TRIAL_DURATION_OPTIONS.includes(input.duration) ? input.duration : 'not_saved'
+  const entry = usedWorkbench && TRIAL_ENTRY_OPTIONS.includes(input.entry) && input.entry !== 'not_used' ? input.entry : 'not_used'
+  const unclearField = usedWorkbench && bool(input.unclearField)
+  const lowValueField = usedWorkbench && bool(input.lowValueField)
   return {
     date,
-    usedWorkbench: input.usedWorkbench !== false,
+    usedWorkbench,
     duration,
     entry,
-    unclearField: bool(input.unclearField),
-    unclearFieldName: bool(input.unclearField) ? text(input.unclearFieldName, 80) : '',
-    lowValueField: bool(input.lowValueField),
-    lowValueFieldName: bool(input.lowValueField) ? text(input.lowValueFieldName, 80) : '',
+    unclearField,
+    unclearFieldName: unclearField ? text(input.unclearFieldName, 80) : '',
+    lowValueField,
+    lowValueFieldName: lowValueField ? text(input.lowValueFieldName, 80) : '',
     pressureFeeling: bool(input.pressureFeeling),
     note: text(input.note, 240)
   }
@@ -63,6 +66,7 @@ export function buildTrialSummary(entries = []) {
   let lowValueCount = 0
   let pressureCount = 0
   let workbenchDays = 0
+  let unusedDays = 0
 
   for (const item of valid) {
     entryCounts[item.entry] += 1
@@ -71,14 +75,17 @@ export function buildTrialSummary(entries = []) {
     if (item.lowValueField) lowValueCount += 1
     if (item.pressureFeeling) pressureCount += 1
     if (item.usedWorkbench) workbenchDays += 1
+    else unusedDays += 1
   }
 
   const mostUsedEntry = Object.entries(entryCounts)
+    .filter(([key]) => key !== 'not_used')
     .sort((a, b) => b[1] - a[1])[0]
 
   return {
     observationCount: valid.length,
     workbenchDays,
+    unusedDays,
     unclearCount,
     lowValueCount,
     pressureCount,
