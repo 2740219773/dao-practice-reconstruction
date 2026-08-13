@@ -1,0 +1,25 @@
+/*
+ * V2.7 首轮试运行第二轮减法。
+ *
+ * 这三个内容保留在既有 schema / 复盘结构中兼容旧数据，但不再主动占据每日记录首屏：
+ * - “阶段方向”只应在 30 天阶段页解释，不在“今日修持”制造升级感；
+ * - “情绪状态”当前不参与 7 天安全规则或 30 天能力判断，新记录默认 not_observed；
+ * - “下次决定”当前不参与安全/阶段计算，新记录默认 not_decided。
+ *
+ * 使用 :has() 仅针对现代浏览器产品层；数据层仍有独立默认值与校验，不依赖 CSS 保证语义。
+ */
+
+/* 今日卡只保留“今天有没有记录”，不展示阶段/升级方向。 */
+.practice-journal .pj-today__meta > span:first-child {
+  display: none;
+}
+
+/* 情绪是可选历史字段，不再作为每次修持的必填/默认信息。 */
+.practice-journal .pj-grid > label:has(select option[value="stable"]) {
+  display: none;
+}
+
+/* 下次决定改为复盘语义；日常保存默认“未决定”，不再默认“继续”。 */
+.practice-journal .pj-grid--small > label:has(select option[value="continue"]) {
+  display: none;
+}
