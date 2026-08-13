@@ -81,10 +81,10 @@ async function main() {
     if (response.status !== 200) throw new Error(`${label} ${pathname} 返回 ${response.status}`)
     if (pathname === '/practice/') {
       const text = await response.text()
-      const required = ['PRACTICE-004', '今日修持', '30天与阶段', '今天决定不练', 'practice-journal']
+      const required = ['PRACTICE-004', '今日修持', '30天与阶段', '今天决定不练', 'practice-journal', '7天产品观察', '仅本地保存']
       const missing = required.filter((marker) => !text.includes(marker))
       if (missing.length) {
-        throw new Error(`线上实践工作台缺少 V2.6 锚点：${missing.join('、')}`)
+        throw new Error(`线上实践工作台缺少 V2.7 锚点：${missing.join('、')}`)
       }
     }
     if (pathname === '/practice/card/natural-breath') {
