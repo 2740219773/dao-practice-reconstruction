@@ -12,6 +12,7 @@ import './styles/layout.css'
 import './styles/components.css'
 import './styles/ink-theme.css'
 import './styles/fidelity.css'
+import './styles/practice-reduction.css'
 
 export default {
   Layout,
