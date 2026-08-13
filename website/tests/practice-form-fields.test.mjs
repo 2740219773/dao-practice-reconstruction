@@ -25,6 +25,19 @@ test('每张实践卡声明自己的最小观察字段', () => {
   assert.equal(practiceUsesField('practice.basic.short_sitting', 'after'), true)
 })
 
+test('新记录默认不虚构情绪状态或下次决定', () => {
+  const draft = createEmptyRecord(NOW)
+  assert.equal(draft.emotionState, 'not_observed')
+  assert.equal(draft.nextStep, 'not_decided')
+
+  draft.practiceId = 'practice.basic.posture'
+  draft.durationMinutes = 3
+  const result = store(draft, 'no-inference-defaults')
+  assert.equal(result.ok, true)
+  assert.equal(result.record.emotionState, 'not_observed')
+  assert.equal(result.record.nextStep, 'not_decided')
+})
+
 test('自然察息保存时清理不属于本卡的姿势和注意字段', () => {
   const draft = createEmptyRecord(NOW)
   draft.practiceId = 'practice.basic.natural_breath'
@@ -67,6 +80,7 @@ test('主动决定不练时清零练习时长并清理全部练习观察字段',
   draft.postureState = 'stopped'
   draft.breathState = 'clearly_controlled'
   draft.attentionState = 'difficult'
+  draft.emotionState = 'interfered'
   draft.afterState = 'affected'
 
   const result = store(draft, 'skip-fields')
@@ -75,6 +89,7 @@ test('主动决定不练时清零练习时长并清理全部练习观察字段',
   assert.equal(result.record.postureState, 'not_observed')
   assert.equal(result.record.breathState, 'not_observed')
   assert.equal(result.record.attentionState, 'not_practiced')
+  assert.equal(result.record.emotionState, 'not_observed')
   assert.equal(result.record.afterState, 'normal')
 })
 
