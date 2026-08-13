@@ -121,7 +121,9 @@ export function sanitizeDraftForPractice(form) {
     attentionState: skipped || !practiceUsesField(practiceId, 'attention') ? 'not_practiced' : form.attentionState,
     emotionState: skipped ? 'not_observed' : (EMOTION_STATES.has(form.emotionState) ? form.emotionState : 'not_observed'),
     afterState: skipped || !practiceUsesField(practiceId, 'after') ? 'normal' : form.afterState,
-    nextStep: NEXT_STEPS.has(form.nextStep) ? form.nextStep : 'not_decided'
+    issues: skipped ? [] : form.issues,
+    severity: skipped ? 'none' : form.severity,
+    nextStep: skipped ? 'not_decided' : (NEXT_STEPS.has(form.nextStep) ? form.nextStep : 'not_decided')
   }
 }
 
