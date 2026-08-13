@@ -92,7 +92,11 @@ function applyPracticeEntryFromUrl() {
     return
   }
 
-  if (safetyReview.value.level === 'red') {
+  // URL 入口在挂载阶段直接依据已载入 records 计算安全状态，避免依赖计算属性刷新时序。
+  const entryStats = aggregateRecent(records.value, { now: new Date(), days: 7 })
+  const entrySafety = buildSafetyReview(entryStats, { periodLabel: '最近7天' })
+
+  if (entrySafety.level === 'red') {
     form.value = {
       ...createEmptyRecord(),
       date: localDateString(),
@@ -103,7 +107,7 @@ function applyPracticeEntryFromUrl() {
     return
   }
 
-  if (safetyReview.value.level === 'yellow') {
+  if (entrySafety.level === 'yellow') {
     form.value = {
       ...createEmptyRecord(),
       date: localDateString(),
