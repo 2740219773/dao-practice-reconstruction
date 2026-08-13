@@ -4,6 +4,16 @@ function findSelectByOption(form: HTMLFormElement, value: string) {
   return Array.from(form.querySelectorAll('select')).find((select) => select.querySelector(`option[value="${value}"]`)) || null
 }
 
+function setButtonText(button: HTMLButtonElement, text: string) {
+  if (button.textContent !== text) button.textContent = text
+}
+
+function setExpanded(button: HTMLButtonElement, form: HTMLFormElement, expanded: boolean) {
+  form.classList.toggle('pj-safety-expanded', expanded)
+  const value = String(expanded)
+  if (button.getAttribute('aria-expanded') !== value) button.setAttribute('aria-expanded', value)
+}
+
 function ensureToggle(form: HTMLFormElement) {
   let button = form.querySelector<HTMLButtonElement>(':scope > .pj-safety-toggle')
   if (button) return button
@@ -18,8 +28,8 @@ function ensureToggle(form: HTMLFormElement) {
   button.textContent = '异常与安全（没有则跳过）'
   button.addEventListener('click', () => {
     const expanded = !form.classList.contains('pj-safety-expanded')
-    form.classList.toggle('pj-safety-expanded', expanded)
-    button?.setAttribute('aria-expanded', String(expanded))
+    setExpanded(button as HTMLButtonElement, form, expanded)
+    setButtonText(button as HTMLButtonElement, expanded ? '异常与安全 · 已展开' : '异常与安全（没有则跳过）')
   })
   issues.before(button)
   return button
@@ -35,28 +45,29 @@ function syncForm(form: HTMLFormElement) {
   const hasIssue = Boolean(form.querySelector('.pj-issues input:checked'))
   const hasDraftWarning = Boolean(form.querySelector('.pj-draft-notes'))
   const hasSeverity = Boolean(severity && severity.value !== 'none')
-  const needsAttention = hasIssue || hasDraftWarning || hasSeverity
+  const hasObservationConcern = Array.from(form.querySelectorAll('select')).some((select) =>
+    ['clearly_controlled', 'affected', 'stopped'].includes(select.value)
+  )
+  const needsAttention = hasIssue || hasDraftWarning || hasSeverity || hasObservationConcern
 
   form.classList.toggle('pj-safety-skipped', skipped)
   button.hidden = skipped
 
   if (skipped) {
-    form.classList.remove('pj-safety-expanded')
-    button.setAttribute('aria-expanded', 'false')
-    button.textContent = '异常与安全（没有则跳过）'
+    setExpanded(button, form, false)
+    setButtonText(button, '异常与安全（没有则跳过）')
     return
   }
 
   if (needsAttention) {
-    form.classList.add('pj-safety-expanded')
-    button.setAttribute('aria-expanded', 'true')
-    button.textContent = '需要安全核对 · 已展开'
-  } else {
-    button.textContent = form.classList.contains('pj-safety-expanded')
-      ? '异常与安全 · 已展开'
-      : '异常与安全（没有则跳过）'
-    button.setAttribute('aria-expanded', String(form.classList.contains('pj-safety-expanded')))
+    setExpanded(button, form, true)
+    setButtonText(button, '需要安全核对 · 已展开')
+    return
   }
+
+  const expanded = form.classList.contains('pj-safety-expanded')
+  if (button.getAttribute('aria-expanded') !== String(expanded)) button.setAttribute('aria-expanded', String(expanded))
+  setButtonText(button, expanded ? '异常与安全 · 已展开' : '异常与安全（没有则跳过）')
 }
 
 function scan() {
