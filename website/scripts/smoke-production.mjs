@@ -81,10 +81,16 @@ async function main() {
     if (response.status !== 200) throw new Error(`${label} ${pathname} 返回 ${response.status}`)
     if (pathname === '/practice/') {
       const text = await response.text()
-      const required = ['PRACTICE-004', '今日修持', '30天与阶段', '今天决定不练']
+      const required = ['PRACTICE-004', '今日修持', '30天与阶段', '今天决定不练', 'practice-journal']
       const missing = required.filter((marker) => !text.includes(marker))
       if (missing.length) {
-        throw new Error(`线上实践工作台缺少 V2.5 锚点：${missing.join('、')}`)
+        throw new Error(`线上实践工作台缺少 V2.6 锚点：${missing.join('、')}`)
+      }
+    }
+    if (pathname === '/practice/card/natural-breath') {
+      const text = await response.text()
+      if (!text.includes('记录本次实践') || !text.includes('practice=natural-breath') || !text.includes('practice-journal')) {
+        throw new Error('线上自然察息实践卡缺少反向记录入口或工作台锚点')
       }
     }
   }
