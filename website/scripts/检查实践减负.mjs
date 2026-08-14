@@ -6,11 +6,13 @@ const read = (p) => readFileSync(path.join(root, p), 'utf8')
 const assert = (condition, message) => { if (!condition) throw new Error(message) }
 
 const model = read('docs/.vitepress/theme/practice/practice-model.mjs')
+const safety = read('docs/.vitepress/theme/practice/practice-safety.mjs')
 const reduction = read('docs/.vitepress/theme/styles/practice-reduction.css')
 const safetyReduction = read('docs/.vitepress/theme/practice/practice-safety-reduction.ts')
 const reviewReduction = read('docs/.vitepress/theme/practice/practice-review-reduction.ts')
 const themeIndex = read('docs/.vitepress/theme/index.ts')
 const tests = read('tests/practice-form-fields.test.mjs')
+const singleYellowTest = read('tests/practice-safety-single-yellow.test.mjs')
 const e2e = read('scripts/e2e-practice-reduction.mjs')
 const safetyE2E = read('scripts/e2e-practice-safety-reduction.mjs')
 const reviewE2E = read('scripts/e2e-practice-review-reduction.mjs')
@@ -23,6 +25,10 @@ assert(model.includes("const NEXT_STEPS = new Set(['not_decided'"), '下次决�
 assert(model.includes('issues: skipped ? []'), '不练记录必须清理本次练习异常')
 assert(model.includes("severity: skipped ? 'none'"), '不练记录必须清理安全分流')
 assert(model.includes("nextStep: skipped ? 'not_decided'"), '不练记录不得残留下次决定')
+
+assert(safety.includes("code: 'yellow_event'"), '单次黄色事件不能缺少独立复盘规则')
+assert(safety.includes('不应因为只出现一次就被当作“状态稳定”'), '单次黄色事件不得被稳定提示覆盖')
+assert(singleYellowTest.includes('单次黄色事件不会被稳定提示覆盖'), '自动测试未覆盖单次黄色事件复盘语义')
 
 assert(reduction.includes('.pj-today__meta > span:first-child'), '首屏减负未移除今日卡阶段方向')
 assert(reduction.includes('option[value="stable"]'), '首屏减负未退出日常情绪字段')
@@ -64,7 +70,8 @@ assert(safetyE2E.includes('不练记录仍携带练习异常或后续决定'), '
 assert(reviewE2E.includes('规则提醒没有成为首要内容'), 'Chromium 未覆盖7天规则提醒首要展示')
 assert(reviewE2E.includes('数字或AI材料没有默认后移'), 'Chromium 未覆盖7天数字/AI默认折叠')
 assert(reviewE2E.includes('真实重复问题被减负层隐藏'), 'Chromium 未覆盖真实重复问题保持可见')
+assert(reviewE2E.includes('安全规则提醒没有直接可见'), 'Chromium 未覆盖单次黄色规则提醒直接可见')
 assert(String(packageJson.scripts?.['test:e2e:daily'] || '').includes('e2e-practice-safety-reduction.mjs'), '每日 E2E 尚未纳入异常安全减负回归')
 assert(String(packageJson.scripts?.['test:e2e:daily'] || '').includes('e2e-practice-review-reduction.mjs'), '实践减负 E2E 尚未纳入7天复盘回归')
 
-console.log('[实践减负检查通过] 日常入口、异常安全与7天复盘均按需展开；规则提醒和真实重复问题保持优先可见。')
+console.log('[实践减负检查通过] 日常入口、异常安全与7天复盘均按需展开；单次黄色、规则提醒和真实重复问题保持优先可见。')
