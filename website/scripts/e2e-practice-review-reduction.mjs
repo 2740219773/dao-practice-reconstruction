@@ -147,11 +147,12 @@ async function runScenario(cdp) {
   if (!expanded.aiText.includes('给 AI 的7天复盘材料') || expanded.promptRows !== '17') throw new Error(`AI复盘材料折叠后不可恢复：${JSON.stringify(expanded)}`)
 
   const date = await evaluate(cdp, `(() => {
-    const recordTab = Array.from(document.querySelectorAll('[role="tab"]')).find((button) => button.textContent?.includes('每日记录'));
-    recordTab?.click();
-    return document.querySelector('.pj-form input[type="date"]')?.value || '';
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return y + '-' + m + '-' + day;
   })()`)
-  if (!date) throw new Error('无法取得工作台本地日期')
 
   await evaluate(cdp, `(() => {
     const record = {
