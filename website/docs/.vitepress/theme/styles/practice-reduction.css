@@ -2,11 +2,12 @@
  * V2.7 首轮试运行减负。
  *
  * 低频/复盘字段继续留在 schema 中兼容旧记录，但不主动占据每日入口。
- * 第三轮进一步把异常与安全区改成“正常时折叠、需要时展开”：
- * - 不删除任何安全字段；
- * - 不自动判定黄色/红色；
- * - 出现草稿安全提醒、已勾选异常或已选安全级别时自动展开；
- * - “今天决定不练”不展示“本次练习异常”区。
+ * 第三轮把异常与安全区改成“正常时折叠、需要时展开”。
+ * 第四轮继续压低 7 天复盘的信息密度：
+ * - 第一眼只看规则提醒与重复问题；
+ * - 6 项数字统计保留，但默认折叠；
+ * - AI 复盘材料保留，但默认折叠；
+ * - 没有重复问题时压缩为轻提示。
  */
 
 /* 今日卡只保留“今天有没有记录”，不展示阶段/升级方向。 */
@@ -56,4 +57,72 @@
 .practice-journal .pj-form.pj-safety-skipped .pj-draft-notes,
 .practice-journal .pj-form.pj-safety-skipped .pj-redbox {
   display: none !important;
+}
+
+/* 第四轮：7 天复盘按“结论 → 问题 → 明细 → AI”排列。 */
+.practice-journal .pj-review[data-review-reduction="1"] {
+  display: flex;
+  flex-direction: column;
+}
+
+.practice-journal .pj-review-guide {
+  order: 0;
+  margin: 0 0 10px;
+  padding: 10px 12px;
+  border-left: 3px solid var(--vp-c-divider);
+  color: var(--vp-c-text-2);
+  background: var(--vp-c-bg-soft);
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.practice-journal .pj-review [data-review-kind="rules"] { order: 1; }
+.practice-journal .pj-review [data-review-kind="issues"] { order: 2; }
+.practice-journal .pj-review-stats-details { order: 3; }
+.practice-journal .pj-review-ai-details { order: 4; }
+
+.practice-journal .pj-review-details {
+  margin-top: 12px;
+  padding: 11px 13px;
+  border: 1px dashed var(--vp-c-divider);
+  border-radius: 10px;
+  color: var(--vp-c-text-2);
+  background: transparent;
+}
+
+.practice-journal .pj-review-details[open] {
+  border-style: solid;
+  background: var(--vp-c-bg);
+}
+
+.practice-journal .pj-review-details > summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--vp-c-text-1);
+}
+
+.practice-journal .pj-review-details > .pj-stats,
+.practice-journal .pj-review-details > .pj-panel {
+  margin-top: 12px;
+}
+
+.practice-journal .pj-review-details > .pj-panel {
+  margin-bottom: 0;
+}
+
+.practice-journal .pj-review-empty-issues {
+  padding: 10px 12px;
+  border-style: dashed;
+  background: transparent;
+}
+
+.practice-journal .pj-review-empty-issues h3 {
+  margin-bottom: 3px;
+  font-size: 14px;
+}
+
+.practice-journal .pj-review-empty-issues p {
+  margin: 0;
+  color: var(--vp-c-text-2);
+  font-size: 13px;
 }
