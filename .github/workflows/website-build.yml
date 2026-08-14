@@ -35,7 +35,7 @@ jobs:
         run: npm run build
       - name: Chromium实践工作台端到端回归
         run: npm run test:e2e:practice
-      - name: Chromium今日修持减负端到端回归
+      - name: Chromium实践减负端到端回归
         run: npm run test:e2e:daily
       - name: Chromium7天产品观察端到端回归
         run: npm run test:e2e:trial
