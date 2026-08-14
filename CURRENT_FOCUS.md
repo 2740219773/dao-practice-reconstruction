@@ -1,8 +1,8 @@
 # 当前聚焦工作包
 
 当前工作包：PRACTICE-007「7天首轮真实试运行与产品减法」  
-当前状态：V2.7 第五轮“30天复盘去等级化与安全优先”完成，进入真实 7 天使用观察  
-当前基线：V3.8 知识图谱稳定；8 张 S1 基础实践卡；7天/30天复盘；schema v1；40 个实践/试运行测试；4 条 Chromium CI 入口；Cloudflare Pages 当前提交验证  
+当前状态：V2.7 五轮产品减法 + Chromium 可访问性自动基线完成，进入真实 7 天使用观察  
+当前基线：V3.8 知识图谱稳定；8 张 S1 基础实践卡；7天/30天复盘；schema v1；40 个实践/试运行测试；4 条 Chromium CI 入口；`test:e2e:daily` 内部 6 段；Cloudflare Pages 当前提交验证  
 当前分支：main  
 线上站点：`https://wendaozhi.pages.dev/`
 
@@ -165,7 +165,44 @@ AI阶段复盘材料（可选，默认折叠）
 
 ---
 
-## 四、当前使用层级
+## 四、可访问性自动基线
+
+真实试运行前已增加一层不改变业务规则的可访问性增强：
+
+- `practice-accessibility.ts`；
+- `practice-accessibility.css`；
+- `e2e-practice-accessibility.mjs`；
+- `33-实践体系/实践工作台可访问性验证-V1.0.md`。
+
+当前 Chromium 已验证：
+
+```text
+Tab 与 TabPanel 一一关联
+↓
+可见表单控件都有可访问名称
+↓
+今日入口动作后焦点进入日期字段
+↓
+红色安全阻断使用 alert + assertive
+↓
+390×844 触控仿真进入 coarse pointer
+↓
+主要触控目标至少 44px
+```
+
+同时增加：
+
+- `:focus-visible` 焦点轮廓；
+- 粗指针环境下按钮、标签页、折叠入口最小 44px 高度；
+- 红色事件提示框使用紧急播报语义。
+
+边界：
+
+> Chromium 自动化可访问性基础已建立，不等于 VoiceOver / TalkBack / NVDA / JAWS 或 Safari 真机已经验证。
+
+---
+
+## 五、当前使用层级
 
 ### 每日入口
 
@@ -225,7 +262,7 @@ AI阶段复盘材料（可选，默认折叠）
 
 ---
 
-## 五、自动化基线
+## 六、自动化基线
 
 ### 40 个实践 / schema / 试运行测试
 
@@ -247,11 +284,11 @@ AI阶段复盘材料（可选，默认折叠）
 CI 顶层仍为：
 
 1. `test:e2e:practice`：通用工作台、JSON、剪贴板、确认框、安全、移动端；
-2. `test:e2e:daily`：实践产品减负主链；
+2. `test:e2e:daily`：实践产品减负 + 可访问性主链；
 3. `test:e2e:trial`：7天产品观察隔离与减负；
 4. `test:e2e:theme`：日读/夜读、持久化、ARIA、390px 移动端。
 
-`test:e2e:daily` 现在串行五段：
+`test:e2e:daily` 现在串行六段：
 
 ```text
 e2e-practice-daily.mjs
@@ -263,18 +300,17 @@ e2e-practice-safety-reduction.mjs
 e2e-practice-review-reduction.mjs
 ↓
 e2e-practice-stage-reduction.mjs
+↓
+e2e-practice-accessibility.mjs
 ```
 
-第五段真实验证：
+第六段真实验证：
 
-- 标签页显示“30天复盘”；
-- “阶段方向”退出用户界面，改为“当前建议”；
-- 当前建议明确不是境界、认证、完成度或自动解锁；
-- 6项统计、30天分布、四类观察维度默认折叠且可完整恢复；
-- AI阶段材料默认折叠且可完整恢复；
-- 单次黄色事件优先显示；
-- 红色事件优先显示并保持暂停长期推进；
-- 黄/红事件不会自动展开低频证据与 AI 内容抢占注意力。
+- 标签页 `id / aria-controls` 与 `tabpanel / aria-labelledby` 对应；
+- 可见输入、选择和文本控件具有可访问名称；
+- 今日入口动作后键盘焦点进入记录表单；
+- 红色安全阻断使用紧急播报；
+- 390px 触控目标满足 44px 基线。
 
 ### 质量门
 
@@ -288,14 +324,16 @@ e2e-practice-stage-reduction.mjs
 
 共同约束。
 
-第五轮新增硬约束：
+现在同时要求：
 
-- 必须存在30天复盘减负层；
-- 用户入口使用“30天复盘”而不是默认强调“阶段”；
-- “当前建议”必须带非等级/非认证边界；
-- 30天记录依据与 AI 材料必须按需展开；
-- 黄色/红色安全事件必须优先于长期建议；
-- 必须有真实 Chromium 覆盖。
+- 五轮减法不能回退；
+- 黄/红安全事件必须优先；
+- 30天记录依据不是等级；
+- 可访问性增强必须启用；
+- 标签页必须有完整程序化关系；
+- 红色提示必须有紧急播报语义；
+- 必须存在 `focus-visible` 与粗指针 44px 触控基线；
+- 必须有真实 Chromium 可访问性回归。
 
 ### Cloudflare Pages
 
@@ -305,11 +343,11 @@ e2e-practice-stage-reduction.mjs
 
 追上当前 GitHub SHA 后才执行线上冒烟。
 
-第五轮代码提交 `89a23af8` 已完整通过：图谱、实践质量门、40 个自动场景、网站构建、全部 Chromium、构建产物与 Cloudflare 当前提交验证。
+可访问性代码提交 `9d7bf055` 已完整通过：图谱、实践质量门、40 个自动场景、网站构建、全部 Chromium、构建产物与 Cloudflare 当前提交验证。
 
 ---
 
-## 六、现在真正要做的事
+## 七、现在真正要做的事
 
 ### P0：真实 7 天使用
 
@@ -325,21 +363,23 @@ e2e-practice-stage-reduction.mjs
 - 哪些字段或页面连续一周都没有使用价值；
 - 哪些词仍像等级、考核或自动升级。
 
-### P1：真实设备差异
+### P1：真实设备与辅助技术差异
 
-仍待：
+Chromium 自动基线已经完成，仍待：
 
-- Edge；
+- Edge 真机；
 - Safari；
 - iOS Safari；
 - Android Chrome；
 - 真机 JSON 下载 / 导入；
 - 夜读真实视觉；
-- 屏幕阅读器与键盘焦点。
+- NVDA / VoiceOver / TalkBack 等真实屏幕阅读器；
+- 浏览器缩放、高对比模式、系统字体放大；
+- 真实手指触控误触与焦点体验。
 
 ---
 
-## 七、继续冻结
+## 八、继续冻结
 
 真实试运行数据回来之前继续冻结：
 
