@@ -6,6 +6,7 @@ import Layout from './Layout.vue'
 import PracticeJournal from './components/PracticeJournal.vue'
 import PracticeTrial from './components/PracticeTrial.vue'
 import { installPracticeSafetyReduction } from './practice/practice-safety-reduction'
+import { installPracticeReviewReduction } from './practice/practice-review-reduction'
 import './style.css'
 import './styles/tokens.css'
 import './styles/typography.css'
@@ -21,5 +22,6 @@ export default {
     app.component('PracticeJournal', PracticeJournal)
     app.component('PracticeTrial', PracticeTrial)
     installPracticeSafetyReduction()
+    installPracticeReviewReduction()
   }
 }
