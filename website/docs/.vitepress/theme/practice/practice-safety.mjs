@@ -26,6 +26,15 @@ export function buildSafetyReview(stats, { periodLabel = '最近7天' } = {}) {
     flags.push({ level: 'yellow', code: 'repeated_over_limit', text: `${periodLabel}有多次实际时长超过当前卡片审查上限。记录应保留，但下一步优先回到已审查负荷，而不是把超时常态化。` })
   }
 
+  // 单次黄色是用户已经明确记录的安全分流，不能因为“尚未重复”而被稳定提示覆盖。
+  if ((stats?.yellowCount || 0) > 0 && !flags.some((flag) => flag.level === 'yellow')) {
+    flags.push({
+      level: 'yellow',
+      code: 'yellow_event',
+      text: `${periodLabel}存在 ${stats.yellowCount} 次黄色事件。先按当次记录的暂停、回退或观察处理；它不等于医学诊断，也不应因为只出现一次就被当作“状态稳定”。`
+    })
+  }
+
   if (!stats?.recordCount) {
     flags.push({ level: 'info', code: 'empty', text: `${periodLabel}还没有记录。可以从一次短时、低负荷的基础实践开始，也可以选择今天不练。` })
   } else if (!flags.length) {
