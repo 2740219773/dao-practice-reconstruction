@@ -1,0 +1,30 @@
+/* 实践工作台可访问性增强：不改变信息层级，只补键盘焦点和触控尺寸。 */
+.practice-journal :where(button, a, input, select, textarea, summary):focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+.practice-journal .pj-tabs [role="tab"]:focus-visible {
+  outline-offset: 2px;
+}
+
+@media (pointer: coarse) {
+  .practice-journal .pj-tabs button,
+  .practice-journal .pj-primary,
+  .practice-journal .pj-secondary,
+  .practice-journal .pj-danger,
+  .practice-journal .pj-link-button,
+  .practice-journal summary {
+    min-height: 44px;
+  }
+
+  .practice-journal .pj-check {
+    min-height: 44px;
+    padding-block: 4px;
+  }
+
+  .practice-journal .pj-check input[type="checkbox"] {
+    min-width: 20px;
+    min-height: 20px;
+  }
+}
