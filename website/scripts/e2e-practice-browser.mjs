@@ -109,7 +109,7 @@ async function runScenario(cdp) {
   await waitFor(cdp, `document.readyState === 'complete' && document.querySelector('.pj-form')`)
 
   const tabs = await evaluate(cdp, `Array.from(document.querySelectorAll('.pj-tabs button')).map(b=>({text:b.textContent.trim(),role:b.getAttribute('role'),selected:b.getAttribute('aria-selected')}))`)
-  for (const label of ['每日记录', '最近7天', '30天与阶段', '数据管理']) {
+  for (const label of ['每日记录', '最近7天', '30天复盘', '数据管理']) {
     if (!tabs.some((item) => item.text === label && item.role === 'tab')) throw new Error(`缺少可访问标签页：${label}`)
   }
   if (tabs.find((item) => item.text === '每日记录')?.selected !== 'true') throw new Error('默认标签页 aria-selected 错误')
@@ -204,10 +204,10 @@ async function runScenario(cdp) {
   })()`)
   if (!clipboardDenied.includes('请手动选择下方文本复制')) throw new Error('剪贴板拒绝后没有降级提示')
 
-  await clickTab(cdp, '30天与阶段')
-  await waitFor(cdp, `document.querySelector('.pj-stage')`)
+  await clickTab(cdp, '30天复盘')
+  await waitFor(cdp, `document.querySelector('.pj-stage[data-stage-reduction="1"]')`)
   const stageText = await evaluate(cdp, `document.querySelector('.pj-stage').innerText`)
-  if (!stageText.includes('继续当前阶段，先补足记录')||!stageText.includes('记录支持状态')) throw new Error('记录不足时阶段阻断异常')
+  if (!stageText.includes('当前建议')||!stageText.includes('继续当前阶段，先补足记录')||!stageText.includes('查看30天记录依据（不是等级）')) throw new Error('记录不足时30天建议或证据折叠异常')
 
   await clickTab(cdp, '每日记录')
   const redSaved = await evaluate(cdp, `(async()=>{
@@ -216,16 +216,17 @@ async function runScenario(cdp) {
   })()`)
   if (!redSaved) throw new Error('红色事件未保存')
 
-  await clickTab(cdp, '30天与阶段')
+  await clickTab(cdp, '30天复盘')
+  await waitFor(cdp, `document.querySelector('.pj-stage[data-stage-reduction="1"]')`)
   const redText = await evaluate(cdp, `document.querySelector('.pj-stage').innerText`)
-  if (!redText.includes('因安全原因暂停并处理异常')||!redText.includes('安全边界')) throw new Error('红色事件后未暂停阶段推进')
+  if (!redText.includes('30天安全提醒')||!redText.includes('红色事件')||!redText.includes('因安全原因暂停并处理异常')||!redText.includes('安全边界')) throw new Error('红色事件后未优先显示安全并暂停长期推进')
 
   await cdp.call('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true })
   await sleep(180)
   const mobile = await evaluate(cdp, `({viewport:window.innerWidth,journalWidth:document.querySelector('.practice-journal').getBoundingClientRect().width,tabsOverflow:getComputedStyle(document.querySelector('.pj-tabs')).overflowX,pageOverflow:document.documentElement.scrollWidth-window.innerWidth})`)
   if (mobile.journalWidth>mobile.viewport+1||!['auto','scroll'].includes(mobile.tabsOverflow)||mobile.pageOverflow>8) throw new Error(`窄屏异常：${JSON.stringify(mobile)}`)
 
-  console.log('[e2e] 通过：最小字段、普通/不练记录、键盘、JSON、剪贴板、删除/清空、阶段安全阻断与390px窄屏正常。')
+  console.log('[e2e] 通过：最小字段、普通/不练记录、键盘、JSON、剪贴板、删除/清空、30天安全优先与390px窄屏正常。')
 }
 
 async function main() {
