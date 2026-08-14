@@ -8,6 +8,7 @@ import PracticeTrial from './components/PracticeTrial.vue'
 import { installPracticeSafetyReduction } from './practice/practice-safety-reduction'
 import { installPracticeReviewReduction } from './practice/practice-review-reduction'
 import { installPracticeStageReduction } from './practice/practice-stage-reduction'
+import { installPracticeAccessibility } from './practice/practice-accessibility'
 import './style.css'
 import './styles/tokens.css'
 import './styles/typography.css'
@@ -16,6 +17,7 @@ import './styles/components.css'
 import './styles/ink-theme.css'
 import './styles/fidelity.css'
 import './styles/practice-reduction.css'
+import './styles/practice-accessibility.css'
 
 export default {
   Layout,
@@ -25,5 +27,6 @@ export default {
     installPracticeSafetyReduction()
     installPracticeReviewReduction()
     installPracticeStageReduction()
+    installPracticeAccessibility()
   }
 }
